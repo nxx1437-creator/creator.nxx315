@@ -5,43 +5,46 @@ import { SectionTitle, GlassCard } from "./ui.jsx";
 const ITEMS = [
   {
     Icon: Gift,
-    title: "Mỗi video một code xu",
-    text: "Video được duyệt nhận ngay một code xu riêng, chỉ bạn nhập được. Dùng xu để đổi quà trong cửa hàng Nxx315 Studio.",
+    title: "Phần thưởng tiền mặt & Gift Code",
+    text: "Top Creator có lượt view và tương tác cao nhất sẽ nhận tiền mặt chuyển thẳng qua Bank/Momo. Video đạt chuẩn nhận ngay code VIP dùng trên hệ thống.",
   },
   {
     Icon: ShieldCheck,
-    title: "Duyệt tay, công bằng",
-    text: "Admin xem từng video. Video không thuộc kênh bạn đã liên kết hoặc thiếu hashtag sẽ bị từ chối kèm lý do rõ ràng.",
+    title: "Hệ thống AI & Admin kiểm duyệt",
+    text: "Bot AI tự động quét view/tương tác 24/7. Đội ngũ Admin duyệt nội dung thủ công 100% để đảm bảo chất lượng, chặn đứng mọi hành vi spam.",
   },
   {
     Icon: RefreshCw,
-    title: "Tự quét kênh YouTube",
-    text: "Video mới đúng hashtag tự vào danh sách chờ duyệt, kèm lượt xem, lượt thích và bình luận được cập nhật.",
+    title: "Tracking minh bạch, chống buff",
+    text: "Kênh YouTube được quét tự động. Hệ thống sử dụng thuật toán gắt gao để lọc view ảo, bot like, đảm bảo sân chơi công bằng cho creator chân chính.",
   },
   {
     Icon: Trophy,
-    title: "Đua top mỗi tháng",
-    text: "Mỗi video được duyệt là 100 điểm. Bảng xếp hạng làm mới theo tháng, ai đứng đầu sẽ nhận giải thêm.",
+    title: "Leaderboard cập nhật liên tục",
+    text: "Điểm số được tính dựa trên lượng tương tác thực tế. Bảng xếp hạng làm mới mỗi ngày, minh bạch và công khai. Lên top bằng thực lực!",
   },
 ];
 
 export default function Features() {
   return (
-    <section id="quyen-loi" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-14">
+    <section id="quyen-loi" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-16">
       <SectionTitle
-        eyebrow="Quyền lợi"
-        title="Vì sao nên tham gia"
-        sub="Chương trình làm cho creator, minh bạch ở từng bước."
+        eyebrow="Vì sao chọn Nxx315"
+        title="Đặc quyền dành riêng cho Creator"
+        sub="Hệ sinh thái hoàn chỉnh giúp bạn vừa thỏa mãn đam mê sáng tạo, vừa tạo ra thu nhập thực tế."
       />
-      <div className="mt-10 grid gap-5 sm:grid-cols-2">
+      <div className="mt-12 grid gap-5 sm:grid-cols-2">
         {ITEMS.map(({ Icon, title, text }) => (
-          <GlassCard key={title} className="flex gap-4 p-6">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-400/10 text-cyan-300">
-              <Icon size={20} />
+          <GlassCard 
+            key={title} 
+            className="group flex gap-5 p-6 md:p-8 transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500/30 hover:shadow-[0_8px_30px_rgba(16,185,129,0.08)]"
+          >
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/5 bg-emerald-500/10 text-emerald-400 transition-colors group-hover:bg-emerald-500 group-hover:text-white">
+              <Icon size={22} />
             </span>
             <div>
-              <h3 className="text-base font-bold text-white">{title}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-slate-400">{text}</p>
+              <h3 className="text-lg font-bold text-white mb-2">{title}</h3>
+              <p className="text-sm leading-relaxed text-slate-400">{text}</p>
             </div>
           </GlassCard>
         ))}
