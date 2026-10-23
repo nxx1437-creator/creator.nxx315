@@ -12,10 +12,7 @@ export const timeAgo = (iso) => {
 
 export function Logo() {
   return (
-    <span className="text-xl font-black tracking-tight text-white flex items-center gap-2">
-      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500 text-white">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
-      </span>
+    <span className="text-xl font-black tracking-tight text-white">
       Nxx315 <span className="text-emerald-400">Creator</span>
     </span>
   );
