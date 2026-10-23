@@ -11,22 +11,13 @@ export const timeAgo = (iso) => {
   return `${Math.floor(s / 86400)} ngày trước`;
 };
 
-export function Logo({ size = 36 }) {
+export function Logo() {
   return (
-    <span className="flex items-center gap-2.5">
-      <span
-        style={{ width: size, height: size }}
-        className="flex items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 text-white shadow-lg shadow-cyan-500/20"
-      >
-        <Play size={size * 0.46} fill="currentColor" />
-      </span>
-      <span className="text-lg font-extrabold tracking-tight text-white">
-        Nxx315 <span className="text-cyan-400">Creator</span>
-      </span>
+    <span className="text-lg font-extrabold tracking-tight text-white">
+      Nxx315 <span className="text-cyan-400">Creator</span>
     </span>
   );
 }
-
 export function SectionTitle({ eyebrow, title, sub, center = true }) {
   return (
     <div className={center ? "text-center" : ""}>
