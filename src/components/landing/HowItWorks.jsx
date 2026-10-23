@@ -1,44 +1,50 @@
 import React from "react";
-import { Link2, Video, Gift } from "lucide-react";
+import { Link2, Video, ShieldCheck } from "lucide-react";
 import { SectionTitle, GlassCard } from "./ui.jsx";
 
 const STEPS = [
   {
+    id: "OP 01",
     Icon: Link2,
-    title: "Liên kết kênh của bạn",
-    text: "Dán link kênh TikTok hoặc YouTube. Hệ thống kiểm tra kênh có thật và lấy ảnh đại diện, bạn không phải cấp thêm quyền gì.",
+    title: "Kết nối kênh mạng xã hội",
+    text: "Dán link kênh TikTok hoặc YouTube của bạn. Hệ thống AI sẽ tự động nhận diện trong 30s, bạn giữ toàn quyền kiểm soát kênh của mình.",
   },
   {
+    id: "OP 02",
     Icon: Video,
-    title: "Đăng video kèm hashtag",
-    text: "Quay video giới thiệu Nxx315 Studio theo phong cách của bạn, gắn hashtag bắt buộc. Kênh YouTube được quét tự động, TikTok thì dán link video.",
+    title: "Sáng tạo Clip & Trải nghiệm",
+    text: "Quay video review, đánh giá độ mượt mà của Nxx315 Studio. Đăng tải kèm các hashtag bắt buộc để hệ thống tự động theo dõi lượt xem.",
   },
   {
-    Icon: Gift,
-    title: "Admin duyệt, nhận code xu",
-    text: "Mỗi video được xem tay. Đạt yêu cầu thì code xu hiện ngay trong lịch sử, nhập ở Ví trên Nxx315 Studio là nhận xu.",
+    id: "OP 03",
+    Icon: ShieldCheck,
+    title: "Duyệt nội dung & Nhận thưởng",
+    text: "Đội ngũ Admin duyệt thủ công. Video đạt chuẩn sẽ được cộng ngay Gift Code. Đua top Bảng Xếp Hạng để nhận tiền mặt mỗi tháng.",
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section id="cach-lam" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-14">
+    <section id="cach-lam" className="mx-auto max-w-5xl scroll-mt-20 px-4 py-16">
       <SectionTitle
-        eyebrow="Cách làm"
-        title="Ba bước, gọn nhẹ"
-        sub="Không cần đăng ký phức tạp. Liên kết kênh một lần, sau đó chỉ việc làm video."
+        eyebrow="Hành trình Creator"
+        title="Ba bước để cày rank"
+        sub="Quy trình tinh gọn, minh bạch và không giới hạn số lượng video."
       />
-      <div className="mt-10 grid gap-5 md:grid-cols-3">
-        {STEPS.map(({ Icon, title, text }, i) => (
-          <GlassCard key={title} className="relative overflow-hidden p-6">
-            <span className="pointer-events-none absolute -right-2 -top-4 text-8xl font-black text-white/[0.04]">
-              {i + 1}
-            </span>
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 text-white">
-              <Icon size={22} />
-            </span>
-            <h3 className="mt-5 text-lg font-bold text-white">{title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-400">{text}</p>
+      <div className="mt-12 space-y-4">
+        {STEPS.map(({ id, Icon, title, text }) => (
+          <GlassCard key={id} className="group relative overflow-hidden p-6 md:p-8 flex flex-col md:flex-row gap-6 items-start md:items-center transition-all hover:border-emerald-500/30">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+              <Icon size={28} />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500/70">{id}</span>
+                <div className="h-px w-8 bg-emerald-500/30"></div>
+              </div>
+              <h3 className="text-xl font-bold text-white">{title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-400">{text}</p>
+            </div>
           </GlassCard>
         ))}
       </div>
