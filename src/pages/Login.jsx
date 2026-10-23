@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Loader2, Film, Trophy, Gift, ShieldCheck, Play, Home, Globe } from "lucide-react";
+import { Loader2, Film, Trophy, Gift, ShieldCheck, Home, Globe } from "lucide-react";
 import { supabase, MAIN_SITE } from "../lib/supabaseClient.js";
-import { Logo } from "../components/landing/ui.jsx";
 
 function GoogleG() {
   return (
@@ -18,7 +17,7 @@ function GoogleG() {
 /* ---------- Hình trang trí ở các góc ---------- */
 function OrnScan() {
   return (
-    <svg width="92" height="92" viewBox="0 0 96 96" fill="none" aria-hidden="true">
+    <svg width="72" height="72" viewBox="0 0 96 96" fill="none" aria-hidden="true">
       <circle cx="48" cy="48" r="34" stroke="#22D3EE" strokeOpacity=".4" strokeWidth="2" strokeDasharray="2 7" />
       <circle cx="48" cy="48" r="21" stroke="#38BDF8" strokeOpacity=".5" />
       <path d="M43 39l16 9-16 9z" fill="#22D3EE" fillOpacity=".75" />
@@ -31,7 +30,7 @@ function OrnScan() {
 
 function OrnSparkle() {
   return (
-    <svg width="118" height="118" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+    <svg width="92" height="92" viewBox="0 0 120 120" fill="none" aria-hidden="true">
       <defs>
         <linearGradient id="spk" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#67E8F9" />
@@ -56,7 +55,7 @@ function OrnSparkle() {
 
 function OrnGem() {
   return (
-    <svg width="84" height="96" viewBox="0 0 84 96" fill="none" aria-hidden="true">
+    <svg width="64" height="74" viewBox="0 0 84 96" fill="none" aria-hidden="true">
       <defs>
         <linearGradient id="gm" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#A5F3FC" />
@@ -71,7 +70,7 @@ function OrnGem() {
 
 function OrnCoin() {
   return (
-    <svg width="104" height="104" viewBox="0 0 104 104" fill="none" aria-hidden="true">
+    <svg width="80" height="80" viewBox="0 0 104 104" fill="none" aria-hidden="true">
       <defs>
         <linearGradient id="cn" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#FDE68A" />
@@ -88,19 +87,19 @@ function OrnCoin() {
   );
 }
 
-/* ---------- Emblem giữa thẻ ---------- */
+/* ---------- Hình lục giác giữa thẻ ---------- */
 function Emblem() {
   return (
-    <div className="relative mx-auto h-36 w-36">
+    <div className="relative mx-auto h-24 w-24">
       <span className="absolute inset-0 animate-[spin_50s_linear_infinite] rounded-full border border-dashed border-cyan-400/25" />
-      <span className="absolute inset-3 animate-[spin_34s_linear_infinite_reverse] rounded-full border border-dotted border-cyan-400/25" />
-      <span className="absolute inset-8 rounded-full bg-cyan-400/10 blur-xl" />
-      <svg viewBox="0 0 100 100" className="absolute inset-[2.4rem]" fill="none" aria-hidden="true">
+      <span className="absolute inset-2 animate-[spin_34s_linear_infinite_reverse] rounded-full border border-dotted border-cyan-400/25" />
+      <span className="absolute inset-6 rounded-full bg-cyan-400/10 blur-lg" />
+      <svg viewBox="0 0 100 100" className="absolute inset-[1.6rem]" fill="none" aria-hidden="true">
         <path
           d="M50 4l38 22v48L50 96 12 74V26z"
           fill="#0E2236"
           stroke="#22D3EE"
-          strokeWidth="3"
+          strokeWidth="3.5"
           strokeLinejoin="round"
         />
         <path d="M43 36l22 14-22 14z" fill="#22D3EE" />
@@ -110,8 +109,8 @@ function Emblem() {
 }
 
 const PERKS = [
-  [Film, "Tự quét kênh YouTube"],
-  [Trophy, "Leo xếp hạng tháng"],
+  [Film, "Tự quét kênh"],
+  [Trophy, "Leo xếp hạng"],
   [Gift, "Nhận code xu"],
 ];
 
@@ -161,75 +160,73 @@ export default function Login() {
           backgroundSize: "34px 34px",
         }}
       />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[520px] bg-[radial-gradient(ellipse_at_top,rgba(34,211,238,0.14),transparent_65%)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-[radial-gradient(ellipse_at_top,rgba(34,211,238,0.14),transparent_65%)]" />
 
-      {/* Thanh trên cùng */}
-      <header className="relative mx-auto flex max-w-md items-center justify-between px-6 py-6">
-        <Link to="/">
-          <Logo size={34} />
+      {/* Thanh trên cùng: chỉ còn chữ */}
+      <header className="relative mx-auto flex max-w-md items-center justify-between px-6 py-4">
+        <Link to="/" className="text-lg font-extrabold tracking-tight text-white">
+          Nxx315 <span className="text-cyan-400">Creator</span>
         </Link>
         <div className="flex items-center gap-4 text-slate-300">
           <Link to="/" aria-label="Trang giới thiệu" className="transition hover:text-white">
-            <Home size={22} />
+            <Home size={21} />
           </Link>
           <a href={MAIN_SITE} aria-label="Nxx315 Studio" className="transition hover:text-white">
-            <Globe size={22} />
+            <Globe size={21} />
           </a>
         </div>
       </header>
 
-      <main className="relative mx-auto max-w-md px-6 pb-14 pt-4">
+      <main className="relative mx-auto max-w-md px-6 pb-8 pt-3">
         <div className="relative">
-          {/* Hình trang trí các góc */}
-          <span className="pointer-events-none absolute -left-4 top-8 z-0 opacity-90">
+          <span className="pointer-events-none absolute -left-3 top-5 z-0 opacity-90">
             <OrnScan />
           </span>
-          <span className="pointer-events-none absolute -right-5 -top-6 z-0">
+          <span className="pointer-events-none absolute -right-4 -top-5 z-0">
             <OrnSparkle />
           </span>
-          <span className="pointer-events-none absolute -left-6 bottom-20 z-0">
+          <span className="pointer-events-none absolute -left-4 bottom-16 z-0">
             <OrnGem />
           </span>
-          <span className="pointer-events-none absolute -bottom-7 -right-4 z-0">
+          <span className="pointer-events-none absolute -bottom-5 -right-3 z-0">
             <OrnCoin />
           </span>
 
-          <div className="relative z-10 rounded-[2rem] border border-white/10 bg-[#0A111E]/85 px-5 pb-7 pt-9 backdrop-blur-sm">
+          <div className="relative z-10 rounded-[1.75rem] border border-white/10 bg-[#0A111E]/90 px-5 pb-6 pt-6 backdrop-blur-sm">
             <Emblem />
 
             <div className="mt-3 flex justify-center">
-              <span className="inline-flex items-center gap-2.5 rounded-full border border-emerald-400/30 bg-emerald-400/5 px-5 py-2 font-mono text-[11px] uppercase tracking-[0.22em] text-emerald-300">
-                <span className="h-2 w-2 rounded-full bg-emerald-400" /> Kết nối an toàn
+              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/5 px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-emerald-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> Kết nối an toàn
               </span>
             </div>
 
-            <h1 className="mt-6 text-center font-mono text-[1.65rem] font-light uppercase leading-snug tracking-[0.14em] text-white">
-              Lối vào
-              <br />
-              Creator
+            <h1 className="mt-4 text-center font-mono text-xl font-light uppercase tracking-[0.12em] text-white">
+              Lối vào Creator
             </h1>
-            <p className="mx-auto mt-4 max-w-[17rem] text-center text-[15px] leading-relaxed text-slate-400">
+            <p className="mx-auto mt-2 max-w-[16rem] text-center text-[13px] leading-relaxed text-slate-400">
               Đăng nhập hoặc tạo tài khoản bằng một lần chạm.
             </p>
 
-            <div className="mt-7 grid grid-cols-3 gap-2.5">
+            <div className="mt-5 grid grid-cols-3 gap-2">
               {PERKS.map(([Icon, label]) => (
                 <div
                   key={label}
-                  className="flex flex-col items-center gap-3 rounded-[1.75rem] border border-white/10 px-2 pb-5 pt-5 text-center"
+                  className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 px-1.5 pb-3 pt-3.5 text-center"
                 >
-                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-cyan-400/10 text-cyan-300">
-                    <Icon size={21} />
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-400/10 text-cyan-300">
+                    <Icon size={18} />
                   </span>
-                  <span className="text-[12px] font-medium leading-tight text-slate-300">{label}</span>
+                  <span className="text-[11px] font-medium leading-tight text-slate-300">{label}</span>
                 </div>
               ))}
             </div>
 
+            {/* Nút Google vuông vức */}
             <button
               onClick={google}
               disabled={busy}
-              className="mt-7 flex w-full items-center justify-between rounded-full bg-white py-4 pl-7 pr-5 text-left shadow-lg shadow-black/30 transition hover:bg-slate-100 disabled:opacity-60"
+              className="mt-5 flex w-full items-center justify-between rounded-md border border-slate-300 bg-white px-5 py-3.5 text-left shadow-md shadow-black/30 transition hover:bg-slate-100 disabled:opacity-60"
             >
               <span className="text-[15px] font-bold text-slate-900">
                 {busy ? "Đang chuyển sang Google..." : "Tiếp tục với Google"}
@@ -239,18 +236,17 @@ export default function Login() {
 
             {error && <p className="mt-3 text-center text-xs font-semibold text-rose-300">{error}</p>}
 
-            <div className="mt-6 flex items-start gap-3 pr-10">
-              <ShieldCheck size={20} className="mt-0.5 shrink-0 text-cyan-400" />
-              <p className="text-[13px] leading-relaxed text-slate-400">
-                Chỉ dùng Google để biết bạn là ai. Không đọc email, không đăng bài thay bạn, không mật khẩu nào phải
-                nhớ.
+            <div className="mt-4 flex items-start gap-2.5">
+              <ShieldCheck size={18} className="mt-0.5 shrink-0 text-cyan-400" />
+              <p className="text-[12px] leading-relaxed text-slate-400">
+                Chỉ dùng Google để xác minh bạn là ai. Không đọc email, không đăng bài thay bạn.
               </p>
             </div>
           </div>
         </div>
 
-        <p className="mx-auto mt-10 max-w-xs text-center text-[11px] leading-relaxed text-slate-500">
-          Lần đầu đăng nhập, hệ thống tự tạo tài khoản. Tài khoản dùng chung với{" "}
+        <p className="mx-auto mt-7 max-w-xs text-center text-[11px] leading-relaxed text-slate-500">
+          Lần đầu đăng nhập, hệ thống tự tạo tài khoản, dùng chung với{" "}
           <a href={MAIN_SITE} className="font-semibold text-cyan-300">
             Nxx315 Studio
           </a>
@@ -259,4 +255,4 @@ export default function Login() {
       </main>
     </div>
   );
-        }
+              }
