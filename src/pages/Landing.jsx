@@ -13,6 +13,10 @@ import {
   Gift,
   Play,
   ShieldCheck,
+  Trophy,
+  Hash,
+  Gamepad2,
+  Zap
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient.js";
 import { Logo, fmtNum } from "../components/landing/ui.jsx";
@@ -121,9 +125,21 @@ function Hero({ hashtags }) {
   const tags = String(hashtags || "").split(/[\s,]+/).filter(Boolean);
   return (
     <section className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pb-12 pt-10 md:grid-cols-2 md:pt-20 md:gap-16">
+      
+      {/* HỌA TIẾT NỀN MỜ (Giống ảnh mẫu) */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden z-0">
+        <Gamepad2 className="absolute -left-10 top-10 h-32 w-32 text-white/[0.03] rotate-12" />
+        <Zap className="absolute right-10 top-40 h-40 w-40 text-emerald-500/[0.03] -rotate-12" />
+      </div>
+
       <div className="relative z-10 flex flex-col items-start">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-emerald-400">
-          <Sparkles size={13} /> Hệ sinh thái Gaming Creator
+        {/* Badge có thêm icon nhỏ xíu giống ảnh 2 */}
+        <span className="relative inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-emerald-400">
+          <Sparkles size={13} /> 
+          Hệ sinh thái Gaming Creator
+          <span className="absolute -left-2 -top-2 text-emerald-500/50">
+            <Gamepad2 size={16} />
+          </span>
         </span>
         
         <h1 className="mt-5 text-[2.5rem] leading-[1.15] font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
@@ -140,7 +156,10 @@ function Hero({ hashtags }) {
 
         {tags.length > 0 && (
           <div className="mt-6 flex flex-wrap items-center gap-2">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500 w-full sm:w-auto mb-1 sm:mb-0">Gắn hashtag:</span>
+            {/* Thêm icon Hash nhỏ trước chữ GẮN HASHTAG */}
+            <span className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-slate-500 w-full sm:w-auto mb-1 sm:mb-0">
+              <Hash size={12} /> Gắn hashtag:
+            </span>
             {tags.map((t) => (
               <span
                 key={t}
@@ -157,12 +176,17 @@ function Hero({ hashtags }) {
             to="/login"
             className="group flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 py-3.5 text-sm sm:text-base font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-400 hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] w-full sm:w-auto"
           >
-            Gia nhập ngay <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            {/* Thêm icon Sparkles giống nút "Gia nhập Biệt Đội" ở ảnh 2 */}
+            <Sparkles size={18} className="text-white" />
+            Gia nhập ngay 
+            <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
           </Link>
           <a
             href="#ranking"
-            className="flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-6 py-3.5 text-sm sm:text-base font-bold text-white transition-colors hover:bg-white/10 w-full sm:w-auto"
+            className="flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3.5 text-sm sm:text-base font-bold text-white transition-colors hover:bg-white/10 w-full sm:w-auto"
           >
+            {/* Thêm icon Cúp Vàng giống nút "Xem Bảng Xếp Hạng" ở ảnh 2 */}
+            <Trophy size={18} className="text-amber-400" />
             Xem Bảng Xếp Hạng
           </a>
         </div>
@@ -205,7 +229,10 @@ export default function Landing() {
   const stats = usePublicStats();
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#0a1214] text-slate-100 font-sans selection:bg-emerald-500/30">
+      
+      {/* Nền chuyển màu xanh thẫm (Gradient) giống ảnh mẫu 2, thay vì màu đen tuyền */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute top-0 inset-x-0 h-[600px] bg-gradient-to-b from-[#0d211d] to-[#0a1214] opacity-80" />
         <div className="absolute top-[-10%] left-[-10%] h-[300px] w-[300px] sm:h-[500px] sm:w-[500px] rounded-full bg-emerald-500/10 blur-[100px] sm:blur-[120px]" />
         <div className="absolute top-[20%] right-[-10%] h-[300px] w-[300px] sm:h-[400px] sm:w-[400px] rounded-full bg-teal-500/10 blur-[80px] sm:blur-[100px]" />
       </div>
@@ -225,4 +252,4 @@ export default function Landing() {
       <Footer />
     </div>
   );
-      }
+            }
