@@ -36,9 +36,8 @@ export function FinalCta() {
           </p>
 
           {/* Tiêu đề chính */}
-          <h2 className="mx-auto max-w-3xl text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-white">
-  Sẵn sàng
-  <br />
+          <h2 className="whitespace-nowrap text-center text-[clamp(1.65rem,6vw,3.75rem)] font-bold tracking-tight text-white">
+  Sẵn sàng{" "}
   <span className="bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 bg-clip-text text-transparent">
     lên sóng?
   </span>
