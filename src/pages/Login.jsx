@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Loader2, Film, Trophy, Gift, ShieldCheck, Home, Globe } from "lucide-react";
 import { supabase, MAIN_SITE } from "../lib/supabaseClient.js";
@@ -11,6 +11,116 @@ function GoogleG() {
       <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z" />
       <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.3-.4-3.9z" />
     </svg>
+  );
+}
+
+/* ---------- Nút đăng nhập Google do chính Google hiển thị ---------- */
+const GIS_SRC = "https://accounts.google.com/gsi/client";
+
+function loadGis() {
+  return new Promise((resolve, reject) => {
+    if (window.google?.accounts?.id) return resolve(window.google);
+    const done = () =>
+      window.google?.accounts?.id ? resolve(window.google) : reject(new Error("gis"));
+    const existing = document.querySelector(`script[src="${GIS_SRC}"]`);
+    if (existing) {
+      existing.addEventListener("load", done);
+      existing.addEventListener("error", () => reject(new Error("gis")));
+      return;
+    }
+    const s = document.createElement("script");
+    s.src = GIS_SRC;
+    s.async = true;
+    s.defer = true;
+    s.onload = done;
+    s.onerror = () => reject(new Error("gis"));
+    document.head.appendChild(s);
+  });
+}
+
+function GoogleSignIn({ setBusy, setError, onFallback }) {
+  const boxRef = useRef(null);
+  const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        let clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+        if (!clientId) {
+          const { data } = await supabase.functions.invoke("public-config");
+          clientId = data?.google_client_id;
+        }
+        if (!clientId) throw new Error("no client id");
+        const google = await loadGis();
+        if (!alive || !boxRef.current) return;
+
+        google.accounts.id.initialize({
+          client_id: clientId,
+          ux_mode: "popup",
+          auto_select: false,
+          callback: async (resp) => {
+            setBusy(true);
+            setError("");
+            const { error } = await supabase.auth.signInWithIdToken({
+              provider: "google",
+              token: resp.credential,
+            });
+            if (error) {
+              setBusy(false);
+              setError(error.message || "Không đăng nhập được bằng Google.");
+            }
+          },
+        });
+        const w = boxRef.current.clientWidth || boxRef.current.parentElement?.clientWidth || 300;
+        google.accounts.id.renderButton(boxRef.current, {
+          type: "standard",
+          theme: "outline",
+          size: "large",
+          text: "continue_with",
+          shape: "pill",
+          logo_alignment: "left",
+          locale: "vi",
+          width: Math.max(200, Math.min(400, Math.floor(w))),
+        });
+        setReady(true);
+      } catch {
+        if (alive) setFailed(true);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [setBusy, setError]);
+
+  if (failed) {
+    return (
+      <button
+        onClick={onFallback}
+        className="mt-5 flex w-full items-center justify-between rounded-md border border-slate-300 bg-white px-5 py-3.5 text-left shadow-md shadow-black/30"
+      >
+        <span className="text-[15px] font-bold text-slate-900">Tiếp tục với Google</span>
+        <GoogleG />
+      </button>
+    );
+  }
+
+  return (
+    <div className="mt-5">
+      <div className="rounded-md bg-white p-2.5 shadow-md shadow-black/30">
+        <div ref={boxRef} className="flex min-h-[44px] w-full justify-center" />
+        {!ready && (
+          <p className="pb-1 text-center text-xs text-slate-500">Đang tải đăng nhập Google...</p>
+        )}
+      </div>
+      <button
+        onClick={onFallback}
+        className="mt-2 w-full text-center text-[11px] text-slate-500 underline"
+      >
+        Không thấy tài khoản? Dùng cách đăng nhập khác
+      </button>
+    </div>
   );
 }
 
@@ -137,6 +247,7 @@ export default function Login() {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
+  // Đường dự phòng: chuyển trang sang Google rồi quay lại
   const google = async () => {
     setBusy(true);
     setError("");
@@ -162,7 +273,6 @@ export default function Login() {
       />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-[radial-gradient(ellipse_at_top,rgba(34,211,238,0.14),transparent_65%)]" />
 
-      {/* Thanh trên cùng: chỉ còn chữ */}
       <header className="relative mx-auto flex max-w-md items-center justify-between px-6 py-4">
         <Link to="/" className="text-lg font-extrabold tracking-tight text-white">
           Nxx315 <span className="text-cyan-400">Creator</span>
@@ -222,18 +332,13 @@ export default function Login() {
               ))}
             </div>
 
-            {/* Nút Google vuông vức */}
-            <button
-              onClick={google}
-              disabled={busy}
-              className="mt-5 flex w-full items-center justify-between rounded-md border border-slate-300 bg-white px-5 py-3.5 text-left shadow-md shadow-black/30 transition hover:bg-slate-100 disabled:opacity-60"
-            >
-              <span className="text-[15px] font-bold text-slate-900">
-                {busy ? "Đang chuyển sang Google..." : "Tiếp tục với Google"}
-              </span>
-              {busy ? <Loader2 size={20} className="animate-spin text-slate-500" /> : <GoogleG />}
-            </button>
+            <GoogleSignIn setBusy={setBusy} setError={setError} onFallback={google} />
 
+            {busy && (
+              <p className="mt-3 flex items-center justify-center gap-2 text-xs text-slate-400">
+                <Loader2 size={14} className="animate-spin" /> Đang đăng nhập...
+              </p>
+            )}
             {error && <p className="mt-3 text-center text-xs font-semibold text-rose-300">{error}</p>}
 
             <div className="mt-4 flex items-start gap-2.5">
@@ -255,4 +360,4 @@ export default function Login() {
       </main>
     </div>
   );
-              }
+}
