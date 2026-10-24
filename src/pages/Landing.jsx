@@ -142,13 +142,13 @@ function Hero({ hashtags }) {
           </span>
         </span>
         
-        <h1 className="mt-5 text-[2.5rem] leading-[1.15] font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
-          Chơi game. <br className="hidden sm:block" />Quay clip.
-          <br />
-          <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 bg-clip-text text-transparent drop-shadow-sm">
-            Biến view thành tiền.
-          </span>
-        </h1>
+        <h1 className="mt-6 text-4xl leading-[1.1] font-black tracking-tight text-white sm:text-5xl lg:text-6xl relative">
+  Chơi game. Quay clip.
+  <br />
+  <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+    Biến view thành<br className="hidden sm:block" /> tiền.
+  </span>
+</h1>
         
         <p className="mt-5 max-w-xl text-sm leading-relaxed text-slate-400 sm:text-base">
           Dành cho các Gamer và Creator đam mê sáng tạo. Làm video review/trải nghiệm trên Nxx315 Studio, đua top bảng xếp hạng để nhận <strong className="text-white">ngày dùng VIP</strong> và <strong className="text-white">tiền mặt cực khủng</strong> mỗi tháng.
