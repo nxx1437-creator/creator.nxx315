@@ -36,13 +36,13 @@ export function FinalCta() {
           </p>
 
           {/* Tiêu đề chính */}
-          <h2 className="mx-auto max-w-3xl text-4xl font-black leading-[1.15] tracking-tight text-white sm:text-5xl lg:text-6xl">
-            Sẵn sàng
-            <br />
-            <span className="bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 bg-clip-text text-transparent">
-              lên sóng?
-            </span>
-          </h2>
+          <h2 className="mx-auto max-w-3xl text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-white">
+  Sẵn sàng
+  <br />
+  <span className="bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 bg-clip-text text-transparent">
+    lên sóng?
+  </span>
+</h2>
 
           {/* Mô tả */}
           <p className="mx-auto mt-7 max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg">
