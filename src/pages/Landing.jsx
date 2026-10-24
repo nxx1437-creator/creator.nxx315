@@ -142,12 +142,12 @@ function Hero({ hashtags }) {
           </span>
         </span>
         
-        <h1 className="mt-6 font-black tracking-tight text-white relative flex flex-col gap-1">
-  <span className="text-[8vw] sm:text-5xl lg:text-6xl leading-[1.1] whitespace-nowrap">
+        <h1 className="mt-6 text-[2.6rem] sm:text-5xl lg:text-6xl font-black tracking-tight text-white relative flex flex-col gap-1">
+  <span className="leading-[1.1]">
     Chơi game. Quay clip.
   </span>
-  <span className="text-[2.1rem] sm:text-5xl lg:text-6xl leading-[1.15] bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-    Biến view thành <br className="sm:hidden" /> tiền.
+  <span className="leading-[1.1] bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+    Biến view thành tiền.
   </span>
 </h1>
       
