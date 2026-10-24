@@ -18,7 +18,9 @@ export function FinalCta() {
 
         <div className="relative z-10">
           <p className="mb-3 text-xs font-bold uppercase tracking-widest text-emerald-400">Chinh phục đỉnh cao</p>
-          <h2 className="text-3xl font-black uppercase text-white md:text-4xl lg:text-5xl drop-shadow-md">Sẵn sàng lên sóng?</h2>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white drop-shadow-md leading-tight">
+         Sẵn sàng lên sóng?
+          </h2>
           <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-slate-400 md:text-base">
             Tham gia cộng đồng Creator. Đăng ký miễn phí, không giới hạn số video. Khẳng định đẳng cấp ngay hôm nay.
           </p>
