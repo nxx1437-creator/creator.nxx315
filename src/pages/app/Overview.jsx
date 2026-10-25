@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { ExternalLink, ChevronRight } from "lucide-react";
-import { 
-  Send, Trophy, Timer, CheckCircle2, Film, Bell, Play, Eye, Heart, MessageSquare, Share2, Clock, AlertCircle, Gift 
-} from "lucide-react";
+import { Send, Trophy, Film, Gift, ArrowRight } from "lucide-react";
 import useSession from "../../hooks/useSession.js";
 import { Card, PLATFORMS, getTier } from "../../components/creator/creatorUi.jsx";
 
@@ -130,7 +128,7 @@ export default function Overview() {
            <div className="flex items-center gap-2 text-amber-700 text-xs font-bold">
              <Gift size={16} /> TỔNG GIẢI THƯỞNG
            </div>
-           <span className="text-sm font-bold text-amber-700">1,750,000Đ + 900H</span>
+           <span className="text-sm font-bold text-amber-700"> 35,000 xu</span>
         </div>
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 mb-6 flex items-center justify-between">
            <div className="flex items-center gap-2 text-emerald-700 text-xs font-bold">
@@ -283,55 +281,7 @@ export default function Overview() {
          </Card>
       </div>
 
-      {/* 6. VỪA NHẬN THƯỞNG (Giống ảnh 4) */}
-      <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/70 p-5 shadow-sm backdrop-blur-md">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50 text-emerald-500"><Gift size={16}/></div>
-             <div>
-               <h3 className="text-sm font-bold text-slate-800">Vừa nhận thưởng</h3>
-               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">GIỜ VỪA ĐƯỢC CỘNG CHO CREATOR</p>
-             </div>
-          </div>
-          <button className="text-[10px] font-bold text-cyan-600 flex items-center gap-1">XEM TẤT CẢ <ChevronRight size={12}/></button>
-        </div>
-
-        <div className="rounded-xl border border-cyan-200 bg-cyan-50/50 p-4 flex items-center justify-between mb-4">
-           <div className="flex items-center gap-2 text-cyan-700 text-xs font-bold">
-             <Trophy size={16} /> TỔNG GIỜ ĐÃ TĂNG
-           </div>
-           <div className="flex items-end gap-1">
-             <span className="text-xl font-black text-cyan-600">83.250</span>
-             <span className="text-[10px] font-bold text-cyan-600 mb-1">GIỜ</span>
-           </div>
-        </div>
-
-        <div className="space-y-3">
-           {[
-             {name: "quan0806", initial: "Q", color: "bg-blue-600", time: "+6 giờ", date: "Hôm qua", title: "Quân Văn hahh #xcloudphone #clo..."},
-             {name: "phunggay", initial: "H", color: "bg-fuchsia-500", time: "+6 giờ", date: "Hôm qua", title: "HiyH ai đang tìm giải pháp ..."},
-             {name: "phunggay", initial: "H", color: "bg-fuchsia-500", time: "+6 giờ", date: "Hôm qua", title: "HiyH xcloudphone là giải phá..."},
-             {name: "phunggay", initial: "H", color: "bg-fuchsia-500", time: "+6 giờ", date: "Hôm qua", title: "HiyH treo steal an egg trên..."}
-           ].map((item, idx) => (
-             <div key={idx} className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                   <div className={`h-10 w-10 rounded-full flex items-center justify-center text-white font-bold text-sm ${item.color}`}>
-                      {item.initial}
-                   </div>
-                   <div className="min-w-0">
-                      <p className="text-sm font-bold text-slate-800">{item.name}</p>
-                      <p className="text-[11px] text-slate-500 truncate max-w-[150px]">{item.title}</p>
-                   </div>
-                </div>
-                <div className="text-right shrink-0">
-                   <span className="inline-block rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-bold text-white">{item.time}</span>
-                   <p className="text-[9px] text-slate-400 mt-1">{item.date}</p>
-                </div>
-             </div>
-           ))}
-        </div>
-      </Card>
-
+    
       {/* 7. VÀO DISCORD */}
       <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/70 p-5 shadow-sm backdrop-blur-md">
          <div className="flex items-start gap-3">
@@ -340,7 +290,7 @@ export default function Overview() {
             </div>
             <div>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">CỘNG ĐỒNG</p>
-              <h3 className="text-[15px] font-bold text-slate-800">Vào Discord creator XCloudPhone</h3>
+              <h3 className="text-[15px] font-bold text-slate-800">Vào Discord creator </h3>
               <p className="mt-1 text-[13px] text-slate-600 leading-relaxed mb-4">
                 Thông báo campaign, tin trả thưởng và hỗ trợ trực tiếp từ team — kèm /rank và /stats ngay trong Discord sau khi bạn liên kết tài khoản.
               </p>
