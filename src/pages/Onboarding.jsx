@@ -218,31 +218,32 @@ export default function Onboarding() {
   };
 
   const handleFinish = async () => {
-    setErrorMsg("");
-    if (youtubeUrl && !ytPreview) {
-      const res = await verifyChannel("youtube", youtubeUrl);
-      if (!res) return; 
-    }
-    if (tiktokUrl && !ttPreview) {
-      const res = await verifyChannel("tiktok", tiktokUrl);
-      if (!res) return; 
-    }
-    localStorage.removeItem("onboarding_step");
-    navigate("/app", { replace: true });
-  };
-
-  const skipAndFinish = () => {
-    localStorage.removeItem("onboarding_step");
-    navigate("/app", { replace: true });
-  };
-
-  if (isCheckingAuth) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#f4fbf9] to-[#e6f7fa]">
-        <Loader2 size={32} className="animate-spin text-cyan-600" />
-      </div>
-    );
+  setErrorMsg("");
+  if (youtubeUrl && !ytPreview) {
+    const res = await verifyChannel("youtube", youtubeUrl);
+    if (!res) return; 
   }
+  if (tiktokUrl && !ttPreview) {
+    const res = await verifyChannel("tiktok", tiktokUrl);
+    if (!res) return; 
+  }
+  
+  // LƯU CỜ ĐÁNH DẤU ĐÃ HOÀN THÀNH ONBOARDING
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) localStorage.setItem(`onboarded_${user.id}`, "true");
+  
+  localStorage.removeItem("onboarding_step");
+  navigate("/app", { replace: true });
+};
+
+const skipAndFinish = async () => {
+  // LƯU CỜ KHI BẤM BỎ QUA
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) localStorage.setItem(`onboarded_${user.id}`, "true");
+  
+  localStorage.removeItem("onboarding_step");
+  navigate("/app", { replace: true });
+};
 
   // --- CÁC BƯỚC RENDER ---
 
