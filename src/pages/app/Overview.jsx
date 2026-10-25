@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { Send, Trophy, Timer, ScrollText, CheckCircle2, ChevronRight, Film, AlertCircle } from "lucide-react";
 import useSession from "../../hooks/useSession.js";
-import { Card, Eyebrow, StatusPill, PLATFORMS, getTier, Avatar } from "../../components/creator/creatorUi.jsx";
+import { Card, Eyebrow, StatusPill, PLATFORMS, getTier } from "../../components/creator/creatorUi.jsx";
 
 const pad = (n) => String(n).padStart(2, "0");
 
@@ -51,24 +51,43 @@ export default function Overview() {
       {/* Card Profile & Quick Actions */}
       <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/80 p-5 shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="relative">
-            <Avatar src={profile?.avatar_url} name={profile?.username} size={64} className="border-2 border-emerald-100 shadow-sm" />
-            <span className="absolute -bottom-1 -right-1 rounded-full bg-slate-700 px-2 py-0.5 text-[8px] font-bold text-white uppercase">Common</span>
+          
+          {/* KHỐI AVATAR MẪU - BOTTS NEUTRAL */}
+          <div className="relative shrink-0">
+            <div className="h-20 w-20 rounded-full border-[3px] border-slate-200 overflow-hidden bg-cyan-50 shadow-sm">
+              <img 
+                // Đã đổi sang API Bottts Neutral và cài đặt màu xanh cho hợp theme
+                src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Nxx315&backgroundColor=transparent&baseColor=cyan" 
+                alt="Avatar" 
+                className="h-full w-full object-cover"
+              />
+            </div>
+            {/* Nhãn COMMON đè lên dưới */}
+            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-md bg-slate-600 px-2 py-0.5 text-[9px] font-bold tracking-widest text-white uppercase shadow-sm whitespace-nowrap">
+              🔍 COMMON
+            </span>
           </div>
-          <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-mono text-[9px] tracking-widest text-emerald-600">
+
+          <div className="flex-1">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-mono text-[9px] font-bold tracking-widest text-emerald-600">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> CREATOR HQ · LIVE
             </span>
-            <p className="mt-1 text-xs text-slate-500">{greet}</p>
-            <h1 className="text-2xl font-extrabold text-cyan-600">{profile?.username || "Creator"}</h1>
+            <p className="mt-1.5 text-[13px] text-slate-500">{greet}</p>
+            <h1 className="text-2xl font-extrabold text-cyan-600 truncate">{profile?.username || "Creator"}</h1>
+            
+            <p className="mt-1.5 font-mono text-[9px] font-bold tracking-widest text-slate-400">
+              ▸ HUD NHIỆM VỤ CỦA BẠN —<br/>30 NGÀY GẦN NHẤT.
+            </p>
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-5 flex flex-wrap gap-2">
           {ov.channels.length > 0 ? (
              ov.channels.map((c) => (
               <span key={c.platform} className="flex items-center gap-2 rounded-full border border-slate-200 bg-white py-1 pl-1 pr-3 text-xs text-slate-700 shadow-sm">
-                <Avatar src={c.avatar} name={c.name} size={24} />
+                <div className="h-6 w-6 rounded-full overflow-hidden border border-slate-200">
+                  <img src={c.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${c.name}`} alt="" className="h-full w-full object-cover" />
+                </div>
                 <span className="max-w-[130px] truncate">{c.name || c.handle}</span>
               </span>
             ))
@@ -93,7 +112,7 @@ export default function Overview() {
       <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/80 p-5 shadow-sm">
         <div className="flex items-center justify-between">
           <Eyebrow className="!text-slate-500 font-bold">{tier.name}</Eyebrow>
-          <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 font-mono text-[10px] tracking-widest text-emerald-600">
+          <span className={`rounded-full border px-3 py-1 font-mono text-[10px] tracking-widest ${ov.pending > 0 ? "border-amber-200 bg-amber-50 text-amber-600" : "border-emerald-200 bg-emerald-50 text-emerald-600"}`}>
             {ov.pending > 0 ? "● ĐANG CHỜ DUYỆT" : "● IDLE"}
           </span>
         </div>
@@ -199,4 +218,4 @@ export default function Overview() {
       </div>
     </div>
   );
-              }
+  }
