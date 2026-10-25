@@ -2,10 +2,14 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Trophy, Film, Gift, Settings, Loader2, AlertTriangle,
-  Download, Search, Bell, Globe, LogOut, User, X
+  Download, Search, Bell, Globe, LogOut, User
 } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
 import useSession from "../../hooks/useSession.js";
+
+// Import 2 component vừa tách
+import SearchModal from "../../components/SearchModal.jsx";
+import NotificationDropdown from "../../components/NotificationDropdown.jsx";
 
 const TABS = [
   { to: "/app", end: true, label: "TỔNG QUAN", Icon: LayoutDashboard },
@@ -55,15 +59,14 @@ export default function AppLayout() {
   const [loading, setLoading] = useState(true);
   const [synced, setSynced] = useState(false);
 
-  // State cho các menu thả xuống
+  // State quản lý đóng/mở
   const [showLang, setShowLang] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  const [showSearch, setShowSearch] = useState(false);
-  const [showNotify, setShowNotify] = useState(false);
+  const [showSearch, setShowSearch] = useState(false); 
+  const [showNotify, setShowNotify] = useState(false); 
   
   const langRef = useRef(null);
   const profileRef = useRef(null);
-  const searchRef = useRef(null);
   const notifyRef = useRef(null);
 
   const reload = useCallback(async () => {
@@ -76,12 +79,11 @@ export default function AppLayout() {
     reload();
   }, [reload]);
 
-  // Đóng menu khi click ra ngoài
+  // Đóng menu khi click ra ngoài (chỉ áp dụng cho thông báo, ngôn ngữ, profile)
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (langRef.current && !langRef.current.contains(event.target)) setShowLang(false);
       if (profileRef.current && !profileRef.current.contains(event.target)) setShowProfile(false);
-      if (searchRef.current && !searchRef.current.contains(event.target)) setShowSearch(false);
       if (notifyRef.current && !notifyRef.current.contains(event.target)) setShowNotify(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -110,13 +112,15 @@ export default function AppLayout() {
     <div className="min-h-screen bg-gradient-to-b from-[#f4fbf9] to-[#e6f7fa] pb-28 text-slate-800 font-sans">
       <div className="pointer-events-none fixed inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(0,0,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
 
+      {/* Gọi Modal Tìm kiếm */}
+      {showSearch && <SearchModal onClose={() => setShowSearch(false)} />}
+
       <header className="sticky top-0 z-50 border-b border-white/50 bg-[#f4fbf9]/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-md items-center justify-between px-4 py-3 md:max-w-3xl">
           
           <Nxx315Logo />
 
           <div className="flex items-center gap-3 sm:gap-4 text-slate-600">
-            {/* Nút Tải xuống (Chỉ hiện trên PC) */}
             <button 
               onClick={() => alert("Tính năng tải App đang được phát triển!")}
               className="hidden sm:block hover:text-slate-900"
@@ -124,46 +128,19 @@ export default function AppLayout() {
               <Download size={20} />
             </button>
 
-            {/* Nút Tìm kiếm */}
-            <div className="relative" ref={searchRef}>
-              <button onClick={() => { setShowSearch(!showSearch); setShowNotify(false); }} className="hover:text-slate-900 flex items-center">
-                <Search size={20} />
-              </button>
-              {showSearch && (
-                <div className="absolute right-0 mt-3 w-64 rounded-2xl border border-slate-100 bg-white p-3 shadow-xl animate-in fade-in slide-in-from-top-2">
-                  <div className="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-2 border border-slate-200">
-                    <Search size={16} className="text-slate-400" />
-                    <input 
-                      type="text" 
-                      placeholder="Tìm kiếm video, creator..." 
-                      className="bg-transparent text-sm w-full outline-none text-slate-700 placeholder:text-slate-400"
-                      autoFocus
-                    />
-                  </div>
-                  <p className="mt-2 text-center text-xs text-slate-400">Tính năng đang phát triển</p>
-                </div>
-              )}
-            </div>
+            <button onClick={() => setShowSearch(true)} className="hover:text-slate-900 flex items-center">
+              <Search size={20} />
+            </button>
 
             {/* Nút Thông báo */}
             <div className="relative" ref={notifyRef}>
-              <button onClick={() => { setShowNotify(!showNotify); setShowSearch(false); }} className="hover:text-slate-900 flex items-center relative">
+              <button onClick={() => setShowNotify(!showNotify)} className="hover:text-slate-900 flex items-center relative">
                 <Bell size={20} />
-                {/* Chấm đỏ thông báo (nếu có) */}
                 <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-rose-500 border border-white"></span>
               </button>
-              {showNotify && (
-                <div className="absolute right-0 mt-3 w-64 rounded-2xl border border-slate-100 bg-white py-2 shadow-xl animate-in fade-in slide-in-from-top-2">
-                  <div className="px-4 py-2 border-b border-slate-100 flex justify-between items-center">
-                    <p className="font-bold text-slate-800">Thông báo</p>
-                    <X size={16} className="text-slate-400 cursor-pointer" onClick={() => setShowNotify(false)} />
-                  </div>
-                  <div className="flex flex-col items-center justify-center py-6 text-slate-400">
-                    <Bell size={32} className="mb-2 opacity-50" />
-                    <p className="text-sm">Chưa có thông báo nào.</p>
-                  </div>
-                </div>
-              )}
+              
+              {/* Gọi Dropdown Thông báo */}
+              {showNotify && <NotificationDropdown onClose={() => setShowNotify(false)} />}
             </div>
             
             {/* Nút Ngôn ngữ */}
@@ -179,7 +156,7 @@ export default function AppLayout() {
               )}
             </div>
 
-            {/* Nút Avatar / Profile */}
+            {/* Nút Profile */}
             <div className="relative" ref={profileRef}>
               <button onClick={() => setShowProfile(!showProfile)} className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-slate-200 shadow-sm">
                 {session?.user?.user_metadata?.avatar_url ? (
@@ -261,4 +238,5 @@ export default function AppLayout() {
       </nav>
     </div>
   );
-    }
+                    }
+
