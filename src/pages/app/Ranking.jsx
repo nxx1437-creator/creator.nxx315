@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Loader2, Trophy } from "lucide-react";
+import { Trophy } from "lucide-react"; // Đã xóa Loader2
 import { supabase } from "../../lib/supabaseClient.js";
 import { Card, Eyebrow } from "../../components/creator/creatorUi.jsx";
 
@@ -12,8 +12,52 @@ export default function Ranking() {
     supabase.rpc("get_creator_leaderboard").then(({ data: d }) => setData(d?.ok ? d : { items: [], me: null }));
   }, []);
 
+  // SKELETON KHI ĐANG TẢI (Mô phỏng đúng bố cục trang Rank)
   if (!data) {
-  return <div className="h-40"></div>; // Khung trống
+    return (
+      <div className="space-y-4 animate-pulse">
+        {/* Skeleton Header */}
+        <div className="px-1 mb-4">
+          <div className="h-5 w-24 rounded-full bg-slate-200 mb-2"></div>
+          <div className="h-8 w-48 rounded bg-slate-200 mb-2"></div>
+          <div className="h-4 w-64 rounded bg-slate-200"></div>
+        </div>
+
+        {/* Skeleton Card Hạng của bạn */}
+        <div className="rounded-[2rem] border border-white bg-white/80 p-5 shadow-sm">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="h-4 w-4 rounded-full bg-slate-200"></div>
+            <div className="h-4 w-24 rounded bg-slate-200"></div>
+          </div>
+          <div className="flex flex-col items-center py-4 space-y-3">
+            <div className="h-16 w-32 rounded bg-slate-200"></div>
+            <div className="h-4 w-40 rounded bg-slate-200"></div>
+            <div className="h-5 w-24 rounded bg-slate-200"></div>
+          </div>
+          <div className="mt-6 grid grid-cols-2 gap-4 border-t border-slate-100 pt-4">
+            <div className="flex flex-col items-center space-y-2">
+              <div className="h-3 w-16 rounded bg-slate-200"></div>
+              <div className="h-6 w-12 rounded bg-slate-200"></div>
+            </div>
+            <div className="flex flex-col items-center space-y-2">
+              <div className="h-3 w-16 rounded bg-slate-200"></div>
+              <div className="h-6 w-12 rounded bg-slate-200"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Skeleton Card Danh sách */}
+        <div className="rounded-[2rem] border border-white bg-white/80 p-5 shadow-sm">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="flex items-center gap-3 px-3 py-3 border-b border-slate-100 last:border-0">
+              <div className="h-8 w-8 rounded-full bg-slate-200"></div>
+              <div className="h-5 flex-1 rounded bg-slate-200"></div>
+              <div className="h-5 w-12 rounded bg-slate-200"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
   
   return (
@@ -75,4 +119,4 @@ export default function Ranking() {
       </Card>
     </div>
   );
-                  }
+                                                                                             }
