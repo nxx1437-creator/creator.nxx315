@@ -78,7 +78,7 @@ export default function Overview() {
           <div className="relative shrink-0">
             <div className="h-20 w-20 rounded-full border-[3px] border-slate-200 overflow-hidden bg-white shadow-sm flex items-center justify-center relative">
               <img 
-  src={`https://api.dicebear.com/7.x/micah/svg?seed=${profile?.username || 'Nxx315'}&radius=50&backgroundColor=e2e8f0`} 
+  src={`https://api.dicebear.com/7.x/thumbs/svg?seed=${profile?.username || 'Nxx315'}&radius=50&backgroundColor=e2e8f0`} 
   alt="Avatar" 
   className="h-full w-full object-cover" 
 />
