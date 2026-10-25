@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { Send, Trophy, Film, Gift, Clock, ArrowRight } from "lucide-react";
+import { Send, Trophy, Film, Gift, ArrowRight } from "lucide-react";
 import useSession from "../../hooks/useSession.js";
 import { Card, PLATFORMS, getTier } from "../../components/creator/creatorUi.jsx";
 
@@ -9,8 +9,10 @@ export default function Overview() {
   const { ov } = useOutletContext(); 
   const { profile } = useSession();
 
-  // Nếu chưa có dữ liệu, hiện khoảng trắng (không hiện vòng xoay)
-  if (!ov) return <div className="h-screen bg-[#f4fbf9]"></div>;
+  // Nếu chưa có dữ liệu, trả về một khoảng trắng (không hiện vòng xoay)
+  if (!ov) {
+    return <div className="h-screen bg-[#f4fbf9]"></div>;
+  }
 
   const hour = new Date().getHours();
   const greet = hour < 11 ? "Chào buổi sáng" : hour < 18 ? "Chào buổi chiều" : "Chào buổi tối";
@@ -49,7 +51,7 @@ export default function Overview() {
         </button>
       </Card>
 
-      {/* 2. THỐNG KÊ NHANH (Dựa trên API thực tế) */}
+      {/* 2. THỐNG KÊ NHANH */}
       <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/80 p-5 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500">
@@ -144,4 +146,4 @@ export default function Overview() {
 
     </div>
   );
-}
+          }
