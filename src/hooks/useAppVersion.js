@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 
 export default function useAppVersion() {
-  const location = useLocation(); // Lắng nghe sự kiện đổi trang
   const [hasUpdate, setHasUpdate] = useState(false);
-  const [pendingUpdate, setPendingUpdate] = useState(false);
 
   useEffect(() => {
     const checkVersion = async () => {
@@ -21,27 +18,18 @@ export default function useAppVersion() {
         if (!savedHash) {
           sessionStorage.setItem("app_version_hash", currentHash);
         } else if (savedHash !== currentHash) {
-          // Phát hiện có code mới, bật cờ báo hiệu
-          setPendingUpdate(true);
+          setHasUpdate(true);
         }
       } catch (err) {}
     };
 
-    // 15 giây check 1 lần
-    const interval = setInterval(checkVersion, 15000);
+    // Kiểm tra ngay lần đầu
+    checkVersion();
+
+    // Cứ 3 phút (180000ms) kiểm tra 1 lần -> Rất nhẹ cho web
+    const interval = setInterval(checkVersion, 180000);
     return () => clearInterval(interval);
   }, []);
-
-  // Hiệu ứng: Khi phát hiện có code mới VÀ người dùng chuyển trang -> Kích hoạt cập nhật
-  useEffect(() => {
-    if (pendingUpdate && !hasUpdate) {
-      // Đợi 1 nhịp (100ms) để trang mới bắt đầu render, sau đó kích hoạt update
-      const timer = setTimeout(() => {
-        setHasUpdate(true);
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [location.pathname, pendingUpdate, hasUpdate]);
 
   return { hasUpdate };
 }
