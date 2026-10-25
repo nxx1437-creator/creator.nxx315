@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
-  ArrowRight, ArrowLeft, Check, Sparkles, User, MessageSquare, Youtube, Loader2, Diamond, Target
+  ArrowRight, ArrowLeft, Check, Sparkles, User, MessageSquare, Youtube, Loader2
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient.js";
 
@@ -16,7 +16,7 @@ function ChannelPreview({ data }) {
   const initial = name.charAt(0).toUpperCase();
 
   return (
-    <div className="mt-3 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+    <div className="mt-3 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3 relative z-20">
       {avatar ? (
         <img src={avatar} alt="Avatar" className="h-10 w-10 rounded-full object-cover border border-emerald-200" />
       ) : (
@@ -39,15 +39,62 @@ function ChannelPreview({ data }) {
   );
 }
 
-// Component thẻ chính, nhận vào icon to chà bá ở background
+/* ---------- Hình trang trí 4 góc (Đè ra ngoài thẻ) ---------- */
+function OrnTarget() {
+  return (
+    <svg width="90" height="90" viewBox="0 0 100 100" fill="none" className="opacity-40 text-cyan-500">
+      <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 8" />
+      <circle cx="50" cy="50" r="20" stroke="currentColor" strokeWidth="2" />
+      <path d="M50 0v20M50 80v20M0 50h20M80 50h20" stroke="currentColor" strokeWidth="2.5" />
+      <circle cx="50" cy="50" r="4" fill="currentColor" />
+    </svg>
+  );
+}
+
+function OrnStar() {
+  return (
+    <svg width="110" height="110" viewBox="0 0 120 120" fill="none" className="opacity-70">
+      <defs>
+        <linearGradient id="starGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#a5f3fc" />
+          <stop offset="100%" stopColor="#60a5fa" />
+        </linearGradient>
+      </defs>
+      <path d="M60 10 L75 45 L110 60 L75 75 L60 110 L45 75 L10 60 L45 45 Z" fill="url(#starGrad)" fillOpacity="0.8" />
+      <path d="M60 30 L68 52 L90 60 L68 68 L60 90 L52 68 L30 60 L52 52 Z" fill="#ffffff" fillOpacity="0.9" />
+    </svg>
+  );
+}
+
+function OrnGem() {
+  return (
+    <svg width="90" height="100" viewBox="0 0 84 96" fill="none" className="opacity-60 -rotate-12">
+      <path d="M42 6l32 26-32 58L10 32z" fill="#22D3EE" fillOpacity=".4" stroke="#06B6D4" strokeWidth="2.5" />
+      <path d="M10 32h64M42 6l-14 26 14 58 14-58z" stroke="#ffffff" strokeOpacity=".8" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+function OrnHex() {
+  return (
+    <svg width="90" height="100" viewBox="0 0 100 100" fill="none" className="opacity-60 rotate-12">
+      <path d="M50 5l40 25v40L50 95 10 70V30z" fill="#60A5FA" fillOpacity=".2" stroke="#3B82F6" strokeWidth="3" />
+      <path d="M50 25l20 12.5v25L50 75 30 62.5v-25z" fill="#BFDBFE" fillOpacity=".6" stroke="#60A5FA" strokeWidth="2" />
+    </svg>
+  );
+}
+
+// Thẻ chính có icon mờ to đằng sau
 function StepCard({ children, bgIcon }) {
   return (
-    <div className="relative z-10 overflow-hidden rounded-[2rem] border border-white bg-white/90 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl">
-      {/* Icon to chà bá mờ phía sau */}
-      <div className="pointer-events-none absolute -right-8 -top-8 text-[180px] text-cyan-500/[0.04] rotate-12">
+    <div className="relative z-10 rounded-[2rem] border border-white bg-white/95 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl overflow-hidden">
+      {/* Icon to mờ đằng sau tiêu đề */}
+      <div className="pointer-events-none absolute -right-6 top-0 text-[160px] text-cyan-500/[0.04] rotate-12 z-0">
         {bgIcon}
       </div>
-      <div className="relative z-10">
+      
+      {/* Nội dung thẻ */}
+      <div className="relative z-20">
         {children}
       </div>
     </div>
@@ -118,7 +165,6 @@ export default function Onboarding() {
       const { data, error } = await supabase.functions.invoke("creator-verify", {
         body: { action: "link_channel", platform, url }
       });
-
       if (error) throw error;
       if (data && data.ok === false) throw new Error(data.message || "Kênh không hợp lệ.");
       return data.channel || data; 
@@ -146,17 +192,14 @@ export default function Onboarding() {
 
   const handleFinish = async () => {
     setErrorMsg("");
-    
     if (youtubeUrl && !ytPreview) {
       const res = await verifyChannel("youtube", youtubeUrl);
       if (!res) return; 
     }
-    
     if (tiktokUrl && !ttPreview) {
       const res = await verifyChannel("tiktok", tiktokUrl);
       if (!res) return; 
     }
-
     localStorage.removeItem("onboarding_step");
     navigate("/app", { replace: true });
   };
@@ -173,6 +216,8 @@ export default function Onboarding() {
       </div>
     );
   }
+
+  // --- CÁC BƯỚC RENDER ---
 
   const renderStep1 = () => (
     <StepCard bgIcon={<Sparkles />}>
@@ -214,13 +259,11 @@ export default function Onboarding() {
     <StepCard bgIcon={<User />}>
       <p className="font-mono text-[10px] font-bold tracking-widest text-slate-400 uppercase">STEP 02 . PROFILE</p>
       <h2 className="mt-2 text-2xl font-extrabold text-slate-900">Hồ sơ của bạn</h2>
-      
       <div className="mt-6 rounded-xl border border-cyan-100 bg-cyan-50/50 p-4">
         <p className="text-[13px] leading-relaxed text-cyan-800">
           Tài khoản của bạn đã được đồng bộ với <strong>Nxx315 Studio</strong>. Bạn không cần tạo lại hồ sơ ở đây.
         </p>
       </div>
-
       <div className="mt-8 flex items-center justify-between">
         <button onClick={prevStep} className="flex items-center gap-2 text-[14px] font-semibold text-slate-500 hover:text-slate-900">
           <ArrowLeft size={16} /> Quay lại
@@ -236,11 +279,9 @@ export default function Onboarding() {
     <StepCard bgIcon={<MessageSquare />}>
       <p className="font-mono text-[10px] font-bold tracking-widest text-slate-400 uppercase">STEP 03 . DISCORD</p>
       <h2 className="mt-2 text-2xl font-extrabold text-slate-900">Liên kết Discord</h2>
-
       <p className="mt-3 text-[14px] leading-relaxed text-slate-600">
         Chương trình creator chạy trên Discord: thông báo, hỗ trợ, thể lệ và các kèo riêng đều ở đó. Bạn cần liên kết tài khoản và tham gia server cộng đồng mới tiếp tục được.
       </p>
-
       <button 
         onClick={handleLinkDiscord}
         disabled={loading || isDiscordLinked}
@@ -249,17 +290,11 @@ export default function Onboarding() {
             ? 'border-emerald-500 bg-emerald-50 text-emerald-600' 
             : 'border-[#5865F2] bg-[#5865F2]/10 text-[#5865F2] hover:bg-[#5865F2] hover:text-white'}`}
       >
-        {loading ? (
-          <><Loader2 size={18} className="animate-spin" /> Đang kết nối...</>
-        ) : isDiscordLinked ? (
-          <><Check size={18} /> Đã liên kết Discord</>
-        ) : (
-          <><MessageSquare size={18} /> Liên kết Discord</>
-        )}
+        {loading ? <><Loader2 size={18} className="animate-spin" /> Đang kết nối...</> : 
+         isDiscordLinked ? <><Check size={18} /> Đã liên kết Discord</> : 
+         <><MessageSquare size={18} /> Liên kết Discord</>}
       </button>
-
       {errorMsg && <p className="mt-3 text-center text-xs font-semibold text-rose-500">{errorMsg}</p>}
-
       <div className="mt-8 flex items-center justify-between">
         <button onClick={prevStep} className="flex items-center gap-2 text-[14px] font-semibold text-slate-500 hover:text-slate-900">
           <ArrowLeft size={16} /> Quay lại
@@ -319,32 +354,14 @@ export default function Onboarding() {
 
       <div className="mt-8 flex flex-col gap-4">
         <div className="flex items-center gap-3">
-          <button 
-            onClick={prevStep} 
-            disabled={loading} 
-            className="flex items-center justify-center h-12 w-12 rounded-full border border-slate-200 text-slate-600 transition hover:bg-slate-50 disabled:opacity-50 shrink-0"
-          >
+          <button onClick={prevStep} disabled={loading} className="flex items-center justify-center h-12 w-12 rounded-full border border-slate-200 text-slate-600 transition hover:bg-slate-50 disabled:opacity-50 shrink-0">
             <ArrowLeft size={16} />
           </button>
-          
-          <button 
-            onClick={handleFinish} 
-            disabled={loading} 
-            className="flex-1 flex items-center justify-center gap-2 rounded-full bg-cyan-600 px-4 h-12 text-[14px] font-bold text-white transition hover:bg-cyan-700 active:scale-95 shadow-md shadow-cyan-600/20 disabled:opacity-70"
-          >
-            {loading ? (
-              <><Loader2 size={16} className="animate-spin" /> Đang xử lý...</>
-            ) : (
-              <>Hoàn tất <Check size={16} /></>
-            )}
+          <button onClick={handleFinish} disabled={loading} className="flex-1 flex items-center justify-center gap-2 rounded-full bg-cyan-600 px-4 h-12 text-[14px] font-bold text-white transition hover:bg-cyan-700 active:scale-95 shadow-md shadow-cyan-600/20 disabled:opacity-70">
+            {loading ? <><Loader2 size={16} className="animate-spin" /> Đang xử lý...</> : <>Hoàn tất <Check size={16} /></>}
           </button>
         </div>
-        
-        <button 
-          onClick={skipAndFinish} 
-          disabled={loading} 
-          className="w-full text-center text-[13px] font-semibold text-slate-500 hover:text-slate-800 disabled:opacity-50"
-        >
+        <button onClick={skipAndFinish} disabled={loading} className="w-full text-center text-[13px] font-semibold text-slate-500 hover:text-slate-800 disabled:opacity-50">
           Bỏ qua & hoàn tất
         </button>
       </div>
@@ -356,7 +373,7 @@ export default function Onboarding() {
       <div className="pointer-events-none absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(rgba(0,0,0,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.8) 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
 
       <div className="w-full max-w-md relative z-10">
-        <div className="mb-6 flex flex-wrap gap-2">
+        <div className="mb-6 flex flex-wrap gap-2 relative z-20">
           {[1, 2, 3, 4].map((num) => {
             const isPast = step > num || (num === 3 && isDiscordLinked);
             const isActive = step === num && !isPast;
@@ -373,11 +390,24 @@ export default function Onboarding() {
           })}
         </div>
 
-        {step === 1 && renderStep1()}
-        {step === 2 && renderStep2()}
-        {step === 3 && renderStep3()}
-        {step === 4 && renderStep4()}
+        {/* Vùng chứa thẻ và các hình trang trí 4 góc */}
+        <div className="relative mt-2">
+          {/* Trang trí 4 góc đè ra ngoài thẻ */}
+          <div className="absolute -top-10 -left-8 z-0 pointer-events-none"><OrnTarget /></div>
+          <div className="absolute -top-12 -right-8 z-0 pointer-events-none"><OrnStar /></div>
+          <div className="absolute -bottom-8 -left-8 z-0 pointer-events-none"><OrnGem /></div>
+          <div className="absolute -bottom-10 -right-8 z-0 pointer-events-none"><OrnHex /></div>
+
+          {/* Nội dung thẻ (z-10 để nổi lên trên hình trang trí) */}
+          <div className="relative z-10">
+            {step === 1 && renderStep1()}
+            {step === 2 && renderStep2()}
+            {step === 3 && renderStep3()}
+            {step === 4 && renderStep4()}
+          </div>
+        </div>
+        
       </div>
     </div>
   );
-    }
+      }
