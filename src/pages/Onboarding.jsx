@@ -5,20 +5,33 @@ import {
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient.js";
 
+// Component hiển thị thông tin kênh (Đã sửa để đọc được mọi cấu trúc data)
 function ChannelPreview({ data }) {
   if (!data) return null;
+  
+  // Cố gắng lấy tên hiển thị từ nhiều trường khác nhau phòng trường hợp backend đổi tên
+  const name = data.display_name || data.name || data.channel_name || data.handle || "Kênh đã liên kết";
+  const handle = data.handle || data.channel_url || "";
+  const followers = data.followers || data.subscriber_count || 0;
+  const avatar = data.avatar_url || data.avatar || data.thumbnail || "";
+  const initial = name.charAt(0).toUpperCase();
+
   return (
     <div className="mt-3 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3">
-      <img 
-        src={data.avatar_url || data.avatar || "https://ui-avatars.com/api/?name=" + (data.name || "User")} 
-        alt="Avatar" 
-        className="h-10 w-10 rounded-full object-cover border border-emerald-200" 
-      />
+      {avatar ? (
+        <img src={avatar} alt="Avatar" className="h-10 w-10 rounded-full object-cover border border-emerald-200" />
+      ) : (
+        <div className="h-10 w-10 rounded-full bg-emerald-200 flex items-center justify-center text-emerald-700 font-bold">
+          {initial}
+        </div>
+      )}
       <div className="flex-1 min-w-0">
-        <p className="text-[13px] font-bold text-slate-900 truncate">{data.display_name || data.name || data.handle}</p>
-        <p className="text-[11px] text-slate-500 truncate">
-          {data.handle || data.channel_url} • {data.followers?.toLocaleString() || 0} followers
-        </p>
+        <p className="text-[13px] font-bold text-slate-900 truncate">{name}</p>
+        {handle && (
+          <p className="text-[11px] text-slate-500 truncate">
+            {handle} • {followers.toLocaleString()} followers
+          </p>
+        )}
       </div>
       <div className="shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-emerald-500 text-white">
         <Check size={14} />
@@ -43,7 +56,6 @@ function StepCard({ children, iconBg }) {
 export default function Onboarding() {
   const navigate = useNavigate();
   
-  // Khôi phục lại bước đang làm dở nếu có (sau khi đi OAuth Discord về)
   const savedStep = sessionStorage.getItem("onboarding_step");
   const [step, setStep] = useState(savedStep ? parseInt(savedStep) : 1);
   
@@ -56,7 +68,6 @@ export default function Onboarding() {
   const [ttPreview, setTtPreview] = useState(null); 
   const [isDiscordLinked, setIsDiscordLinked] = useState(false);
 
-  // Mỗi khi đổi bước, lưu lại vào sessionStorage
   const changeStep = (newStep) => {
     setStep(newStep);
     sessionStorage.setItem("onboarding_step", newStep);
@@ -72,10 +83,8 @@ export default function Onboarding() {
       
       if (discordIdentity) {
         setIsDiscordLinked(true);
-        // Đã liên kết xong thì nhảy sang bước 4
         if (step === 3) {
           changeStep(4);
-          // Xóa session lưu bước đi để lần sau vào không bị kẹt
           sessionStorage.removeItem("onboarding_step");
         }
       }
@@ -90,18 +99,16 @@ export default function Onboarding() {
     try {
       const { error } = await supabase.auth.linkIdentity({
         provider: 'discord',
-        options: {
-          redirectTo: `${window.location.origin}/onboarding`,
-        },
+        options: { redirectTo: `${window.location.origin}/onboarding` },
       });
       if (error) throw error;
-      // Trình duyệt sẽ tự chuyển sang Discord
     } catch (err) {
       setErrorMsg("Không thể kết nối Discord: " + err.message);
       setLoading(false);
     }
   };
 
+  // Hàm gọi API kiểm tra kênh - Sửa lại để bắt mọi lỗi từ Backend
   const verifyChannel = async (platform, url) => {
     if (!url) return null;
     setLoading(true);
@@ -112,11 +119,16 @@ export default function Onboarding() {
       });
 
       if (error) throw error;
-      if (!data.ok) throw new Error(data.message || "Kênh không hợp lệ");
+      
+      // Nếu backend trả về lỗi ok: false
+      if (data && data.ok === false) {
+        throw new Error(data.message || "Kênh không hợp lệ hoặc không tìm thấy.");
+      }
 
+      // Trả về dữ liệu kênh (data.channel hoặc chính data)
       return data.channel || data; 
     } catch (err) {
-      setErrorMsg(`Lỗi kiểm tra kênh ${platform}: ${err.message}`);
+      setErrorMsg(`Lỗi kênh ${platform}: ${err.message || "Không thể xác minh"}`);
       return null;
     } finally {
       setLoading(false);
@@ -137,16 +149,22 @@ export default function Onboarding() {
     }
   };
 
+  // Hàm hoàn tất được viết lại để không bị treo
   const handleFinish = async () => {
+    setErrorMsg("");
+    
+    // Chỉ kiểm tra nếu có nhập link mà chưa có preview (nghĩa là chưa verify)
     if (youtubeUrl && !ytPreview) {
       const res = await verifyChannel("youtube", youtubeUrl);
-      if (!res) return; 
+      if (!res) return; // Dừng nếu lỗi
     }
+    
     if (tiktokUrl && !ttPreview) {
       const res = await verifyChannel("tiktok", tiktokUrl);
-      if (!res) return;
+      if (!res) return; // Dừng nếu lỗi
     }
-    // Xóa bộ nhớ tạm khi hoàn tất
+
+    // Mọi thứ OK -> Chuyển vào App
     sessionStorage.removeItem("onboarding_step");
     navigate("/app", { replace: true });
   };
@@ -173,10 +191,6 @@ export default function Onboarding() {
         <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
           <h3 className="text-[13px] font-bold text-cyan-600">02 . NHẬN THƯỞNG</h3>
           <p className="mt-1 text-[13px] text-slate-600">Mỗi video duyệt = +X giờ cloud phone. Top tháng nhận tiền mặt.</p>
-        </div>
-        <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-          <h3 className="text-[13px] font-bold text-cyan-600">03 . LEO BẢNG XẾP HẠNG</h3>
-          <p className="mt-1 text-[13px] text-slate-600">Bảng xếp hạng live theo lượt xem + lượt thích + bình luận.</p>
         </div>
       </div>
 
@@ -296,10 +310,6 @@ export default function Onboarding() {
         </div>
       </div>
 
-      <p className="mt-4 text-[11px] font-medium text-slate-500">
-        ▸ LIÊN KẾT YOUTUBE VÀ/HOẶC TIKTOK. BẠN CÓ THỂ THÊM/ĐỔI KÊNH SAU TRONG SETTINGS.
-      </p>
-
       {errorMsg && <p className="mt-3 text-xs font-semibold text-rose-500">{errorMsg}</p>}
 
       <div className="mt-8 flex flex-col gap-4">
@@ -341,13 +351,7 @@ export default function Onboarding() {
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-b from-[#f4fbf9] to-[#e6f7fa] text-slate-800 font-sans flex flex-col items-center pt-8 px-4 pb-12">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage: "linear-gradient(rgba(0,0,0,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.8) 1px, transparent 1px)",
-          backgroundSize: "30px 30px",
-        }}
-      />
+      <div className="pointer-events-none absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(rgba(0,0,0,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.8) 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
 
       <div className="w-full max-w-md relative z-10">
         <div className="mb-6 flex flex-wrap gap-2">
@@ -355,13 +359,7 @@ export default function Onboarding() {
             const isActive = step === num;
             const isPast = step > num;
             return (
-              <div 
-                key={num} 
-                className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-[12px] font-semibold transition-colors
-                  ${isActive ? 'border-cyan-600 bg-cyan-50 text-cyan-700' : 
-                    isPast ? 'border-emerald-200 bg-emerald-50 text-emerald-600' : 
-                    'border-slate-200 bg-white text-slate-400'}`}
-              >
+              <div key={num} className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-[12px] font-semibold transition-colors ${isActive ? 'border-cyan-600 bg-cyan-50 text-cyan-700' : isPast ? 'border-emerald-200 bg-emerald-50 text-emerald-600' : 'border-slate-200 bg-white text-slate-400'}`}>
                 {isPast ? <Check size={14} /> : <span>{num}.</span>}
                 {num === 1 && "BẮT ĐẦU"}
                 {num === 2 && "HỒ SƠ"}
@@ -379,4 +377,4 @@ export default function Onboarding() {
       </div>
     </div>
   );
-}
+                                                     }
