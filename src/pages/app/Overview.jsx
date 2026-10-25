@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { ExternalLink, ChevronRight } from "lucide-react";
-import { Send, Trophy, Film, Gift, ArrowRight } from "lucide-react";
+import { Send, Trophy, Film, Gift, ArrowRight, Bell, Clock, CheckCircle2, AlertCircle, Play, Eye, Heart, MessageSquare, ExternalLink } from "lucide-react";
 import useSession from "../../hooks/useSession.js";
 import { Card, PLATFORMS, getTier } from "../../components/creator/creatorUi.jsx";
 
@@ -41,11 +40,6 @@ export default function Overview() {
 
   if (!ov) return <div className="h-screen bg-[#f4fbf9]"></div>;
 
-  // Lấy tổng số liệu (giả lập từ API hoặc mặc định là 0)
-  const totalViews = ov.recent?.reduce((sum, v) => sum + (v.views || 0), 0) || 0;
-  const totalLikes = ov.recent?.reduce((sum, v) => sum + (v.likes || 0), 0) || 0;
-  const totalComments = ov.recent?.reduce((sum, v) => sum + (v.comments || 0), 0) || 0;
-
   return (
     <div className="space-y-4 pb-10">
       
@@ -74,7 +68,7 @@ export default function Overview() {
         </div>
       )}
 
-      {/* 2. CARD THÔNG TIN USER (Giống ảnh 1) */}
+      {/* 2. CARD THÔNG TIN USER */}
       <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/70 p-5 shadow-sm backdrop-blur-md">
         <div className="flex items-center gap-4">
           <div className="relative shrink-0">
@@ -110,12 +104,12 @@ export default function Overview() {
           </button>
           <button onClick={() => navigate("/app/ranking")} className="flex w-full items-center justify-between rounded-full border border-slate-200 bg-white py-3 pl-5 pr-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50">
             <span className="flex items-center gap-2"><Trophy size={18} className="text-amber-500" /> Bảng xếp hạng</span>
-            <ChevronRight size={18} className="text-slate-400" />
+            <ArrowRight size={18} className="text-slate-400" />
           </button>
         </div>
       </Card>
 
-      {/* 3. CARD SỰ KIỆN (Giống ảnh 2) */}
+      {/* 3. CARD SỰ KIỆN */}
       <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/70 p-5 shadow-sm backdrop-blur-md">
         <div className="flex items-center justify-between mb-4">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 font-mono text-[10px] font-bold tracking-widest text-cyan-600">
@@ -128,7 +122,7 @@ export default function Overview() {
            <div className="flex items-center gap-2 text-amber-700 text-xs font-bold">
              <Gift size={16} /> TỔNG GIẢI THƯỞNG
            </div>
-           <span className="text-sm font-bold text-amber-700"> 35,000 xu</span>
+           <span className="text-sm font-bold text-amber-700">35,000 xu</span>
         </div>
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 mb-6 flex items-center justify-between">
            <div className="flex items-center gap-2 text-emerald-700 text-xs font-bold">
@@ -154,7 +148,7 @@ export default function Overview() {
       <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/70 p-5 shadow-sm backdrop-blur-md">
          <div className="flex items-center justify-between mb-3">
           <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">▸ YÊU CẦU NHẬN THƯỞNG</span>
-          <button onClick={() => navigate("/app/rules")} className="text-[10px] font-bold text-cyan-600 flex items-center gap-1">XEM THỂ LỆ <ChevronRight size={12}/></button>
+          <button onClick={() => navigate("/app/rules")} className="text-[10px] font-bold text-cyan-600 flex items-center gap-1">XEM THỂ LỆ <ArrowRight size={12}/></button>
         </div>
         <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4">
           <div className="flex items-center gap-2 text-rose-600 font-bold text-sm mb-2">
@@ -183,105 +177,79 @@ export default function Overview() {
         </ul>
       </Card>
 
-      {/* 5. CARD ĐIỂM THÁNG NÀY & TỔNG TÍCH LŨY (Giống ảnh 3, 4) */}
-      <div className="grid grid-cols-1 gap-4">
-         {/* Điểm tháng này */}
-         <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/70 p-5 shadow-sm backdrop-blur-md">
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 font-mono text-[10px] font-bold tracking-widest text-emerald-600 mb-4">
-               <Trophy size={12}/> ĐIỂM THÁNG NÀY
-            </div>
-            <p className="text-6xl font-black text-emerald-500 mb-2">{ov.points_month || 0}</p>
-            <div className="h-1.5 w-full bg-slate-200 rounded-full mb-6"><div className="h-full w-0 bg-emerald-500 rounded-full"></div></div>
+      {/* 5. CARD ĐIỂM THÁNG NÀY & TỔNG TÍCH LŨY */}
+      <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/70 p-5 shadow-sm backdrop-blur-md">
+         <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 font-mono text-[10px] font-bold tracking-widest text-emerald-600 mb-4">
+            <Trophy size={12}/> ĐIỂM THÁNG NÀY
+         </div>
+         <p className="text-6xl font-black text-emerald-500 mb-2">{ov.points_month || 0}</p>
+         <div className="h-1.5 w-full bg-slate-200 rounded-full mb-6"><div className="h-full w-0 bg-emerald-500 rounded-full"></div></div>
 
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">▸ TỔNG TÍCH LŨY</p>
-            <div className="grid grid-cols-2 gap-4">
-               <div className="flex items-center gap-2">
-                 <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"><Film size={14}/></div>
-                 <div>
-                   <p className="text-[9px] font-bold text-slate-400 uppercase">TỔNG VIDEO</p>
-                   <p className="text-sm font-black text-slate-800">{ov.total || 0}</p>
-                 </div>
-               </div>
-               <div className="flex items-center gap-2">
-                 <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"><Eye size={14}/></div>
-                 <div>
-                   <p className="text-[9px] font-bold text-slate-400 uppercase">LƯỢT XEM</p>
-                   <p className="text-sm font-black text-slate-800">{totalViews}</p>
-                 </div>
-               </div>
-               <div className="flex items-center gap-2">
-                 <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"><Heart size={14}/></div>
-                 <div>
-                   <p className="text-[9px] font-bold text-slate-400 uppercase">LƯỢT THÍCH</p>
-                   <p className="text-sm font-black text-slate-800">{totalLikes}</p>
-                 </div>
-               </div>
-               <div className="flex items-center gap-2">
-                 <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"><MessageSquare size={14}/></div>
-                 <div>
-                   <p className="text-[9px] font-bold text-slate-400 uppercase">BÌNH LUẬN</p>
-                   <p className="text-sm font-black text-slate-800">{totalComments}</p>
-                 </div>
-               </div>
-            </div>
-
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-6 mb-3">▸ TRẠNG THÁI VIDEO</p>
-            <div className="grid grid-cols-2 gap-2">
-               <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-3 flex items-center gap-2">
-                 <CheckCircle2 size={16} className="text-emerald-500"/>
-                 <div>
-                   <p className="text-[9px] font-bold text-emerald-600 uppercase">ĐÃ DUYỆT</p>
-                   <p className="text-lg font-black text-emerald-600 leading-none">{ov.approved || 0}</p>
-                 </div>
-               </div>
-               <div className="rounded-2xl border border-blue-200 bg-blue-50/50 p-3 flex items-center gap-2">
-                 <Clock size={16} className="text-blue-500"/>
-                 <div>
-                   <p className="text-[9px] font-bold text-blue-600 uppercase">ĐANG CHỜ</p>
-                   <p className="text-lg font-black text-blue-600 leading-none">{ov.pending || 0}</p>
-                 </div>
-               </div>
-               <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-3 flex items-center gap-2">
-                 <AlertCircle size={16} className="text-amber-500"/>
-                 <div>
-                   <p className="text-[9px] font-bold text-amber-600 uppercase">NGHI VẤN</p>
-                   <p className="text-lg font-black text-amber-600 leading-none">0</p>
-                 </div>
-               </div>
-               <div className="rounded-2xl border border-rose-200 bg-rose-50/50 p-3 flex items-center gap-2">
-                 <AlertCircle size={16} className="text-rose-500"/>
-                 <div>
-                   <p className="text-[9px] font-bold text-rose-600 uppercase">BỊ LOẠI</p>
-                   <p className="text-lg font-black text-rose-600 leading-none">{ov.rejected || 0}</p>
-                 </div>
-               </div>
-            </div>
-         </Card>
-
-         {/* Giờ đã nhận */}
-         <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/70 p-5 shadow-sm backdrop-blur-md flex items-center justify-between">
-            <div>
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 font-mono text-[10px] font-bold tracking-widest text-emerald-600 mb-2">
-                 <Gift size={12}/> GIỜ ĐÃ NHẬN
-              </div>
-              <div className="flex items-end gap-1">
-                <p className="text-4xl font-black text-emerald-500">{ov.total_coins || 0}</p>
-                <p className="text-lg font-bold text-slate-500 mb-1">h</p>
+         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">▸ TỔNG TÍCH LŨY</p>
+         <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"><Film size={14}/></div>
+              <div>
+                <p className="text-[9px] font-bold text-slate-400 uppercase">TỔNG VIDEO</p>
+                <p className="text-sm font-black text-slate-800">{ov.total || 0}</p>
               </div>
             </div>
-            <button className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">CLAIM</button>
-         </Card>
-
-         {/* Video tháng này */}
-         <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/70 p-5 shadow-sm backdrop-blur-md">
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 font-mono text-[10px] font-bold tracking-widest text-cyan-600 mb-4">
-               # VIDEO THÁNG NÀY
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"><Eye size={14}/></div>
+              <div>
+                <p className="text-[9px] font-bold text-slate-400 uppercase">LƯỢT XEM</p>
+                <p className="text-sm font-black text-slate-800">{ov.total_views || 0}</p>
+              </div>
             </div>
-            <p className="text-4xl font-black text-cyan-600">{ov.month_approved || 0}</p>
-         </Card>
-      </div>
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"><Heart size={14}/></div>
+              <div>
+                <p className="text-[9px] font-bold text-slate-400 uppercase">LƯỢT THÍCH</p>
+                <p className="text-sm font-black text-slate-800">{ov.total_likes || 0}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"><MessageSquare size={14}/></div>
+              <div>
+                <p className="text-[9px] font-bold text-slate-400 uppercase">BÌNH LUẬN</p>
+                <p className="text-sm font-black text-slate-800">{ov.total_comments || 0}</p>
+              </div>
+            </div>
+         </div>
 
-    
+         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-6 mb-3">▸ TRẠNG THÁI VIDEO</p>
+         <div className="grid grid-cols-2 gap-2">
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-3 flex items-center gap-2">
+              <CheckCircle2 size={16} className="text-emerald-500"/>
+              <div>
+                <p className="text-[9px] font-bold text-emerald-600 uppercase">ĐÃ DUYỆT</p>
+                <p className="text-lg font-black text-emerald-600 leading-none">{ov.approved || 0}</p>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-blue-200 bg-blue-50/50 p-3 flex items-center gap-2">
+              <Clock size={16} className="text-blue-500"/>
+              <div>
+                <p className="text-[9px] font-bold text-blue-600 uppercase">ĐANG CHỜ</p>
+                <p className="text-lg font-black text-blue-600 leading-none">{ov.pending || 0}</p>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-3 flex items-center gap-2">
+              <AlertCircle size={16} className="text-amber-500"/>
+              <div>
+                <p className="text-[9px] font-bold text-amber-600 uppercase">NGHI VẤN</p>
+                <p className="text-lg font-black text-amber-600 leading-none">0</p>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-rose-200 bg-rose-50/50 p-3 flex items-center gap-2">
+              <AlertCircle size={16} className="text-rose-500"/>
+              <div>
+                <p className="text-[9px] font-bold text-rose-600 uppercase">BỊ LOẠI</p>
+                <p className="text-lg font-black text-rose-600 leading-none">{ov.rejected || 0}</p>
+              </div>
+            </div>
+         </div>
+      </Card>
+
       {/* 7. VÀO DISCORD */}
       <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/70 p-5 shadow-sm backdrop-blur-md">
          <div className="flex items-start gap-3">
@@ -290,7 +258,7 @@ export default function Overview() {
             </div>
             <div>
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">CỘNG ĐỒNG</p>
-              <h3 className="text-[15px] font-bold text-slate-800">Vào Discord creator </h3>
+              <h3 className="text-[15px] font-bold text-slate-800">Vào Discord creator</h3>
               <p className="mt-1 text-[13px] text-slate-600 leading-relaxed mb-4">
                 Thông báo campaign, tin trả thưởng và hỗ trợ trực tiếp từ team — kèm /rank và /stats ngay trong Discord sau khi bạn liên kết tài khoản.
               </p>
@@ -332,4 +300,4 @@ export default function Overview() {
       </div>
     </div>
   );
-}
+                                                        }
