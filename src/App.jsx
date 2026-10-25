@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import useSession from "./hooks/useSession.js";
 import { supabase } from "./lib/supabaseClient.js";
 
+import Rules from "./pages/app/Rules.jsx";
 import Landing from "./pages/Landing.jsx";
 import Login from "./pages/Login.jsx";
 import Onboarding from "./pages/Onboarding.jsx";
@@ -128,6 +129,7 @@ export default function App() {
           <Route path="videos" element={<Videos />} />
           <Route path="rewards" element={<Rewards />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="rules" element={<Rules />} />
         </Route>
         
         <Route path="*" element={<Navigate to="/" replace />} />
