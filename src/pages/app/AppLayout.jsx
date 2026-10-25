@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Trophy, Film, Gift, Settings, Loader2, AlertTriangle,
-  Download, Search, Bell, Globe, LogOut, User, RefreshCw
+  Download, Search, Bell, Globe, LogOut, User
 } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
 import useSession from "../../hooks/useSession.js";
@@ -63,13 +63,11 @@ export default function AppLayout() {
   const langRef = useRef(null);
   const profileRef = useRef(null);
 
-  // TỰ ĐỘNG TẢI LẠI SAU 3 GIÂY KHI CÓ BẢN CẬP NHẬT
+  // Lắng nghe tín hiệu có code mới
   useEffect(() => {
     if (hasUpdate) {
-      const timer = setTimeout(() => {
-        window.location.reload();
-      }, 3000); 
-      return () => clearTimeout(timer);
+      // Lưu lại mã hash mới để không bị kích hoạt lại lần nữa
+      sessionStorage.setItem("app_version_hash", "updated");
     }
   }, [hasUpdate]);
 
@@ -111,22 +109,10 @@ export default function AppLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f4fbf9] to-[#e6f7fa] pb-28 text-slate-800 font-sans">
+    // BÍ QUYẾT NẰM Ở ĐÂY: Dùng key={hasUpdate} 
+    // Khi hasUpdate thay đổi từ false -> true, React sẽ tự động reset lại toàn bộ giao diện
+    <div key={hasUpdate} className="min-h-screen bg-gradient-to-b from-[#f4fbf9] to-[#e6f7fa] pb-28 text-slate-800 font-sans">
       <div className="pointer-events-none fixed inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(0,0,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
-
-      {/* TOAST THÔNG BÁO CẬP NHẬT */}
-      {hasUpdate && (
-        <div className="fixed top-16 left-1/2 z-[100] -translate-x-1/2 w-[90%] max-w-sm animate-in slide-in-from-top-4 fade-in">
-          <div className="relative overflow-hidden rounded-2xl bg-slate-900 px-4 py-3 shadow-2xl flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5 text-white">
-              <RefreshCw size={16} className="animate-spin text-cyan-400" />
-              <span className="text-[13px] font-semibold">Đang cập nhật phiên bản mới...</span>
-            </div>
-            {/* Thanh loading chạy ngang 3 giây */}
-            <div className="absolute bottom-0 left-0 h-[3px] bg-cyan-400" style={{ width: "0%", animation: "progress 3s linear forwards" }} />
-          </div>
-        </div>
-      )}
 
       <header className="sticky top-0 z-50 border-b border-white/50 bg-[#f4fbf9]/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-md items-center justify-between px-4 py-3 md:max-w-3xl">
@@ -231,4 +217,4 @@ export default function AppLayout() {
       </nav>
     </div>
   );
-      }
+    }
