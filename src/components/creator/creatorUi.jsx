@@ -4,13 +4,13 @@ import { supabase } from "../../lib/supabaseClient.js";
 
 export const PLATFORMS = {
   youtube: { name: "YouTube", dot: "bg-red-500", ph: "https://youtube.com/@ten-kenh-cua-ban" },
-  tiktok: { name: "TikTok", dot: "bg-cyan-400", ph: "https://tiktok.com/@ten-nguoi-dung" },
+  tiktok: { name: "TikTok", dot: "bg-cyan-500", ph: "https://tiktok.com/@ten-nguoi-dung" },
 };
 
 export const STATUS = {
-  pending: { label: "Đang chờ", cls: "border-amber-400/30 bg-amber-400/10 text-amber-300", Icon: Clock },
-  approved: { label: "Đã duyệt", cls: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300", Icon: CheckCircle2 },
-  rejected: { label: "Bị từ chối", cls: "border-rose-400/30 bg-rose-400/10 text-rose-300", Icon: XCircle },
+  pending: { label: "Đang chờ", cls: "border-amber-200 bg-amber-50 text-amber-600", Icon: Clock },
+  approved: { label: "Đã duyệt", cls: "border-emerald-200 bg-emerald-50 text-emerald-600", Icon: CheckCircle2 },
+  rejected: { label: "Bị từ chối", cls: "border-rose-200 bg-rose-50 text-rose-600", Icon: XCircle },
 };
 
 export const getTier = (n) =>
@@ -30,25 +30,29 @@ export const fmt = (n) => {
   return String(v);
 };
 
+// 1. CARD: Đổi sang nền trắng, viền xám nhạt, bóng đổ nhẹ
 export function Card({ children, className = "" }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-[#111C30] to-[#0B1322] p-5 ${className}`}
+      className={`relative overflow-hidden rounded-[2rem] border border-white bg-white/80 p-5 shadow-sm backdrop-blur-sm ${className}`}
     >
       {children}
-      <span className="pointer-events-none absolute inset-x-0 bottom-0 h-[3px] bg-gradient-to-r from-cyan-400/0 via-cyan-400 to-blue-500/0" />
+      {/* Đường kẻ màu xanh dưới đáy thẻ */}
+      <span className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-cyan-400/0 via-cyan-400/50 to-blue-500/0" />
     </div>
   );
 }
 
+// 2. EYEBROW (Chữ nhỏ trên tiêu đề)
 export function Eyebrow({ children, className = "" }) {
   return (
-    <p className={`font-mono text-[11px] uppercase tracking-[0.18em] text-slate-400 ${className}`}>
+    <p className={`font-mono text-[11px] uppercase tracking-[0.18em] text-slate-500 font-semibold ${className}`}>
       {children}
     </p>
   );
 }
 
+// 3. STATUS PILL (Nhãn trạng thái)
 export function StatusPill({ status }) {
   const s = STATUS[status] || STATUS.pending;
   return (
@@ -58,6 +62,7 @@ export function StatusPill({ status }) {
   );
 }
 
+// 4. AVATAR
 export function Avatar({ src, name, size = 48 }) {
   const [bad, setBad] = useState(false);
   const letter = (name || "?").trim().charAt(0).toUpperCase();
@@ -68,18 +73,19 @@ export function Avatar({ src, name, size = 48 }) {
       referrerPolicy="no-referrer"
       onError={() => setBad(true)}
       style={{ width: size, height: size }}
-      className="shrink-0 rounded-full border border-white/15 object-cover"
+      className="shrink-0 rounded-full border border-slate-200 object-cover shadow-sm"
     />
   ) : (
     <span
       style={{ width: size, height: size }}
-      className="flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 font-bold text-white"
+      className="flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 font-bold text-white shadow-sm"
     >
       {letter}
     </span>
   );
 }
 
+// 5. CODE BOX (Hộp nhập Gift Code)
 export function CodeBox({ code, coins }) {
   const [done, setDone] = useState(false);
   const copy = async () => {
@@ -92,33 +98,34 @@ export function CodeBox({ code, coins }) {
     }
   };
   return (
-    <div className="mt-3 rounded-2xl border border-dashed border-emerald-400/40 bg-emerald-400/5 p-3">
+    <div className="mt-3 rounded-2xl border border-dashed border-emerald-300 bg-emerald-50 p-3">
       <div className="flex items-center justify-between text-xs">
-        <span className="flex items-center gap-1.5 font-semibold text-emerald-300">
+        <span className="flex items-center gap-1.5 font-bold text-emerald-600">
           <Gift size={14} /> Code nhận xu
         </span>
-        <span className="rounded-full bg-amber-400/15 px-2 py-0.5 font-bold text-amber-300">
+        <span className="rounded-full bg-amber-100 px-2 py-0.5 font-bold text-amber-600">
           +{Number(coins || 0).toLocaleString("vi-VN")} xu
         </span>
       </div>
       <div className="mt-2 flex items-center gap-2">
-        <code className="min-w-0 flex-1 truncate rounded-xl bg-black/30 px-3 py-2.5 text-center font-mono text-sm font-bold tracking-wider text-white">
+        <code className="min-w-0 flex-1 truncate rounded-xl border border-emerald-200 bg-white px-3 py-2.5 text-center font-mono text-sm font-bold tracking-wider text-slate-800">
           {code}
         </code>
         <button
           onClick={copy}
-          className="flex shrink-0 items-center gap-1 rounded-xl bg-emerald-500 px-3 py-2.5 text-xs font-bold text-white"
+          className="flex shrink-0 items-center gap-1 rounded-xl bg-emerald-500 px-3 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-600"
         >
           {done ? <Check size={13} /> : <Copy size={13} />} {done ? "Đã chép" : "Chép"}
         </button>
       </div>
-      <p className="mt-2 text-[11px] text-emerald-300/80">
+      <p className="mt-2 text-[11px] font-medium text-emerald-600">
         Vào web chính → Ví → Nhập Gift Code để nhận xu.
       </p>
     </div>
   );
 }
 
+// Hook lấy danh sách video (Giữ nguyên logic)
 export function useMyVideos(userId) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -141,6 +148,7 @@ export function useMyVideos(userId) {
   return { items, loading, reload: load };
 }
 
+// 6. CHANNEL LINK CARD (Thẻ liên kết kênh)
 export function ChannelLinkCard({ platform, channel, onChanged }) {
   const meta = PLATFORMS[platform];
   const [url, setUrl] = useState("");
@@ -177,17 +185,17 @@ export function ChannelLinkCard({ platform, channel, onChanged }) {
   };
 
   return (
-    <Card>
+    <div className="py-3 px-1">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className={`h-3 w-3 rounded-full ${meta.dot}`} />
-          <span className="text-base font-bold text-white">{meta.name}</span>
+          <span className="text-base font-bold text-slate-800">{meta.name}</span>
         </div>
         <span
-          className={`rounded-full border px-3 py-1 font-mono text-[10px] tracking-widest ${
+          className={`rounded-full border px-3 py-1 font-mono text-[10px] font-bold tracking-widest ${
             channel
-              ? "border-emerald-400/40 bg-emerald-400/10 text-emerald-300"
-              : "border-white/15 text-slate-400"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-600"
+              : "border-slate-200 bg-slate-50 text-slate-500"
           }`}
         >
           {channel ? "✓ ĐÃ LIÊN KẾT" : "CHƯA LIÊN KẾT"}
@@ -199,17 +207,17 @@ export function ChannelLinkCard({ platform, channel, onChanged }) {
           <div className="mt-4 flex items-center gap-3">
             <Avatar src={channel.avatar} name={channel.name} size={56} />
             <div className="min-w-0">
-              <p className="truncate text-base font-bold text-white">{channel.name || channel.handle}</p>
-              <p className="truncate font-mono text-xs text-slate-400">{channel.handle}</p>
+              <p className="truncate text-base font-bold text-slate-800">{channel.name || channel.handle}</p>
+              <p className="truncate font-mono text-xs text-slate-500">{channel.handle}</p>
               {channel.followers !== null && channel.followers !== undefined && (
-                <p className="text-xs text-cyan-300">{fmt(channel.followers)} người theo dõi</p>
+                <p className="text-xs font-semibold text-cyan-600">{fmt(channel.followers)} người theo dõi</p>
               )}
             </div>
           </div>
           <button
             onClick={unlink}
             disabled={busy}
-            className="mt-4 rounded-full border border-white/15 px-4 py-2 text-xs font-semibold text-slate-300 disabled:opacity-50"
+            className="mt-4 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 shadow-sm disabled:opacity-50"
           >
             {busy ? "Đang xử lý..." : "Huỷ liên kết"}
           </button>
@@ -224,12 +232,12 @@ export function ChannelLinkCard({ platform, channel, onChanged }) {
             autoComplete="off"
             spellCheck={false}
             maxLength={200}
-            className="mt-3 w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-cyan-400/60"
+            className="mt-3 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white transition-colors"
           />
           <button
             onClick={link}
             disabled={busy || !url.trim()}
-            className="mt-3 flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50"
+            className="mt-3 flex items-center gap-2 rounded-full bg-cyan-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-700 disabled:opacity-50"
           >
             {busy && <Loader2 size={15} className="animate-spin" />}
             {busy ? "Đang kiểm tra kênh..." : "Liên kết kênh"}
@@ -238,14 +246,15 @@ export function ChannelLinkCard({ platform, channel, onChanged }) {
       )}
 
       {msg && (
-        <p className={`mt-3 text-xs font-semibold ${msg.ok ? "text-emerald-300" : "text-rose-300"}`}>
+        <p className={`mt-3 text-xs font-semibold ${msg.ok ? "text-emerald-600" : "text-rose-500"}`}>
           {msg.text}
         </p>
       )}
-    </Card>
+    </div>
   );
 }
 
+// 7. GUIDE VIDEO
 export function GuideVideo({ url }) {
   const u = (url || "").trim();
   const yt = u.match(
@@ -253,10 +262,10 @@ export function GuideVideo({ url }) {
   )?.[1];
   return (
     <Card>
-      <Eyebrow className="flex items-center gap-2">
-        <PlayCircle size={14} className="text-cyan-400" /> Hướng dẫn liên kết kênh
+      <Eyebrow className="flex items-center gap-2 !text-slate-600">
+        <PlayCircle size={14} className="text-cyan-600" /> Hướng dẫn liên kết kênh
       </Eyebrow>
-      <div className="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-black/40">
+      <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
         {yt ? (
           <iframe
             title="Hướng dẫn liên kết kênh"
@@ -269,12 +278,12 @@ export function GuideVideo({ url }) {
           <video src={u} controls playsInline className="aspect-video w-full" />
         ) : (
           <div className="flex aspect-video flex-col items-center justify-center gap-2 text-center">
-            <PlayCircle size={34} className="text-slate-600" />
-            <p className="text-sm font-semibold text-slate-300">Video hướng dẫn sắp có</p>
-            <p className="px-6 text-xs text-slate-500">Dán link kênh ở bên dưới để liên kết nhé.</p>
+            <PlayCircle size={34} className="text-slate-300" />
+            <p className="text-sm font-semibold text-slate-500">Video hướng dẫn sắp có</p>
+            <p className="px-6 text-xs text-slate-400">Dán link kênh ở bên dưới để liên kết nhé.</p>
           </div>
         )}
       </div>
     </Card>
   );
-}
+    }
