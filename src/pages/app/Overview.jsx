@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
+import { ExternalLink, ChevronRight } from "lucide-react";
 import { 
   Send, Trophy, Timer, CheckCircle2, Film, Bell, Play, Eye, Heart, MessageSquare, Share2, Clock, AlertCircle, Gift 
 } from "lucide-react";
