@@ -1,10 +1,26 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Bell, X, ArrowRight } from "lucide-react";
 
 export default function NotificationDropdown({ onClose }) {
+  const ref = useRef(null);
+
+  // Tự động đóng khi click ra ngoài
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (ref.current && !ref.current.contains(event.target)) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [onClose]);
+
   return (
-    // Sửa right-[-60px] thành right-0 để nó thẳng hàng với icon chuông
-    <div className="absolute right-0 mt-3 w-72 rounded-2xl border border-slate-100 bg-white p-4 shadow-xl animate-in fade-in slide-in-from-top-2 z-50">
+    // Dùng fixed, top-16 (cách header) và right-4 (cách lề phải 16px) để không bao giờ bị tràn
+    <div 
+      ref={ref}
+      className="fixed top-[64px] right-4 z-[100] w-[calc(100vw-32px)] max-w-[320px] rounded-2xl border border-slate-100 bg-white p-4 shadow-2xl animate-in fade-in slide-in-from-top-2"
+    >
       <div className="flex items-center justify-between mb-2">
         <span className="text-[11px] font-bold tracking-widest text-slate-500 uppercase">▸ THÔNG BÁO</span>
         <X size={16} className="text-slate-400 cursor-pointer hover:text-slate-600 transition" onClick={onClose} />
