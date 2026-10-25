@@ -52,12 +52,12 @@ export default function Overview() {
       <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/80 p-5 shadow-sm">
         <div className="flex items-center gap-4">
           
-          {/* KHỐI AVATAR MẪU - BOTTS NEUTRAL */}
+          {/* AVATAR ROBOT ĐÃ SỬA LỖI */}
           <div className="relative shrink-0">
-            <div className="h-20 w-20 rounded-full border-[3px] border-slate-200 overflow-hidden bg-cyan-50 shadow-sm">
+            <div className="h-20 w-20 rounded-full border-[3px] border-slate-100 overflow-hidden bg-white shadow-sm flex items-center justify-center">
               <img 
-                // Đã đổi sang API Bottts Neutral và cài đặt màu xanh cho hợp theme
-                src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Nxx315&backgroundColor=transparent&baseColor=cyan" 
+                // Bỏ backgroundColor, thêm radius=50 để cắt tròn chuẩn
+                src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Nxx315&radius=50" 
                 alt="Avatar" 
                 className="h-full w-full object-cover"
               />
@@ -218,4 +218,4 @@ export default function Overview() {
       </div>
     </div>
   );
-  }
+                     }
