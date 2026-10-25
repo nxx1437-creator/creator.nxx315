@@ -40,7 +40,6 @@ function LinkBanner({ showButton, onGo }) {
   );
 }
 
-// ĐÃ SỬA LẠI LOGO THÀNH NXX315 CREATOR
 function Nxx315Logo() {
   return (
     <div className="flex items-center gap-1 text-[18px] font-extrabold tracking-tight text-slate-900">
@@ -115,7 +114,7 @@ export default function AppLayout() {
     <div className="min-h-screen bg-gradient-to-b from-[#f4fbf9] to-[#e6f7fa] pb-28 text-slate-800 font-sans">
       <div className="pointer-events-none fixed inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(0,0,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
 
-      {/* TOAST THÔNG BÁO CẬP NHẬT TỰ ĐỘNG */}
+      {/* TOAST THÔNG BÁO CẬP NHẬT */}
       {hasUpdate && (
         <div className="fixed top-16 left-1/2 z-[100] -translate-x-1/2 w-[90%] max-w-sm animate-in slide-in-from-top-4 fade-in">
           <div className="relative overflow-hidden rounded-2xl bg-slate-900 px-4 py-3 shadow-2xl flex items-center justify-between gap-3">
@@ -132,7 +131,6 @@ export default function AppLayout() {
       <header className="sticky top-0 z-50 border-b border-white/50 bg-[#f4fbf9]/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-md items-center justify-between px-4 py-3 md:max-w-3xl">
           
-          {/* DÙNG LOGO NXX315 CREATOR */}
           <Nxx315Logo />
 
           <div className="flex items-center gap-3 sm:gap-4 text-slate-600">
@@ -233,4 +231,4 @@ export default function AppLayout() {
       </nav>
     </div>
   );
-}
+      }
