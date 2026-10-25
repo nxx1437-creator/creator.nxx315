@@ -1,9 +1,30 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
-  ArrowRight, ArrowLeft, Check, Sparkles, User, MessageSquare, Youtube, AlertCircle
+  ArrowRight, ArrowLeft, Check, Sparkles, User, MessageSquare, Youtube, AlertCircle, Loader2
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient.js";
+
+// Component hiển thị thông tin kênh sau khi kiểm tra thành công
+function ChannelPreview({ data, platform }) {
+  if (!data) return null;
+  return (
+    <div className="mt-3 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+      <img 
+        src={data.avatar || "https://ui-avatars.com/api/?name=" + (data.name || "User")} 
+        alt="Avatar" 
+        className="h-10 w-10 rounded-full object-cover border border-emerald-200" 
+      />
+      <div className="flex-1 min-w-0">
+        <p className="text-[13px] font-bold text-slate-900 truncate">{data.name || data.handle}</p>
+        <p className="text-[11px] text-slate-500 truncate">{data.handle} • {data.followers?.toLocaleString() || 0} followers</p>
+      </div>
+      <div className="shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-emerald-500 text-white">
+        <Check size={14} />
+      </div>
+    </div>
+  );
+}
 
 function StepCard({ children, iconBg }) {
   return (
@@ -24,20 +45,22 @@ export default function Onboarding() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // State lưu link kênh
+  // States cho Kênh (Step 4)
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [tiktokUrl, setTiktokUrl] = useState("");
+  const [ytPreview, setYtPreview] = useState(null); // Lưu thông tin kênh YT sau khi check
+  const [ttPreview, setTtPreview] = useState(null); // Lưu thông tin kênh TT sau khi check
 
   const nextStep = () => setStep((s) => Math.min(s + 1, 4));
   const prevStep = () => setStep((s) => Math.max(s - 1, 1));
 
-  // Hàm gọi API Liên kết kênh (Edge Function creator-verify)
-  const handleLinkChannel = async (platform, url) => {
-    if (!url) return { ok: true }; // Bỏ trống thì bỏ qua
+  // Hàm gọi API để kiểm tra (và lấy thông tin) kênh
+  const verifyChannel = async (platform, url) => {
+    if (!url) return null;
     setLoading(true);
     setErrorMsg("");
-    
     try {
+      // Gọi hàm link_channel. Theo tài liệu, hàm này tự lưu vào DB và trả về thông tin kênh
       const { data, error } = await supabase.functions.invoke("creator-verify", {
         body: { action: "link_channel", platform, url }
       });
@@ -45,32 +68,45 @@ export default function Onboarding() {
       if (error) throw error;
       if (!data.ok) throw new Error(data.message || "Kênh không hợp lệ");
 
-      return { ok: true };
+      // Trả về data để hiển thị Preview (giả sử API trả về data.channel hoặc data trực tiếp)
+      return data.channel || data; 
     } catch (err) {
-      setErrorMsg(`Lỗi liên kết ${platform}: ${err.message}`);
-      return { ok: false };
+      setErrorMsg(`Lỗi kiểm tra kênh ${platform}: ${err.message}`);
+      return null;
     } finally {
       setLoading(false);
     }
   };
 
-  // Hàm hoàn tất Onboarding
+  // Xử lý khi người dùng nhập xong link YouTube và bấm ra ngoài
+  const handleYoutubeBlur = async () => {
+    if (youtubeUrl && !ytPreview) {
+      const res = await verifyChannel("youtube", youtubeUrl);
+      if (res) setYtPreview(res);
+    }
+  };
+
+  // Xử lý khi người dùng nhập xong link TikTok
+  const handleTiktokBlur = async () => {
+    if (tiktokUrl && !ttPreview) {
+      const res = await verifyChannel("tiktok", tiktokUrl);
+      if (res) setTtPreview(res);
+    }
+  };
+
+  // Hàm hoàn tất
   const handleFinish = async () => {
-    setErrorMsg("");
-    
-    // 1. Liên kết YouTube (nếu có nhập)
-    if (youtubeUrl) {
-      const ytRes = await handleLinkChannel("youtube", youtubeUrl);
-      if (!ytRes.ok) return; // Dừng lại nếu lỗi
+    // Nếu có link nhưng chưa verify (chưa có preview), verify lần cuối
+    if (youtubeUrl && !ytPreview) {
+      const res = await verifyChannel("youtube", youtubeUrl);
+      if (!res) return; // Lỗi thì dừng
+    }
+    if (tiktokUrl && !ttPreview) {
+      const res = await verifyChannel("tiktok", tiktokUrl);
+      if (!res) return;
     }
 
-    // 2. Liên kết TikTok (nếu có nhập)
-    if (tiktokUrl) {
-      const ttRes = await handleLinkChannel("tiktok", tiktokUrl);
-      if (!ttRes.ok) return;
-    }
-
-    // 3. Chuyển vào App
+    // Mọi thứ OK, chuyển vào App
     navigate("/app", { replace: true });
   };
 
@@ -83,11 +119,11 @@ export default function Onboarding() {
       </div>
       
       <h1 className="mt-5 text-3xl font-extrabold tracking-tight text-slate-900 leading-tight">
-        Chào mừng đến<br/>với <span className="text-cyan-600">XCloudPhone Creator</span>
+        Chào mừng đến<br/>với <span className="text-cyan-600">Nxx315 Creator</span>
       </h1>
       
       <p className="mt-4 text-[14px] leading-relaxed text-slate-600">
-        Đăng video TikTok/YouTube quảng bá XCloudPhone → bot tự scrape → admin duyệt → bạn nhận thưởng (giờ dùng cloud phone + tiền cho top tháng).
+        Đăng video TikTok/YouTube quảng bá Nxx315 → bot tự scrape → admin duyệt → bạn nhận thưởng (giờ dùng cloud phone + tiền cho top tháng).
       </p>
 
       <div className="mt-6 space-y-3">
@@ -172,6 +208,7 @@ export default function Onboarding() {
       <p className="mt-2 text-[13px] text-slate-600">Bot quét cả hai kênh mỗi ngày, video mới có hashtag yêu cầu sẽ tự được ghi nhận.</p>
 
       <div className="mt-6 space-y-4">
+        {/* YouTube Input */}
         <div>
           <label className="text-[13px] font-semibold text-slate-700 flex items-center gap-2">
             <Youtube size={16} className="text-red-500" /> YouTube
@@ -179,23 +216,34 @@ export default function Onboarding() {
           <input 
             type="text" 
             value={youtubeUrl}
-            onChange={(e) => setYoutubeUrl(e.target.value)}
+            onChange={(e) => {
+              setYoutubeUrl(e.target.value);
+              if (ytPreview) setYtPreview(null); // Reset preview nếu đổi link
+            }}
+            onBlur={handleYoutubeBlur} // Kích hoạt check khi bấm ra ngoài
             placeholder="https://youtube.com/@ten"
             className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[14px] text-slate-900 outline-none transition focus:border-cyan-500 focus:bg-white"
           />
+          <ChannelPreview data={ytPreview} platform="youtube" />
         </div>
         
+        {/* TikTok Input */}
         <div>
-          <label className="text-[13px] font-semibold text-slate-700 flex items-center gap-2">
+          <label className="text-[13px] font-semibold text-slate-700 flex items-center gap-2 mt-2">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg> TikTok
           </label>
           <input 
             type="text" 
             value={tiktokUrl}
-            onChange={(e) => setTiktokUrl(e.target.value)}
+            onChange={(e) => {
+              setTiktokUrl(e.target.value);
+              if (ttPreview) setTtPreview(null);
+            }}
+            onBlur={handleTiktokBlur}
             placeholder="https://tiktok.com/@handle"
             className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[14px] text-slate-900 outline-none transition focus:border-cyan-500 focus:bg-white"
           />
+          <ChannelPreview data={ttPreview} platform="tiktok" />
         </div>
       </div>
 
@@ -205,16 +253,35 @@ export default function Onboarding() {
 
       {errorMsg && <p className="mt-3 text-xs font-semibold text-rose-500">{errorMsg}</p>}
 
-      <div className="mt-8 flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <button onClick={prevStep} disabled={loading} className="flex items-center gap-2 text-[14px] font-semibold text-slate-500 hover:text-slate-900 disabled:opacity-50">
-            <ArrowLeft size={16} /> Quay lại
+      {/* FIX LỖI NÚT BỊ TẬT */}
+      <div className="mt-8 flex flex-col gap-4">
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={prevStep} 
+            disabled={loading} 
+            className="flex items-center justify-center h-12 px-4 rounded-full border border-slate-200 text-[14px] font-semibold text-slate-600 transition hover:bg-slate-50 disabled:opacity-50 shrink-0"
+          >
+            <ArrowLeft size={16} />
           </button>
-          <button onClick={handleFinish} disabled={loading} className="flex items-center gap-2 rounded-full bg-cyan-600 px-6 py-3 text-[14px] font-bold text-white transition hover:bg-cyan-700 active:scale-95 shadow-md shadow-cyan-600/20 disabled:opacity-70">
-            {loading ? "Đang liên kết..." : "Liên kết & hoàn tất"} <Check size={16} />
+          
+          <button 
+            onClick={handleFinish} 
+            disabled={loading} 
+            className="flex-1 flex items-center justify-center gap-2 rounded-full bg-cyan-600 px-4 h-12 text-[14px] font-bold text-white transition hover:bg-cyan-700 active:scale-95 shadow-md shadow-cyan-600/20 disabled:opacity-70"
+          >
+            {loading ? (
+              <><Loader2 size={16} className="animate-spin" /> Đang xử lý...</>
+            ) : (
+              <>Hoàn tất <Check size={16} /></>
+            )}
           </button>
         </div>
-        <button onClick={() => navigate("/app")} disabled={loading} className="w-full text-center text-[13px] font-semibold text-slate-500 hover:text-slate-800 mt-2 disabled:opacity-50">
+        
+        <button 
+          onClick={() => navigate("/app")} 
+          disabled={loading} 
+          className="w-full text-center text-[13px] font-semibold text-slate-500 hover:text-slate-800 disabled:opacity-50"
+        >
           Bỏ qua & hoàn tất
         </button>
       </div>
@@ -261,4 +328,4 @@ export default function Onboarding() {
       </div>
     </div>
   );
-    }
+            }
