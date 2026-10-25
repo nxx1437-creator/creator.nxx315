@@ -56,7 +56,7 @@ export default function Rules() {
         </InfoCard>
         
         <InfoCard icon={Globe} title="Trạng thái">
-          Công khai · Không xóa
+          Công khai · Không xóa · không ẩn
         </InfoCard>
         
         <InfoCard icon={Hash} title="Hashtag bắt buộc">
