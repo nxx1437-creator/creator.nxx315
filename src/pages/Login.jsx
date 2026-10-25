@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Loader2, Film, Trophy, Gift, ShieldCheck, Home, Globe, Moon } from "lucide-react";
+import { Loader2, Film, Trophy, Gift, ShieldCheck, Home, Globe } from "lucide-react";
 import { supabase, MAIN_SITE } from "../lib/supabaseClient.js";
 
 function GoogleG() {
@@ -14,7 +14,7 @@ function GoogleG() {
   );
 }
 
-/* ---------- Nút đăng nhập Google do chính Google hiển thị ---------- */
+/* ---------- Nút đăng nhập Google ---------- */
 const GIS_SRC = "https://accounts.google.com/gsi/client";
 
 function loadGis() {
@@ -94,7 +94,6 @@ function GoogleSignIn({ setBusy, setError, onFallback }) {
     };
   }, [setBusy, setError]);
 
-  // Nếu Google lỗi
   if (failed) {
     return (
       <div className="mt-5">
@@ -111,17 +110,13 @@ function GoogleSignIn({ setBusy, setError, onFallback }) {
 
   return (
     <div className="mt-5 flex flex-col items-center">
-      {/* Vùng chứa nút Google */}
       <div className="relative w-full min-h-[44px] flex justify-center">
-        {/* Nút giả lập (Skeleton) khi Google chưa tải xong */}
         {!ready && (
           <div className="absolute inset-0 flex w-full animate-pulse items-center justify-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2.5 shadow-sm">
             <GoogleG />
             <span className="text-[14px] font-bold text-slate-700">Đăng nhập bằng Google</span>
           </div>
         )}
-        
-        {/* Nút thật của Google (sẽ đè lên trên khi tải xong) */}
         <div ref={boxRef} className={`w-full flex justify-center ${!ready ? 'opacity-0 pointer-events-none' : 'opacity-100'}`} />
       </div>
 
@@ -135,7 +130,7 @@ function GoogleSignIn({ setBusy, setError, onFallback }) {
   );
 }
 
-/* ---------- Hình trang trí ở các góc (Xanh nước biển) ---------- */
+/* ---------- Hình trang trí ở các góc ---------- */
 function OrnScan() {
   return (
     <svg width="80" height="80" viewBox="0 0 100 100" fill="none" className="opacity-40 text-cyan-500">
@@ -177,20 +172,6 @@ function OrnCoin() {
       <circle cx="52" cy="52" r="26" fill="#BFDBFE" fillOpacity=".6" />
       <text x="52" y="59" textAnchor="middle" fontSize="20" fontWeight="800" fill="#1E3A8A" fontFamily="sans-serif">xu</text>
     </svg>
-  );
-}
-
-/* ---------- Hình lục giác giữa thẻ ---------- */
-function Emblem() {
-  return (
-    <div className="relative mx-auto h-24 w-24 flex items-center justify-center">
-      <span className="absolute inset-0 animate-[spin_50s_linear_infinite] rounded-full border-2 border-dashed border-cyan-200/60" />
-      <span className="absolute inset-2 animate-[spin_34s_linear_infinite_reverse] rounded-full border-2 border-dotted border-cyan-200/60" />
-      <svg viewBox="0 0 100 100" className="relative h-16 w-16 drop-shadow-sm" fill="none">
-        <path d="M50 4l38 22v48L50 96 12 74V26z" fill="#E0F2FE" stroke="#0891B2" strokeWidth="3" strokeLinejoin="round" />
-        <text x="50" y="60" textAnchor="middle" fill="#0E7490" fontSize="28" fontWeight="bold" fontFamily="sans-serif">XC</text>
-      </svg>
-    </div>
   );
 }
 
@@ -238,7 +219,6 @@ export default function Login() {
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-b from-[#f4fbf9] to-[#e6f7fa] text-slate-800 font-sans">
-      {/* Background Grid */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.04]"
         style={{
@@ -249,7 +229,6 @@ export default function Login() {
       />
 
       <header className="relative mx-auto flex max-w-md items-center justify-between px-6 py-4 z-20">
-        {/* ĐÃ KHÔI PHỤC LOGO NXX315 CREATOR CHUẨN CỦA BẠN */}
         <Link to="/" className="text-[20px] font-extrabold tracking-tight text-slate-900">
           Nxx315 <span className="text-cyan-600">Creator</span>
         </Link>
@@ -263,26 +242,25 @@ export default function Login() {
         </div>
       </header>
 
-      {/* Thu gọn khoảng cách */}
       <main className="relative mx-auto flex max-w-md flex-col justify-center px-5 pb-6 pt-2 z-10">
         <div className="relative mt-2">
-          {/* Trang trí */}
+          {/* Hình trang trí 4 góc */}
           <div className="absolute top-10 -left-6 z-0 pointer-events-none"><OrnScan /></div>
           <div className="absolute -top-6 -right-6 z-0 pointer-events-none"><OrnSparkle /></div>
           <div className="absolute bottom-20 -left-6 z-0 pointer-events-none"><OrnGem /></div>
           <div className="absolute -bottom-4 -right-6 z-0 pointer-events-none"><OrnCoin /></div>
 
-          {/* Thẻ chính */}
+          {/* Thẻ chính - Đã xóa phần Emblem ở trên cùng */}
           <div className="relative z-10 rounded-[2rem] border border-white bg-white/85 px-5 pb-6 pt-8 shadow-[0_8px_30px_rgba(0,0,0,0.05)] backdrop-blur-xl">
-            <Emblem />
-
-            <div className="mt-4 flex justify-center">
+            
+            <div className="flex justify-center">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-600/20 bg-cyan-50 px-3 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.15em] text-cyan-700">
                 <span className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" /> Kết nối an toàn
               </span>
             </div>
 
-            <h1 className="mt-4 text-center font-mono text-[22px] font-semibold uppercase tracking-[0.1em] text-slate-900">
+            {/* Đã giảm khoảng cách margin top của tiêu đề vì không còn cụm icon ở trên */}
+            <h1 className="mt-5 text-center font-mono text-[22px] font-semibold uppercase tracking-[0.1em] text-slate-900">
               Lối vào Creator
             </h1>
             <p className="mx-auto mt-2 max-w-[16rem] text-center text-[13px] leading-relaxed text-slate-600">
@@ -333,4 +311,4 @@ export default function Login() {
       </main>
     </div>
   );
-      }
+  }
