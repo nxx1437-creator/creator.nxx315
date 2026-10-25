@@ -5,7 +5,6 @@ import {
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient.js";
 
-// Component hiển thị thông tin kênh sau khi kiểm tra thành công
 function ChannelPreview({ data }) {
   if (!data) return null;
   return (
@@ -43,23 +42,29 @@ function StepCard({ children, iconBg }) {
 
 export default function Onboarding() {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1);
+  
+  // Khôi phục lại bước đang làm dở nếu có (sau khi đi OAuth Discord về)
+  const savedStep = sessionStorage.getItem("onboarding_step");
+  const [step, setStep] = useState(savedStep ? parseInt(savedStep) : 1);
+  
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // States cho Kênh (Step 4)
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [tiktokUrl, setTiktokUrl] = useState("");
   const [ytPreview, setYtPreview] = useState(null); 
   const [ttPreview, setTtPreview] = useState(null); 
-  
-  // State check xem đã liên kết Discord chưa
   const [isDiscordLinked, setIsDiscordLinked] = useState(false);
 
-  const nextStep = () => setStep((s) => Math.min(s + 1, 4));
-  const prevStep = () => setStep((s) => Math.max(s - 1, 1));
+  // Mỗi khi đổi bước, lưu lại vào sessionStorage
+  const changeStep = (newStep) => {
+    setStep(newStep);
+    sessionStorage.setItem("onboarding_step", newStep);
+  };
 
-  // Tự động kiểm tra xem user đã liên kết Discord chưa khi vào trang
+  const nextStep = () => changeStep(Math.min(step + 1, 4));
+  const prevStep = () => changeStep(Math.max(step - 1, 1));
+
   useEffect(() => {
     const checkDiscordStatus = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -67,9 +72,11 @@ export default function Onboarding() {
       
       if (discordIdentity) {
         setIsDiscordLinked(true);
-        // Nếu đang ở bước 3 mà đã có Discord rồi thì tự động nhảy sang bước 4
+        // Đã liên kết xong thì nhảy sang bước 4
         if (step === 3) {
-          setStep(4);
+          changeStep(4);
+          // Xóa session lưu bước đi để lần sau vào không bị kẹt
+          sessionStorage.removeItem("onboarding_step");
         }
       }
     };
@@ -77,7 +84,6 @@ export default function Onboarding() {
     checkDiscordStatus();
   }, [step]);
 
-  // Xử lý liên kết Discord
   const handleLinkDiscord = async () => {
     setLoading(true);
     setErrorMsg("");
@@ -89,14 +95,13 @@ export default function Onboarding() {
         },
       });
       if (error) throw error;
-      // Trình duyệt sẽ tự chuyển sang Discord, không chạy code bên dưới
+      // Trình duyệt sẽ tự chuyển sang Discord
     } catch (err) {
       setErrorMsg("Không thể kết nối Discord: " + err.message);
       setLoading(false);
     }
   };
 
-  // Hàm gọi API kiểm tra kênh
   const verifyChannel = async (platform, url) => {
     if (!url) return null;
     setLoading(true);
@@ -141,10 +146,10 @@ export default function Onboarding() {
       const res = await verifyChannel("tiktok", tiktokUrl);
       if (!res) return;
     }
+    // Xóa bộ nhớ tạm khi hoàn tất
+    sessionStorage.removeItem("onboarding_step");
     navigate("/app", { replace: true });
   };
-
-  // --- GIAO DIỆN CÁC BƯỚC ---
 
   const renderStep1 = () => (
     <StepCard iconBg={<Sparkles />}>
@@ -321,7 +326,10 @@ export default function Onboarding() {
         </div>
         
         <button 
-          onClick={() => navigate("/app")} 
+          onClick={() => {
+            sessionStorage.removeItem("onboarding_step");
+            navigate("/app");
+          }} 
           disabled={loading} 
           className="w-full text-center text-[13px] font-semibold text-slate-500 hover:text-slate-800 disabled:opacity-50"
         >
@@ -371,4 +379,4 @@ export default function Onboarding() {
       </div>
     </div>
   );
-        }
+}
