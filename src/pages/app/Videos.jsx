@@ -233,10 +233,8 @@ export default function Videos() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-10">
-          <Loader2 size={22} className="animate-spin text-cyan-600" />
-        </div>
-      ) : shown.length === 0 ? (
+  <div className="h-40"></div> // Khung trống
+) : shown.length === 0 ? (
         <div className="rounded-[2rem] border border-dashed border-slate-300 bg-white/50 px-5 py-14 text-center">
           <Film size={36} className="mx-auto text-slate-400" />
           <p className="mt-3 text-lg font-bold text-slate-600">Chưa có video.</p>
