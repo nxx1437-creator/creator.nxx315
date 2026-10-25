@@ -3,14 +3,15 @@ import { Bell, X, ArrowRight } from "lucide-react";
 
 export default function NotificationDropdown({ onClose }) {
   return (
-    <div className="absolute right-[-60px] sm:right-0 mt-3 w-72 rounded-2xl border border-slate-100 bg-white p-4 shadow-xl animate-in fade-in slide-in-from-top-2">
-      <div className="flex items-center justify-between mb-4">
-        <span className="text-[10px] font-bold tracking-widest text-slate-500 uppercase">▸ THÔNG BÁO</span>
-        <X size={16} className="text-slate-400 cursor-pointer hover:text-slate-600" onClick={onClose} />
+    // Sửa right-[-60px] thành right-0 để nó thẳng hàng với icon chuông
+    <div className="absolute right-0 mt-3 w-72 rounded-2xl border border-slate-100 bg-white p-4 shadow-xl animate-in fade-in slide-in-from-top-2 z-50">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[11px] font-bold tracking-widest text-slate-500 uppercase">▸ THÔNG BÁO</span>
+        <X size={16} className="text-slate-400 cursor-pointer hover:text-slate-600 transition" onClick={onClose} />
       </div>
       
-      <div className="flex flex-col items-center justify-center py-6 text-slate-400">
-        <Bell size={32} className="mb-3 opacity-30" />
+      <div className="flex flex-col items-center justify-center py-8">
+        <Bell size={36} className="mb-3 text-slate-200" />
         <p className="text-sm font-medium text-slate-500">Chưa có thông báo.</p>
       </div>
 
