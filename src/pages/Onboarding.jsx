@@ -247,36 +247,41 @@ export default function Onboarding() {
   // --- CÁC BƯỚC RENDER ---
 
   const renderStep1 = () => (
-    <StepCard bgIcon={<Sparkles />}>
-      <div className="inline-flex items-center gap-2 rounded-full border border-cyan-600/20 bg-cyan-50 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-cyan-700">
-        <span className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" /> ONBOARDING
+  <StepCard bgIcon={<Sparkles />}>
+    <div className="inline-flex items-center gap-2 rounded-full border border-cyan-600/20 bg-cyan-50 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-cyan-700">
+      <span className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" /> ONBOARDING
+    </div>
+    
+    {/* Đã bỏ thẻ <br/> và giảm font-size xuống text-[26px] để nằm gọn trên 1 dòng */}
+    <h1 className="mt-5 text-[26px] font-extrabold tracking-tight text-slate-900 leading-tight">
+      Chào mừng đến với <span className="text-cyan-600 whitespace-nowrap">Nxx315 Creator</span>
+    </h1>
+    
+    <p className="mt-4 text-[14px] leading-relaxed text-slate-600">
+      Đăng video TikTok/YouTube quảng bá Nxx315 → bot tự scrape → admin duyệt → bạn nhận thưởng.
+    </p>
+
+    <div className="mt-6 space-y-3">
+      <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+        <h3 className="text-[13px] font-bold text-cyan-600">01 . LIÊN KẾT KÊNH</h3>
+        <p className="mt-1 text-[13px] text-slate-600">Liên kết YouTube/TikTok để bot scrape video bạn đăng.</p>
       </div>
-      <h1 className="mt-5 text-3xl font-extrabold tracking-tight text-slate-900 leading-tight">
-        Chào mừng đến<br/>với <span className="text-cyan-600">Nxx315 Creator</span>
-      </h1>
-      <p className="mt-4 text-[14px] leading-relaxed text-slate-600">
-        Đăng video TikTok/YouTube quảng bá Nxx315 → bot tự scrape → admin duyệt → bạn nhận thưởng (giờ dùng cloud phone + tiền cho top tháng).
-      </p>
-      <div className="mt-6 space-y-3">
-        <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-          <h3 className="text-[13px] font-bold text-cyan-600">01 . LIÊN KẾT KÊNH</h3>
-          <p className="mt-1 text-[13px] text-slate-600">Liên kết YouTube/TikTok để bot scrape video bạn đăng.</p>
-        </div>
-        <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-          <h3 className="text-[13px] font-bold text-cyan-600">02 . NHẬN THƯỞNG</h3>
-          <p className="mt-1 text-[13px] text-slate-600">Mỗi video duyệt = +X giờ cloud phone. Top tháng nhận tiền mặt.</p>
-        </div>
+      <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+        <h3 className="text-[13px] font-bold text-cyan-600">02 . NHẬN THƯỞNG</h3>
+        <p className="mt-1 text-[13px] text-slate-600">Mỗi video duyệt = +X code xu. Top tháng nhận tiền mặt.</p>
       </div>
-      <div className="mt-8 flex items-center justify-between">
-        <button onClick={nextStep} className="flex items-center gap-2 rounded-full bg-cyan-600 px-6 py-3 text-[14px] font-bold text-white transition hover:bg-cyan-700 active:scale-95 shadow-md shadow-cyan-600/20">
-          Bắt đầu <ArrowRight size={16} />
-        </button>
-        <button onClick={skipAndFinish} className="text-[14px] font-semibold text-slate-500 hover:text-slate-800">
-          Bỏ qua
-        </button>
-      </div>
-    </StepCard>
-  );
+    </div>
+
+    <div className="mt-8 flex items-center justify-between">
+      <button onClick={nextStep} className="flex items-center gap-2 rounded-full bg-cyan-600 px-6 py-3 text-[14px] font-bold text-white transition hover:bg-cyan-700 active:scale-95 shadow-md shadow-cyan-600/20">
+        Bắt đầu <ArrowRight size={16} />
+      </button>
+      <button onClick={skipAndFinish} className="text-[14px] font-semibold text-slate-500 hover:text-slate-800">
+        Bỏ qua
+      </button>
+    </div>
+  </StepCard>
+);
 
   const renderStep2 = () => (
     <StepCard bgIcon={<User />}>
