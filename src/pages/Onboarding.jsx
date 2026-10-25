@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient.js";
 
-// Component hiển thị thông tin kênh
+// Tạm thời hiển thị toàn bộ data để debug
 function ChannelPreview({ data }) {
   if (!data) return null;
   
@@ -16,84 +16,42 @@ function ChannelPreview({ data }) {
   const initial = name.charAt(0).toUpperCase();
 
   return (
-    <div className="mt-3 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3 relative z-20">
-      {avatar ? (
-        <img src={avatar} alt="Avatar" className="h-10 w-10 rounded-full object-cover border border-emerald-200" />
-      ) : (
-        <div className="h-10 w-10 rounded-full bg-emerald-200 flex items-center justify-center text-emerald-700 font-bold">
-          {initial}
-        </div>
-      )}
-      <div className="flex-1 min-w-0">
-        <p className="text-[13px] font-bold text-slate-900 truncate">{name}</p>
-        {handle && (
-          <p className="text-[11px] text-slate-500 truncate">
-            {handle} • {followers.toLocaleString()} followers
-          </p>
+    <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+      <div className="flex items-center gap-3">
+        {avatar ? (
+          <img src={avatar} alt="Avatar" className="h-10 w-10 rounded-full object-cover border border-emerald-200" />
+        ) : (
+          <div className="h-10 w-10 rounded-full bg-emerald-200 flex items-center justify-center text-emerald-700 font-bold">
+            {initial}
+          </div>
         )}
+        <div className="flex-1 min-w-0">
+          <p className="text-[13px] font-bold text-slate-900 truncate">{name}</p>
+          {handle && (
+            <p className="text-[11px] text-slate-500 truncate">
+              {handle} • {followers.toLocaleString()} followers
+            </p>
+          )}
+        </div>
+        <div className="shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-emerald-500 text-white">
+          <Check size={14} />
+        </div>
       </div>
-      <div className="shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-emerald-500 text-white">
-        <Check size={14} />
+      
+      {/* KHUNG DEBUG: Hiển thị data thô từ API để xem cấu trúc */}
+      <div className="mt-2 bg-yellow-100 p-2 rounded text-[10px] text-yellow-800 break-all max-h-32 overflow-y-auto font-mono">
+        <strong>[DEBUG DATA]:</strong> {JSON.stringify(data)}
       </div>
     </div>
   );
 }
 
-/* ---------- Hình trang trí 4 góc (Đè ra ngoài thẻ) ---------- */
-function OrnTarget() {
-  return (
-    <svg width="90" height="90" viewBox="0 0 100 100" fill="none" className="opacity-40 text-cyan-500">
-      <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 8" />
-      <circle cx="50" cy="50" r="20" stroke="currentColor" strokeWidth="2" />
-      <path d="M50 0v20M50 80v20M0 50h20M80 50h20" stroke="currentColor" strokeWidth="2.5" />
-      <circle cx="50" cy="50" r="4" fill="currentColor" />
-    </svg>
-  );
-}
-
-function OrnStar() {
-  return (
-    <svg width="110" height="110" viewBox="0 0 120 120" fill="none" className="opacity-70">
-      <defs>
-        <linearGradient id="starGrad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#a5f3fc" />
-          <stop offset="100%" stopColor="#60a5fa" />
-        </linearGradient>
-      </defs>
-      <path d="M60 10 L75 45 L110 60 L75 75 L60 110 L45 75 L10 60 L45 45 Z" fill="url(#starGrad)" fillOpacity="0.8" />
-      <path d="M60 30 L68 52 L90 60 L68 68 L60 90 L52 68 L30 60 L52 52 Z" fill="#ffffff" fillOpacity="0.9" />
-    </svg>
-  );
-}
-
-function OrnGem() {
-  return (
-    <svg width="90" height="100" viewBox="0 0 84 96" fill="none" className="opacity-60 -rotate-12">
-      <path d="M42 6l32 26-32 58L10 32z" fill="#22D3EE" fillOpacity=".4" stroke="#06B6D4" strokeWidth="2.5" />
-      <path d="M10 32h64M42 6l-14 26 14 58 14-58z" stroke="#ffffff" strokeOpacity=".8" strokeWidth="1.5" />
-    </svg>
-  );
-}
-
-function OrnHex() {
-  return (
-    <svg width="90" height="100" viewBox="0 0 100 100" fill="none" className="opacity-60 rotate-12">
-      <path d="M50 5l40 25v40L50 95 10 70V30z" fill="#60A5FA" fillOpacity=".2" stroke="#3B82F6" strokeWidth="3" />
-      <path d="M50 25l20 12.5v25L50 75 30 62.5v-25z" fill="#BFDBFE" fillOpacity=".6" stroke="#60A5FA" strokeWidth="2" />
-    </svg>
-  );
-}
-
-// Thẻ chính có icon mờ to đằng sau
 function StepCard({ children, bgIcon }) {
   return (
     <div className="relative z-10 rounded-[2rem] border border-white bg-white/95 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl overflow-hidden">
-      {/* Icon to mờ đằng sau tiêu đề */}
       <div className="pointer-events-none absolute -right-6 top-0 text-[160px] text-cyan-500/[0.04] rotate-12 z-0">
         {bgIcon}
       </div>
-      
-      {/* Nội dung thẻ */}
       <div className="relative z-20">
         {children}
       </div>
@@ -125,13 +83,18 @@ export default function Onboarding() {
   const nextStep = () => changeStep(Math.min(step + 1, 4));
   const prevStep = () => changeStep(Math.max(step - 1, 1));
 
+  // SỬA LỖI 2: Kiểm tra Discord kỹ hơn, có độ trễ để chờ Supabase cập nhật session
   useEffect(() => {
     const checkDiscordStatus = async () => {
+      // Đợi 0.5s để Supabase kịp xử lý OAuth callback khi từ Discord quay về
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       const { data: { user } } = await supabase.auth.getUser();
       const discordIdentity = user?.identities?.find(id => id.provider === 'discord');
       
       if (discordIdentity) {
         setIsDiscordLinked(true);
+        // Tự động nhảy sang bước 4 nếu đang ở bước 3 hoặc ít hơn
         if (step < 4) {
           changeStep(4);
         }
@@ -157,6 +120,7 @@ export default function Onboarding() {
     }
   };
 
+  // Hàm lấy dữ liệu kênh, thêm log để kiểm tra
   const verifyChannel = async (platform, url) => {
     if (!url) return null;
     setLoading(true);
@@ -165,8 +129,13 @@ export default function Onboarding() {
       const { data, error } = await supabase.functions.invoke("creator-verify", {
         body: { action: "link_channel", platform, url }
       });
+      
       if (error) throw error;
       if (data && data.ok === false) throw new Error(data.message || "Kênh không hợp lệ.");
+      
+      console.log(`Dữ liệu ${platform} trả về:`, data);
+      
+      // Trả về nguyên gốc data để hiển thị lên khung Debug
       return data.channel || data; 
     } catch (err) {
       setErrorMsg(`Lỗi kênh ${platform}: ${err.message || "Không thể xác minh"}`);
@@ -217,22 +186,17 @@ export default function Onboarding() {
     );
   }
 
-  // --- CÁC BƯỚC RENDER ---
-
   const renderStep1 = () => (
     <StepCard bgIcon={<Sparkles />}>
       <div className="inline-flex items-center gap-2 rounded-full border border-cyan-600/20 bg-cyan-50 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-cyan-700">
         <span className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" /> ONBOARDING
       </div>
-      
       <h1 className="mt-5 text-3xl font-extrabold tracking-tight text-slate-900 leading-tight">
         Chào mừng đến<br/>với <span className="text-cyan-600">Nxx315 Creator</span>
       </h1>
-      
       <p className="mt-4 text-[14px] leading-relaxed text-slate-600">
         Đăng video TikTok/YouTube quảng bá Nxx315 → bot tự scrape → admin duyệt → bạn nhận thưởng (giờ dùng cloud phone + tiền cho top tháng).
       </p>
-
       <div className="mt-6 space-y-3">
         <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
           <h3 className="text-[13px] font-bold text-cyan-600">01 . LIÊN KẾT KÊNH</h3>
@@ -243,7 +207,6 @@ export default function Onboarding() {
           <p className="mt-1 text-[13px] text-slate-600">Mỗi video duyệt = +X giờ cloud phone. Top tháng nhận tiền mặt.</p>
         </div>
       </div>
-
       <div className="mt-8 flex items-center justify-between">
         <button onClick={nextStep} className="flex items-center gap-2 rounded-full bg-cyan-600 px-6 py-3 text-[14px] font-bold text-white transition hover:bg-cyan-700 active:scale-95 shadow-md shadow-cyan-600/20">
           Bắt đầu <ArrowRight size={16} />
@@ -390,15 +353,12 @@ export default function Onboarding() {
           })}
         </div>
 
-        {/* Vùng chứa thẻ và các hình trang trí 4 góc */}
         <div className="relative mt-2">
-          {/* Trang trí 4 góc đè ra ngoài thẻ */}
           <div className="absolute -top-10 -left-8 z-0 pointer-events-none"><OrnTarget /></div>
           <div className="absolute -top-12 -right-8 z-0 pointer-events-none"><OrnStar /></div>
           <div className="absolute -bottom-8 -left-8 z-0 pointer-events-none"><OrnGem /></div>
           <div className="absolute -bottom-10 -right-8 z-0 pointer-events-none"><OrnHex /></div>
 
-          {/* Nội dung thẻ (z-10 để nổi lên trên hình trang trí) */}
           <div className="relative z-10">
             {step === 1 && renderStep1()}
             {step === 2 && renderStep2()}
@@ -406,8 +366,7 @@ export default function Onboarding() {
             {step === 4 && renderStep4()}
           </div>
         </div>
-        
       </div>
     </div>
   );
-      }
+  }
