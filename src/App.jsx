@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { Loader2 } from "lucide-react";
 import useSession from "./hooks/useSession.js";
 import { supabase } from "./lib/supabaseClient.js";
 
@@ -15,7 +14,22 @@ import Videos from "./pages/app/Videos.jsx";
 import Rewards from "./pages/app/Rewards.jsx";
 import Settings from "./pages/app/Settings.jsx";
 
-// Component bảo vệ: Yêu cầu đăng nhập
+// Component Skeleton dùng chung để hiển thị khi đang tải
+function PageSkeleton() {
+  return (
+    <div className="min-h-screen bg-[#f4fbf9] p-5 animate-pulse">
+      <div className="flex justify-between items-center mb-6">
+        <div className="h-6 w-32 bg-slate-200 rounded"></div>
+        <div className="h-8 w-8 bg-slate-200 rounded-full"></div>
+      </div>
+      <div className="space-y-4">
+        <div className="h-48 bg-white rounded-[2rem] shadow-sm"></div>
+        <div className="h-64 bg-white rounded-[2rem] shadow-sm"></div>
+      </div>
+    </div>
+  );
+}
+
 function Protected({ children }) {
   const { session, loading } = useSession();
   const [checkingStatus, setCheckingStatus] = useState(true);
@@ -29,13 +43,11 @@ function Protected({ children }) {
 
     const checkUserStatus = async () => {
       try {
-        // 1. Kiểm tra cờ đã hoàn thành Onboarding trong localStorage
         const localOnboarded = localStorage.getItem(`onboarded_${session.user.id}`);
         
         if (localOnboarded === "true") {
           setNeedsOnboarding(false);
         } else {
-          // 2. Nếu chưa có cờ, kiểm tra xem DB đã có kênh chưa
           const { data: channels, error } = await supabase
             .from("creator_channels")
             .select("platform")
@@ -61,15 +73,9 @@ function Protected({ children }) {
     checkUserStatus();
   }, [session]);
 
-  // Nếu đang tải session hoặc đang kiểm tra lần đầu -> hiện vòng xoay
-  // NHƯNG: Khi đã vào App, quá trình này chỉ chạy 1 lần. 
-  // Nếu user đã onboarded, lần sau nó sẽ load cực nhanh (vì đọc từ localStorage).
+  // BỎ VÒNG XOAY, THAY BẰNG SKELETON
   if (loading || checkingStatus) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f4fbf9]">
-        <Loader2 size={26} className="animate-spin text-cyan-600" />
-      </div>
-    );
+    return <PageSkeleton />;
   }
 
   if (!session) return <Navigate to="/login" replace />;
@@ -78,16 +84,11 @@ function Protected({ children }) {
   return children;
 }
 
-// Component bảo vệ cho Onboarding
 function OnboardingProtected({ children }) {
   const { session, loading } = useSession();
   
   if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f4fbf9]">
-        <Loader2 size={26} className="animate-spin text-cyan-600" />
-      </div>
-    );
+    return <PageSkeleton />;
   }
   
   if (!session) return <Navigate to="/login" replace />;
@@ -95,12 +96,11 @@ function OnboardingProtected({ children }) {
   return children;
 }
 
-// Tách phần Routes ra để tránh bị render lại toàn bộ khi chuyển trang
 function AppRoutes() {
   const location = useLocation();
   
   return (
-    <div key={location.pathname} className="animate-in fade-in duration-300">
+    <div key={location.pathname}>
       <Routes location={location}>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
@@ -108,7 +108,6 @@ function AppRoutes() {
         
         <Route path="/onboarding" element={<OnboardingProtected><Onboarding /></OnboardingProtected>} />
 
-        {/* Bọc AppLayout trong Protected */}
         <Route path="/app" element={<Protected><AppLayout /></Protected>}>
           <Route index element={<Overview />} />
           <Route path="ranking" element={<Ranking />} />
