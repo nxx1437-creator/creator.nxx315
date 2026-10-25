@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { X, Loader2 } from "lucide-react";
-import { supabase } from "../../lib/supabase.js";
+import { supabase } from "../../lib/supabaseClient.js";
 
 const METHODS = [
   { id: "bank", label: "Ngân hàng" },
