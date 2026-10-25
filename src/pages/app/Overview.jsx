@@ -25,6 +25,29 @@ function useMonthEnd() {
   return left;
 }
 
+// Component Avatar xử lý Skeleton (Chống nháy ảnh)
+function AvatarWithSkeleton({ seed }) {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const imgUrl = `https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${seed || 'Nxx315'}&radius=50`;
+
+  return (
+    <div className="relative h-full w-full">
+      {/* Skeleton hiện lên trước khi ảnh tải xong */}
+      {!isLoaded && (
+        <div className="absolute inset-0 animate-pulse rounded-full bg-slate-200"></div>
+      )}
+      
+      {/* Ảnh Avatar, chỉ hiện ra khi đã tải xong */}
+      <img 
+        src={imgUrl} 
+        alt="Avatar" 
+        onLoad={() => setIsLoaded(true)}
+        className={`h-full w-full object-cover transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+      />
+    </div>
+  );
+}
+
 // Component Skeleton cho toàn trang
 function OverviewSkeleton() {
   return (
@@ -106,17 +129,12 @@ export default function Overview() {
       <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/80 p-5 shadow-sm">
         <div className="flex items-center gap-4">
           
-          {/* KHỐI AVATAR CÓ FADE-IN */}
+          {/* KHỐI AVATAR CÓ SKELETON CHỐNG NHÁY */}
           <div className="relative shrink-0">
-            <div className="h-20 w-20 rounded-full border-[3px] border-slate-100 overflow-hidden bg-slate-100 shadow-sm flex items-center justify-center">
-              <img 
-                src={`https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${profile?.id || profile?.username || 'Nxx315'}&radius=50`} 
-                alt="Avatar" 
-                className="h-full w-full object-cover animate-in fade-in duration-500"
-                onLoad={(e) => e.currentTarget.classList.remove('opacity-0')}
-              />
+            <div className="h-20 w-20 rounded-full border-[3px] border-slate-100 overflow-hidden bg-white shadow-sm flex items-center justify-center relative">
+              <AvatarWithSkeleton seed={profile?.id || profile?.username} />
             </div>
-            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-md bg-slate-600 px-2 py-0.5 text-[9px] font-bold tracking-widest text-white uppercase shadow-sm whitespace-nowrap">
+            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-md bg-slate-600 px-2 py-0.5 text-[9px] font-bold tracking-widest text-white uppercase shadow-sm whitespace-nowrap z-10">
               🔍 COMMON
             </span>
           </div>
@@ -271,4 +289,4 @@ export default function Overview() {
       </div>
     </div>
   );
-  }
+        }
