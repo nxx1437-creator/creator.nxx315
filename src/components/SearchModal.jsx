@@ -1,0 +1,76 @@
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Search, LayoutDashboard, Trophy, Film, Gift, Bell, BookOpen, HelpCircle, Settings, Coins, ArrowUpDown } from "lucide-react";
+
+const SEARCH_MENU = [
+  { label: "Tổng quan", path: "/app", icon: LayoutDashboard, sub: "/DASHBOARD" },
+  { label: "Xếp hạng", path: "/app/ranking", icon: Trophy, sub: "/RANKING" },
+  { label: "Video", path: "/app/videos", icon: Film, sub: "/VIDEOS" },
+  { label: "Phần thưởng", path: "/app/rewards", icon: Gift, sub: "/REWARDS" },
+  { label: "Nhận tiền", path: "/app/payout", icon: Coins, sub: "/PAYOUT" },
+  { label: "Thông báo", path: "/app/notifications", icon: Bell, sub: "/NOTIFICATIONS" },
+  { label: "Thể lệ", path: "/app/rules", icon: BookOpen, sub: "/RULES" },
+  { label: "Trợ giúp", path: "/app/help", icon: HelpCircle, sub: "/HELP" },
+  { label: "Cài đặt", path: "/app/settings", icon: Settings, sub: "/SETTINGS" },
+];
+
+export default function SearchModal({ onClose }) {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredMenu = SEARCH_MENU.filter(item => 
+    item.label.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div className="fixed inset-0 z-[100] flex justify-center bg-slate-900/40 backdrop-blur-sm px-4 pt-16 sm:pt-24 animate-in fade-in">
+      <div className="w-full max-w-lg h-fit max-h-[80vh] overflow-hidden rounded-2xl bg-[#e6f2f0] shadow-2xl flex flex-col border border-white/50">
+        {/* Thanh nhập liệu */}
+        <div className="flex items-center gap-3 px-4 py-4 border-b border-slate-300/50">
+          <Search size={22} className="text-slate-500" />
+          <input 
+            type="text" 
+            placeholder="Đi tới... (thử: payout, ranking, admin)"
+            className="flex-1 bg-transparent text-slate-800 text-lg outline-none placeholder:text-slate-500"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            autoFocus
+          />
+          <button onClick={onClose} className="rounded-lg bg-white/50 px-2 py-1 text-xs font-bold text-slate-600 hover:bg-white">
+            ESC
+          </button>
+        </div>
+        
+        {/* Danh sách menu */}
+        <div className="overflow-y-auto py-2">
+          {filteredMenu.length > 0 ? (
+            filteredMenu.map((item, idx) => (
+              <button 
+                key={idx}
+                onClick={() => { onClose(); navigate(item.path); }}
+                className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/60 transition-colors text-slate-700"
+              >
+                <div className="flex items-center gap-3">
+                  <item.icon size={20} className="text-slate-500" />
+                  <span className="text-[15px] font-medium">{item.label}</span>
+                </div>
+                <span className="text-[11px] font-mono text-slate-400 tracking-wider">{item.sub}</span>
+              </button>
+            ))
+          ) : (
+            <div className="py-10 text-center text-slate-500">
+              Không tìm thấy kết quả cho "{searchQuery}"
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between px-4 py-2 bg-slate-200/50 text-[10px] font-bold text-slate-500 uppercase tracking-widest border-t border-slate-300/50">
+          <span className="flex items-center gap-1"><ArrowUpDown size={12}/> DI CHUYỂN</span>
+          <span className="flex items-center gap-1">↵ MỞ</span>
+          <span className="flex items-center gap-1">⌘K BẬT/TẮT</span>
+        </div>
+      </div>
+    </div>
+  );
+}
