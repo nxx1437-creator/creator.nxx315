@@ -154,17 +154,26 @@ export default function Overview() {
           <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">▸ YÊU CẦU NHẬN THƯỞNG</span>
           <button onClick={() => navigate("/app/rules")} className="text-[10px] font-bold text-cyan-600 flex items-center gap-1">XEM THỂ LỆ <ArrowRight size={12}/></button>
         </div>
-        <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4">
-          <div className="flex items-center gap-2 text-rose-600 font-bold text-sm mb-2">
-            <AlertCircle size={16} /> Chưa đủ điều kiện nhận thưởng
-          </div>
-          <p className="text-xs text-rose-600/80 mb-3">Bạn mới có 0/5 video được duyệt — cần tối thiểu 5 video được duyệt mới nhận thưởng.</p>
-          <div className="flex items-center justify-between text-xs font-bold text-slate-700 mb-1">
-            <span className="flex items-center gap-1"><Film size={14}/> Video được duyệt</span>
-            <span>0/5</span>
-          </div>
-          <div className="h-1.5 w-full rounded-full bg-slate-200"><div className="h-full w-0 rounded-full bg-emerald-500"></div></div>
-        </div>
+        <div className={`rounded-2xl border p-4 ${ov.month_approved >= 5 ? 'border-emerald-200 bg-emerald-50' : 'border-rose-200 bg-rose-50'}`}>
+  <div className={`flex items-center gap-2 font-bold text-sm mb-2 ${ov.month_approved >= 5 ? 'text-emerald-600' : 'text-rose-600'}`}>
+    {ov.month_approved >= 5 ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />} 
+    {ov.month_approved >= 5 ? "Đã đủ điều kiện nhận thưởng" : "Chưa đủ điều kiện nhận thưởng"}
+  </div>
+  <p className={`text-xs mb-3 ${ov.month_approved >= 5 ? 'text-emerald-600/80' : 'text-rose-600/80'}`}>
+    Bạn mới có {ov.month_approved || 0}/5 video được duyệt — cần tối thiểu 5 video được duyệt mới nhận thưởng.
+  </p>
+  <div className="flex items-center justify-between text-xs font-bold text-slate-700 mb-1">
+    <span className="flex items-center gap-1"><Film size={14}/> Video được duyệt</span>
+    <span>{ov.month_approved || 0}/5</span>
+  </div>
+  <div className="h-1.5 w-full rounded-full bg-slate-200">
+     <div 
+       className="h-full rounded-full bg-emerald-500 transition-all duration-500" 
+       style={{ width: `${Math.min(((ov.month_approved || 0) / 5) * 100, 100)}%` }}
+     ></div>
+  </div>
+</div>
+
 
         <p className="mt-4 text-[11px] font-bold tracking-widest text-slate-500 uppercase">YÊU CẦU MỖI VIDEO</p>
         <ul className="mt-2 space-y-2">
