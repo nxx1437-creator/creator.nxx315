@@ -133,15 +133,13 @@ export default function AppLayout() {
             </button>
 
             {/* Nút Thông báo */}
-            <div className="relative" ref={notifyRef}>
-              <button onClick={() => setShowNotify(!showNotify)} className="hover:text-slate-900 flex items-center relative">
-                <Bell size={20} />
-                <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-rose-500 border border-white"></span>
-              </button>
-              
-              {/* Gọi Dropdown Thông báo */}
-              {showNotify && <NotificationDropdown onClose={() => setShowNotify(false)} />}
-            </div>
+<button onClick={() => setShowNotify(!showNotify)} className="hover:text-slate-900 flex items-center relative">
+  <Bell size={20} />
+  <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-rose-500 border border-white"></span>
+</button>
+
+{/* Gọi Dropdown Thông báo (Đặt ở ngoài thẻ div relative) */}
+{showNotify && <NotificationDropdown onClose={() => setShowNotify(false)} />}
             
             {/* Nút Ngôn ngữ */}
             <div className="relative" ref={langRef}>
