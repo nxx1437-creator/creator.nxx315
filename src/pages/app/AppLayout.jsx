@@ -6,7 +6,6 @@ import {
 } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
 import useSession from "../../hooks/useSession.js";
-
 import SearchModal from "../../components/SearchModal.jsx";
 import NotificationDropdown from "../../components/NotificationDropdown.jsx";
 
@@ -23,18 +22,10 @@ function LinkBanner({ showButton, onGo }) {
     <div className="flex items-start gap-3 rounded-3xl border border-amber-200 bg-amber-50 p-4 shadow-sm">
       <AlertTriangle size={22} className="mt-0.5 shrink-0 text-amber-500" />
       <div className="min-w-0 flex-1">
-        <p className="font-mono text-xs font-bold uppercase tracking-widest text-amber-900">
-          Bạn chưa liên kết kênh
-        </p>
-        <p className="mt-1 font-mono text-[11px] uppercase leading-relaxed tracking-wide text-amber-700">
-          Liên kết kênh TikTok hoặc YouTube để bắt đầu gửi video và nhận thưởng.
-        </p>
+        <p className="font-mono text-xs font-bold uppercase tracking-widest text-amber-900">Bạn chưa liên kết kênh</p>
+        <p className="mt-1 font-mono text-[11px] uppercase leading-relaxed tracking-wide text-amber-700">Liên kết kênh TikTok hoặc YouTube để bắt đầu gửi video và nhận thưởng.</p>
       </div>
-      {showButton && (
-        <button onClick={onGo} className="shrink-0 rounded-xl bg-amber-500 px-3 py-2 text-xs font-bold text-white shadow-sm">
-          Liên kết ngay
-        </button>
-      )}
+      {showButton && <button onClick={onGo} className="shrink-0 rounded-xl bg-amber-500 px-3 py-2 text-xs font-bold text-white shadow-sm">Liên kết ngay</button>}
     </div>
   );
 }
@@ -66,11 +57,13 @@ export default function AppLayout() {
   const langRef = useRef(null);
   const profileRef = useRef(null);
 
+  // SỬA TẠI ĐÂY: Nếu đã có ov thì không gọi lại API
   const reload = useCallback(async () => {
+    if (ov) return; 
     const { data } = await supabase.rpc("get_creator_overview");
     if (data?.ok) setOv(data);
     setLoading(false);
-  }, []);
+  }, [ov]);
 
   useEffect(() => {
     reload();
@@ -130,17 +123,11 @@ export default function AppLayout() {
 
       <header className="sticky top-0 z-50 border-b border-white/50 bg-[#f4fbf9]/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-md items-center justify-between px-4 py-3 md:max-w-3xl">
-          
           <Nxx315Logo />
 
           <div className="flex items-center gap-3 sm:gap-4 text-slate-600">
-            <button onClick={() => alert("Tính năng tải App đang được phát triển!")} className="hidden sm:block hover:text-slate-900">
-              <Download size={20} />
-            </button>
-
-            <button onClick={() => setShowSearch(true)} className="hover:text-slate-900 flex items-center">
-              <Search size={20} />
-            </button>
+            <button onClick={() => alert("Tính năng đang phát triển!")} className="hidden sm:block hover:text-slate-900"><Download size={20} /></button>
+            <button onClick={() => setShowSearch(true)} className="hover:text-slate-900 flex items-center"><Search size={20} /></button>
 
             <button 
               data-notif-toggle
@@ -163,9 +150,7 @@ export default function AppLayout() {
             )}
             
             <div className="relative" ref={langRef}>
-              <button onClick={() => setShowLang(!showLang)} className="hover:text-slate-900 flex items-center">
-                <Globe size={20} />
-              </button>
+              <button onClick={() => setShowLang(!showLang)} className="hover:text-slate-900 flex items-center"><Globe size={20} /></button>
               {showLang && (
                 <div className="absolute right-0 mt-3 w-40 rounded-2xl border border-slate-100 bg-white p-2 shadow-xl">
                   <button className="w-full text-left px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg">EN — English</button>
@@ -179,9 +164,7 @@ export default function AppLayout() {
                 {session?.user?.user_metadata?.avatar_url ? (
                   <img src={session.user.user_metadata.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
                 ) : (
-                  <div className="h-full w-full bg-cyan-600 text-white flex items-center justify-center font-bold text-xs uppercase">
-                    {session?.user?.email?.charAt(0) || "U"}
-                  </div>
+                  <div className="h-full w-full bg-cyan-600 text-white flex items-center justify-center font-bold text-xs uppercase">{session?.user?.email?.charAt(0) || "U"}</div>
                 )}
               </button>
               
@@ -191,27 +174,19 @@ export default function AppLayout() {
                     <p className="font-bold text-slate-800 truncate">{session?.user?.user_metadata?.full_name || "Creator"}</p>
                     <p className="text-xs text-slate-500 truncate">{session?.user?.email}</p>
                   </div>
-                  <button onClick={() => { setShowProfile(false); navigate("/app/settings"); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
-                    <Settings size={16} /> Cài đặt
-                  </button>
-                  <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
-                    <User size={16} /> Tài khoản
-                  </button>
+                  <button onClick={() => { setShowProfile(false); navigate("/app/settings"); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"><Settings size={16} /> Cài đặt</button>
+                  <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"><User size={16} /> Tài khoản</button>
                   <div className="h-px bg-slate-100 my-1"></div>
-                  <button onClick={signOut} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-rose-500 hover:bg-rose-50">
-                    <LogOut size={16} /> Đăng xuất
-                  </button>
+                  <button onClick={signOut} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-rose-500 hover:bg-rose-50"><LogOut size={16} /> Đăng xuất</button>
                 </div>
               )}
             </div>
           </div>
-
         </div>
       </header>
 
       <main className="relative mx-auto max-w-md space-y-4 px-4 py-5 md:max-w-3xl">
         {loading ? (
-          // ĐÃ THAY VÒNG XOAY BẰNG SKELETON
           <div className="space-y-4 animate-pulse">
             <div className="rounded-[2rem] border border-white bg-white/80 p-5 shadow-sm h-64">
               <div className="flex gap-4">
@@ -229,9 +204,7 @@ export default function AppLayout() {
         ) : !ov ? (
           <div className="py-16 text-center">
             <p className="text-sm text-slate-500">Không tải được dữ liệu.</p>
-            <button onClick={() => { setLoading(true); reload(); }} className="mt-3 rounded-full border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-700 shadow-sm">
-              Thử lại
-            </button>
+            <button onClick={() => { setLoading(true); reload(); }} className="mt-3 rounded-full border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-700 shadow-sm">Thử lại</button>
           </div>
         ) : (
           <>
