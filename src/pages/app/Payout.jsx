@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Wallet, History, AlertCircle, Trophy, Loader2 } from "lucide-react";
 import { Eyebrow } from "../../components/creator/creatorUi.jsx";
 import PayoutSheet from "../../components/creator/PayoutSheet.jsx";
-import { supabase } from "../../lib/supabase.js";
+import { supabase } from "../../lib/supabaseClient.js";
 
 const METHOD_LABEL = { bank: "Ngân hàng", momo: "MoMo", zalopay: "ZaloPay" };
 
