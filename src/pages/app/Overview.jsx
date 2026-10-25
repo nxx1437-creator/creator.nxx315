@@ -25,19 +25,67 @@ function useMonthEnd() {
   return left;
 }
 
+// Component Skeleton cho toàn trang
+function OverviewSkeleton() {
+  return (
+    <div className="space-y-4 animate-pulse">
+      {/* Card 1 */}
+      <div className="rounded-[2rem] border border-white bg-white/80 p-5 shadow-sm h-64">
+        <div className="flex gap-4">
+          <div className="h-20 w-20 rounded-full bg-slate-200"></div>
+          <div className="flex-1 space-y-3 py-2">
+            <div className="h-5 w-1/2 rounded bg-slate-200"></div>
+            <div className="h-6 w-3/4 rounded bg-slate-200"></div>
+            <div className="h-3 w-2/3 rounded bg-slate-200"></div>
+          </div>
+        </div>
+        <div className="mt-6 h-10 w-full rounded-full bg-slate-200"></div>
+        <div className="mt-3 h-10 w-full rounded-full bg-slate-200"></div>
+      </div>
+      {/* Card 2 */}
+      <div className="rounded-[2rem] border border-white bg-white/80 p-5 shadow-sm h-48">
+        <div className="h-4 w-1/3 rounded bg-slate-200 mb-4"></div>
+        <div className="h-12 w-1/2 rounded bg-slate-200 mb-6"></div>
+        <div className="grid grid-cols-2 gap-4 border-t border-slate-100 pt-4">
+          <div className="h-10 w-full rounded bg-slate-200"></div>
+          <div className="h-10 w-full rounded bg-slate-200"></div>
+        </div>
+      </div>
+      {/* Card 3 */}
+      <div className="rounded-[2rem] border border-white bg-white/80 p-5 shadow-sm h-40">
+        <div className="h-4 w-1/3 rounded bg-slate-200 mb-4"></div>
+        <div className="h-8 w-1/2 rounded bg-slate-200 mb-4"></div>
+        <div className="grid grid-cols-4 gap-2">
+          <div className="h-12 w-full rounded bg-slate-200"></div>
+          <div className="h-12 w-full rounded bg-slate-200"></div>
+          <div className="h-12 w-full rounded bg-slate-200"></div>
+          <div className="h-12 w-full rounded bg-slate-200"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Overview() {
   const navigate = useNavigate();
-  const { ov } = useOutletContext();
+  const { ov } = useOutletContext(); // Lấy ov từ AppLayout
   const { profile } = useSession();
   const left = useMonthEnd();
+  
+  // State để kiểm tra xem đã có dữ liệu chưa
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (ov) setIsLoading(false);
+  }, [ov]);
 
   const hour = new Date().getHours();
   const greet = hour < 11 ? "Chào buổi sáng" : hour < 18 ? "Chào buổi chiều" : "Chào buổi tối";
-  const tier = getTier(ov.approved);
+  const tier = ov ? getTier(ov.approved) : null;
   const vn = new Date(Date.now() + 7 * 3600e3);
   const monthLabel = `THÁNG ${vn.getUTCMonth() + 1} ${vn.getUTCFullYear()}`;
-  const hashtags = ov.settings?.hashtags || "#Nxx315Studio";
-  const prize = ov.settings?.event_prize_text;
+  const hashtags = ov?.settings?.hashtags || "#Nxx315Studio";
+  const prize = ov?.settings?.event_prize_text;
 
   const rules = [
     "Đăng công khai trên kênh TikTok hoặc YouTube bạn đã liên kết",
@@ -46,23 +94,28 @@ export default function Overview() {
     `Gắn hashtag ${hashtags} trong tiêu đề hoặc mô tả`,
   ];
 
+  // 1. NẾU ĐANG TẢI -> HIỆN SKELETON
+  if (isLoading || !ov) {
+    return <OverviewSkeleton />;
+  }
+
+  // 2. NẾU ĐÃ CÓ DỮ LIỆU -> HIỆN GIAO DIỆN CHÍNH
   return (
     <div className="space-y-4">
       {/* Card Profile & Quick Actions */}
       <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/80 p-5 shadow-sm">
         <div className="flex items-center gap-4">
           
-          {/* KHỐI AVATAR MẪU - BOTTS NEUTRAL */}
-<div className="relative shrink-0">
-  <div className="h-20 w-20 rounded-full border-[3px] border-slate-100 overflow-hidden bg-white shadow-sm flex items-center justify-center">
-    <img 
-      // Dùng profile.id hoặc profile.username để mỗi tài khoản ra 1 con robot khác nhau
-      src={`https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${profile?.id || profile?.username || 'Nxx315'}&radius=50`} 
-      alt="Avatar" 
-      className="h-full w-full object-cover"
-    />
-  </div>
-            {/* Nhãn COMMON đè lên dưới */}
+          {/* KHỐI AVATAR CÓ FADE-IN */}
+          <div className="relative shrink-0">
+            <div className="h-20 w-20 rounded-full border-[3px] border-slate-100 overflow-hidden bg-slate-100 shadow-sm flex items-center justify-center">
+              <img 
+                src={`https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${profile?.id || profile?.username || 'Nxx315'}&radius=50`} 
+                alt="Avatar" 
+                className="h-full w-full object-cover animate-in fade-in duration-500"
+                onLoad={(e) => e.currentTarget.classList.remove('opacity-0')}
+              />
+            </div>
             <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-md bg-slate-600 px-2 py-0.5 text-[9px] font-bold tracking-widest text-white uppercase shadow-sm whitespace-nowrap">
               🔍 COMMON
             </span>
@@ -218,4 +271,4 @@ export default function Overview() {
       </div>
     </div>
   );
-                     }
+  }
