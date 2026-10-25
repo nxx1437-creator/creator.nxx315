@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { Send, Trophy, Film, Gift, ArrowRight, Bell, Clock, CheckCircle2, AlertCircle, Play, Eye, Heart, MessageSquare, ExternalLink } from "lucide-react";
+import { 
+  Send, Trophy, Film, Gift, ArrowRight, Bell, Clock, CheckCircle2, AlertCircle, Play, Eye, Heart, MessageSquare, ExternalLink 
+} from "lucide-react";
 import useSession from "../../hooks/useSession.js";
 import { Card, PLATFORMS, getTier } from "../../components/creator/creatorUi.jsx";
 
@@ -34,11 +36,13 @@ export default function Overview() {
 
   const hour = new Date().getHours();
   const greet = hour < 11 ? "Chào buổi sáng" : hour < 18 ? "Chào buổi chiều" : "Chào buổi tối";
-  const tier = ov ? getTier(ov.approved) : null;
+  
+  // Nếu chưa có dữ liệu ov, hiển thị màn hình trắng (không lỗi)
+  if (!ov) return <div className="h-screen bg-[#f4fbf9]"></div>;
+
+  const tier = getTier(ov.approved || 0);
   const vn = new Date(Date.now() + 7 * 3600e3);
   const monthLabel = `THÁNG ${vn.getUTCMonth() + 1} ${vn.getUTCFullYear()}`;
-
-  if (!ov) return <div className="h-screen bg-[#f4fbf9]"></div>;
 
   return (
     <div className="space-y-4 pb-10">
@@ -80,7 +84,7 @@ export default function Overview() {
               />
             </div>
             <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-md bg-slate-700 px-2 py-0.5 text-[9px] font-bold tracking-widest text-white uppercase shadow-sm whitespace-nowrap z-10">
-              🔍 {tier?.name || "COMMON"}
+              🔍 {tier.name}
             </span>
           </div>
 
@@ -275,7 +279,7 @@ export default function Overview() {
           <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2"><Play size={14}/> VIDEO GẦN ĐÂY</span>
           <button onClick={() => navigate("/app/videos")} className="font-mono text-[11px] font-bold tracking-widest text-cyan-600">XEM TẤT CẢ →</button>
         </div>
-        {ov.recent.length === 0 ? (
+        {ov.recent && ov.recent.length === 0 ? (
           <div className="rounded-[2rem] border-2 border-dashed border-slate-300 bg-white/40 px-5 py-8 text-center">
             <Film size={32} className="mx-auto text-slate-300 mb-3" />
             <p className="text-[15px] font-bold text-slate-800">Chưa có video. Đăng video đầu tiên để bắt đầu tích điểm.</p>
@@ -286,7 +290,7 @@ export default function Overview() {
           </div>
         ) : (
           <div className="space-y-2">
-            {ov.recent.map((v) => (
+            {ov.recent?.map((v) => (
               <div key={v.id} className="flex items-center justify-between rounded-2xl border border-white bg-white p-3 shadow-sm">
                 <div className="min-w-0">
                   <p className="text-sm font-bold text-slate-800">{PLATFORMS[v.platform]?.name}</p>
@@ -300,4 +304,4 @@ export default function Overview() {
       </div>
     </div>
   );
-                                                        }
+      }
