@@ -38,11 +38,11 @@ export default function Ranking() {
              
              <div className="mt-6 grid grid-cols-2 gap-4 border-t border-slate-100 pt-4">
                 <div>
-                  <p className="text-xs font-bold text-slate-500">⭐ ĐIỂM SỐ</p>
+                  <p className="text-xs font-bold text-slate-500">ĐIỂM SỐ</p>
                   <p className="text-2xl font-black text-cyan-500">{data.me.points}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-500">🎁 GIỜ THƯỞNG</p>
+                  <p className="text-xs font-bold text-slate-500">GIỜ THƯỞNG</p>
                   <p className="text-2xl font-black text-emerald-500">0h</p>
                 </div>
              </div>
