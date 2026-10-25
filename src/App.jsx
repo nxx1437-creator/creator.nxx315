@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import useSession from "./hooks/useSession.js";
-import { supabase } from "./lib/supabaseClient.js"; // Nhớ import supabase
+import { supabase } from "./lib/supabaseClient.js";
 
 import Landing from "./pages/Landing.jsx";
 import Login from "./pages/Login.jsx";
-import Onboarding from "./pages/Onboarding.jsx"; // Import trang Onboarding vừa tạo
+import Onboarding from "./pages/Onboarding.jsx";
 import AppLayout from "./pages/app/AppLayout.jsx";
 import Overview from "./pages/app/Overview.jsx";
 import Ranking from "./pages/app/Ranking.jsx";
@@ -14,45 +14,48 @@ import Videos from "./pages/app/Videos.jsx";
 import Rewards from "./pages/app/Rewards.jsx";
 import Settings from "./pages/app/Settings.jsx";
 
-// Component bảo vệ: Yêu cầu đăng nhập VÀ yêu cầu đã hoàn thành Onboarding
+// Component bảo vệ: Yêu cầu đăng nhập VÀ đã hoàn thành Onboarding
 function Protected({ children }) {
   const { session, loading } = useSession();
-  const [checkingProfile, setCheckingProfile] = useState(true);
-  const [hasProfile, setHasProfile] = useState(false);
+  const [checkingStatus, setCheckingStatus] = useState(true);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
   useEffect(() => {
     if (!session) {
-      setCheckingProfile(false);
+      setCheckingStatus(false);
       return;
     }
 
-    // Kiểm tra xem user này đã có hồ sơ (username) trong DB chưa
-    const checkProfile = async () => {
+    const checkUserStatus = async () => {
       try {
-        const { data, error } = await supabase
-          .from("profiles") // Tên bảng chứa thông tin user của bạn
-          .select("username")
-          .eq("id", session.user.id)
-          .single();
+        // Kiểm tra xem user đã liên kết kênh nào chưa (bảng creator_channels)
+        const { data: channels, error } = await supabase
+          .from("creator_channels")
+          .select("platform")
+          .eq("user_id", session.user.id)
+          .limit(1);
 
-        // Nếu có data và có username thì coi như đã onboard
-        if (data && data.username) {
-          setHasProfile(true);
+        if (error) throw error;
+
+        // Nếu chưa có kênh nào (mảng rỗng) -> Bắt buộc Onboarding
+        if (!channels || channels.length === 0) {
+          setNeedsOnboarding(true);
         } else {
-          setHasProfile(false);
+          setNeedsOnboarding(false);
         }
       } catch (err) {
-        // Nếu lỗi (vd: chưa có row nào trong bảng), coi như chưa onboard
-        setHasProfile(false);
+        console.error("Lỗi kiểm tra trạng thái:", err);
+        // Nếu lỗi mạng, tạm thời cho qua để không chặn người dùng
+        setNeedsOnboarding(false);
       } finally {
-        setCheckingProfile(false);
+        setCheckingStatus(false);
       }
     };
 
-    checkProfile();
+    checkUserStatus();
   }, [session]);
 
-  if (loading || checkingProfile) {
+  if (loading || checkingStatus) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f4fbf9]">
         <Loader2 size={26} className="animate-spin text-cyan-600" />
@@ -62,13 +65,13 @@ function Protected({ children }) {
 
   if (!session) return <Navigate to="/login" replace />;
 
-  // Nếu đã đăng nhập nhưng chưa có hồ sơ -> Đẩy sang trang Onboarding
-  if (!hasProfile) return <Navigate to="/onboarding" replace />;
+  // Nếu chưa có kênh -> Đẩy sang Onboarding
+  if (needsOnboarding) return <Navigate to="/onboarding" replace />;
 
   return children;
 }
 
-// Component bảo vệ riêng cho trang Onboarding (Bắt buộc đăng nhập, nhưng KHÔNG cần có profile)
+// Component bảo vệ cho Onboarding (Yêu cầu đăng nhập, nhưng không cần kênh)
 function OnboardingProtected({ children }) {
   const { session, loading } = useSession();
   
@@ -93,7 +96,6 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Navigate to="/login" replace />} />
         
-        {/* Route cho trang Onboarding */}
         <Route
           path="/onboarding"
           element={
@@ -103,7 +105,6 @@ export default function App() {
           }
         />
 
-        {/* Route cho App chính */}
         <Route
           path="/app"
           element={
@@ -123,4 +124,4 @@ export default function App() {
       </Routes>
     </BrowserRouter>
   );
-        }
+}
