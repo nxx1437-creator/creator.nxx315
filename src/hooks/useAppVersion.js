@@ -1,24 +1,32 @@
 import { useEffect, useState } from "react";
+// Import trực tiếp file package.json để lấy version
+import packageJson from "../../package.json";
 
 export default function useAppVersion() {
   const [hasUpdate, setHasUpdate] = useState(false);
-  const [currentVersion, setCurrentVersion] = useState(null);
+  // Lưu phiên bản lúc người dùng mới vào web
+  const [currentVersion, setCurrentVersion] = useState(packageJson.version);
 
   useEffect(() => {
     const checkVersion = async () => {
       try {
-        // Gọi file version.json kèm timestamp để không bị lấy từ cache
-        const res = await fetch(`/version.json?t=${Date.now()}`, { cache: "no-store" });
-        if (!res.ok) return; // Nếu không có file thì bỏ qua
-        const data = await res.json();
+        // Gọi file index.html (chứa mã hash của build mới nhất)
+        // Nếu Vercel deploy bản mới, mã hash sẽ thay đổi
+        const res = await fetch(`/?t=${Date.now()}`, { cache: "no-store" });
+        const text = await res.text();
         
-        const newVersion = data.version;
-        
-        if (!currentVersion) {
-          // Lần đầu vào web, lưu lại phiên bản hiện tại
-          setCurrentVersion(newVersion);
-        } else if (currentVersion !== newVersion) {
-          // Nếu phiên bản mới khác phiên bản cũ -> Có cập nhật!
+        // Tìm thẻ script chính của Vite (chứa mã hash)
+        const match = text.match(/src="\/assets\/index-[a-zA-Z0-9]+\.js"/);
+        const currentScriptHash = match ? match[0] : "";
+
+        // Lấy mã hash lúc mới vào web (lưu vào localStorage để so sánh)
+        const savedHash = localStorage.getItem("app_build_hash");
+
+        if (!savedHash) {
+          // Lần đầu vào web, lưu mã hash lại
+          localStorage.setItem("app_build_hash", currentScriptHash);
+        } else if (savedHash !== currentScriptHash && currentScriptHash !== "") {
+          // Phát hiện mã hash thay đổi -> Có bản cập nhật mới
           setHasUpdate(true);
         }
       } catch (err) {
@@ -26,14 +34,11 @@ export default function useAppVersion() {
       }
     };
 
-    // Kiểm tra ngay lần đầu
-    checkVersion();
-
-    // Cứ 30 giây kiểm tra 1 lần (nhanh hơn cho dễ test)
+    // Cứ 30 giây kiểm tra 1 lần (để dễ test)
     const interval = setInterval(checkVersion, 30000);
 
     return () => clearInterval(interval);
-  }, [currentVersion]);
+  }, []);
 
   return { hasUpdate };
 }
