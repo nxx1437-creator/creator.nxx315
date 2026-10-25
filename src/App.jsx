@@ -14,22 +14,7 @@ import Videos from "./pages/app/Videos.jsx";
 import Rewards from "./pages/app/Rewards.jsx";
 import Settings from "./pages/app/Settings.jsx";
 
-// Component Skeleton dùng chung để hiển thị khi đang tải
-function PageSkeleton() {
-  return (
-    <div className="min-h-screen bg-[#f4fbf9] p-5 animate-pulse">
-      <div className="flex justify-between items-center mb-6">
-        <div className="h-6 w-32 bg-slate-200 rounded"></div>
-        <div className="h-8 w-8 bg-slate-200 rounded-full"></div>
-      </div>
-      <div className="space-y-4">
-        <div className="h-48 bg-white rounded-[2rem] shadow-sm"></div>
-        <div className="h-64 bg-white rounded-[2rem] shadow-sm"></div>
-      </div>
-    </div>
-  );
-}
-
+// Component bảo vệ: Yêu cầu đăng nhập
 function Protected({ children }) {
   const { session, loading } = useSession();
   const [checkingStatus, setCheckingStatus] = useState(true);
@@ -41,27 +26,31 @@ function Protected({ children }) {
       return;
     }
 
+    // Đọc cờ từ localStorage trước để có kết quả ngay lập tức
+    const localOnboarded = localStorage.getItem(`onboarded_${session.user.id}`);
+    
+    if (localOnboarded === "true") {
+      setNeedsOnboarding(false);
+      setCheckingStatus(false);
+      return; // Thoát sớm, không cần chờ API
+    }
+
+    // Nếu chưa có cờ mới gọi API kiểm tra
     const checkUserStatus = async () => {
       try {
-        const localOnboarded = localStorage.getItem(`onboarded_${session.user.id}`);
-        
-        if (localOnboarded === "true") {
-          setNeedsOnboarding(false);
+        const { data: channels, error } = await supabase
+          .from("creator_channels")
+          .select("platform")
+          .eq("user_id", session.user.id)
+          .limit(1);
+
+        if (error) throw error;
+
+        if (!channels || channels.length === 0) {
+          setNeedsOnboarding(true); 
         } else {
-          const { data: channels, error } = await supabase
-            .from("creator_channels")
-            .select("platform")
-            .eq("user_id", session.user.id)
-            .limit(1);
-
-          if (error) throw error;
-
-          if (!channels || channels.length === 0) {
-            setNeedsOnboarding(true); 
-          } else {
-            localStorage.setItem(`onboarded_${session.user.id}`, "true");
-            setNeedsOnboarding(false);
-          }
+          localStorage.setItem(`onboarded_${session.user.id}`, "true");
+          setNeedsOnboarding(false);
         }
       } catch (err) {
         setNeedsOnboarding(false);
@@ -73,9 +62,24 @@ function Protected({ children }) {
     checkUserStatus();
   }, [session]);
 
-  // BỎ VÒNG XOAY, THAY BẰNG SKELETON
+  // Chỉ hiện màn hình chờ (hoặc để trống) khi đang tải session lần đầu
   if (loading || checkingStatus) {
-    return <PageSkeleton />;
+    return (
+      <div className="min-h-screen bg-[#f4fbf9] flex items-center justify-center">
+        <div className="animate-pulse flex space-x-4">
+          <div className="rounded-full bg-slate-200 h-10 w-10"></div>
+          <div className="flex-1 space-y-6 py-1">
+            <div className="h-2 bg-slate-200 rounded"></div>
+            <div className="space-y-3">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="h-2 bg-slate-200 rounded col-span-2"></div>
+                <div className="h-2 bg-slate-200 rounded col-span-1"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!session) return <Navigate to="/login" replace />;
@@ -84,11 +88,12 @@ function Protected({ children }) {
   return children;
 }
 
+// Component bảo vệ cho Onboarding
 function OnboardingProtected({ children }) {
   const { session, loading } = useSession();
   
   if (loading) {
-    return <PageSkeleton />;
+    return <div className="min-h-screen bg-[#f4fbf9]"></div>;
   }
   
   if (!session) return <Navigate to="/login" replace />;
@@ -100,26 +105,24 @@ function AppRoutes() {
   const location = useLocation();
   
   return (
-    <div key={location.pathname}>
-      <Routes location={location}>
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Navigate to="/login" replace />} />
-        
-        <Route path="/onboarding" element={<OnboardingProtected><Onboarding /></OnboardingProtected>} />
+    <Routes location={location}>
+      <Route path="/" element={<Landing />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Navigate to="/login" replace />} />
+      
+      <Route path="/onboarding" element={<OnboardingProtected><Onboarding /></OnboardingProtected>} />
 
-        <Route path="/app" element={<Protected><AppLayout /></Protected>}>
-          <Route index element={<Overview />} />
-          <Route path="ranking" element={<Ranking />} />
-          <Route path="videos" element={<Videos />} />
-          <Route path="rewards" element={<Rewards />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="rules" element={<Rules />} />
-        </Route>
-        
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </div>
+      <Route path="/app" element={<Protected><AppLayout /></Protected>}>
+        <Route index element={<Overview />} />
+        <Route path="ranking" element={<Ranking />} />
+        <Route path="videos" element={<Videos />} />
+        <Route path="rewards" element={<Rewards />} />
+        <Route path="settings" element={<Settings />} />
+        <Route path="rules" element={<Rules />} />
+      </Route>
+      
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
@@ -129,4 +132,4 @@ export default function App() {
       <AppRoutes />
     </BrowserRouter>
   );
-}
+          }
