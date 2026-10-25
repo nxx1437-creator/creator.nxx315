@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient.js";
 
-// Component hiển thị thông tin kênh (Đã thêm khung Debug màu vàng)
+// Component hiển thị thông tin kênh
 function ChannelPreview({ data }) {
   if (!data) return null;
   
@@ -16,31 +16,24 @@ function ChannelPreview({ data }) {
   const initial = name.charAt(0).toUpperCase();
 
   return (
-    <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3 relative z-20">
-      <div className="flex items-center gap-3">
-        {avatar ? (
-          <img src={avatar} alt="Avatar" className="h-10 w-10 rounded-full object-cover border border-emerald-200" />
-        ) : (
-          <div className="h-10 w-10 rounded-full bg-emerald-200 flex items-center justify-center text-emerald-700 font-bold">
-            {initial}
-          </div>
+    <div className="mt-3 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+      {avatar ? (
+        <img src={avatar} alt="Avatar" className="h-10 w-10 rounded-full object-cover border border-emerald-200" />
+      ) : (
+        <div className="h-10 w-10 rounded-full bg-emerald-200 flex items-center justify-center text-emerald-700 font-bold">
+          {initial}
+        </div>
+      )}
+      <div className="flex-1 min-w-0">
+        <p className="text-[13px] font-bold text-slate-900 truncate">{name}</p>
+        {handle && (
+          <p className="text-[11px] text-slate-500 truncate">
+            {handle} • {followers.toLocaleString()} followers
+          </p>
         )}
-        <div className="flex-1 min-w-0">
-          <p className="text-[13px] font-bold text-slate-900 truncate">{name}</p>
-          {handle && (
-            <p className="text-[11px] text-slate-500 truncate">
-              {handle} • {followers.toLocaleString()} followers
-            </p>
-          )}
-        </div>
-        <div className="shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-emerald-500 text-white">
-          <Check size={14} />
-        </div>
       </div>
-      
-      {/* KHUNG DEBUG: Hiển thị data thô từ API để xem cấu trúc */}
-      <div className="mt-2 bg-yellow-100 p-2 rounded text-[10px] text-yellow-800 break-all max-h-32 overflow-y-auto font-mono">
-        <strong>[DEBUG DATA]:</strong> {JSON.stringify(data)}
+      <div className="shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-emerald-500 text-white">
+        <Check size={14} />
       </div>
     </div>
   );
@@ -91,7 +84,6 @@ function OrnHex() {
   );
 }
 
-// Thẻ chính có icon mờ to đằng sau
 function StepCard({ children, bgIcon }) {
   return (
     <div className="relative z-10 rounded-[2rem] border border-white bg-white/95 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl overflow-hidden">
@@ -129,25 +121,41 @@ export default function Onboarding() {
   const nextStep = () => changeStep(Math.min(step + 1, 4));
   const prevStep = () => changeStep(Math.max(step - 1, 1));
 
-  // Kiểm tra Discord có độ trễ
+  // SỬA LỖI 2: Kiểm tra Discord bằng cách lắng nghe sự kiện Auth
   useEffect(() => {
-    const checkDiscordStatus = async () => {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+    let isMounted = true;
+    
+    const checkDiscord = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       const discordIdentity = user?.identities?.find(id => id.provider === 'discord');
       
-      if (discordIdentity) {
+      if (discordIdentity && isMounted) {
         setIsDiscordLinked(true);
-        if (step < 4) {
-          changeStep(4);
+        // Nếu đang ở bước 3 hoặc ít hơn, nhảy lên bước 4
+        if (step < 4) changeStep(4);
+      }
+      if (isMounted) setIsCheckingAuth(false);
+    };
+
+    // Kiểm tra ngay lập tức
+    checkDiscord();
+
+    // Lắng nghe sự kiện thay đổi trạng thái (dành cho trường hợp quay về từ Discord)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        const discordId = session?.user?.identities?.find(id => id.provider === 'discord');
+        if (discordId && isMounted) {
+          setIsDiscordLinked(true);
+          if (step < 4) changeStep(4);
         }
       }
-      setIsCheckingAuth(false);
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
     };
-    
-    checkDiscordStatus();
-  }, []);
+  }, [step]);
 
   const handleLinkDiscord = async () => {
     setLoading(true);
@@ -164,20 +172,29 @@ export default function Onboarding() {
     }
   };
 
+  // SỬA LỖI 1: Lấy thông tin kênh từ Database sau khi liên kết thành công
   const verifyChannel = async (platform, url) => {
     if (!url) return null;
     setLoading(true);
     setErrorMsg("");
     try {
-      const { data, error } = await supabase.functions.invoke("creator-verify", {
+      // 1. Gọi API liên kết kênh
+      const { data: resData, error: resError } = await supabase.functions.invoke("creator-verify", {
         body: { action: "link_channel", platform, url }
       });
       
-      if (error) throw error;
-      if (data && data.ok === false) throw new Error(data.message || "Kênh không hợp lệ.");
+      if (resError) throw resError;
+      if (resData && resData.ok === false) throw new Error(resData.message || "Kênh không hợp lệ.");
+
+      // 2. Gọi RPC get_creator_overview để lấy lại thông tin kênh (Tên, Avatar)
+      const { data: ovData, error: ovError } = await supabase.rpc("get_creator_overview");
       
-      console.log(`Dữ liệu ${platform} trả về:`, data);
-      return data.channel || data; 
+      if (ovError) throw ovError;
+
+      // 3. Tìm kênh vừa liên kết trong danh sách trả về
+      const linkedChannel = ovData.channels?.find(c => c.platform === platform);
+      
+      return linkedChannel || { ok: true }; // Trả về data kênh (có avatar_url, display_name)
     } catch (err) {
       setErrorMsg(`Lỗi kênh ${platform}: ${err.message || "Không thể xác minh"}`);
       return null;
@@ -226,6 +243,8 @@ export default function Onboarding() {
       </div>
     );
   }
+
+  // --- CÁC BƯỚC RENDER ---
 
   const renderStep1 = () => (
     <StepCard bgIcon={<Sparkles />}>
@@ -395,7 +414,6 @@ export default function Onboarding() {
         </div>
 
         <div className="relative mt-2">
-          {/* Các hình trang trí 4 góc đã được gọi lại đầy đủ */}
           <div className="absolute -top-10 -left-8 z-0 pointer-events-none"><OrnTarget /></div>
           <div className="absolute -top-12 -right-8 z-0 pointer-events-none"><OrnStar /></div>
           <div className="absolute -bottom-8 -left-8 z-0 pointer-events-none"><OrnGem /></div>
@@ -411,4 +429,4 @@ export default function Onboarding() {
       </div>
     </div>
   );
-            }
+         }
