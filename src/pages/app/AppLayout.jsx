@@ -40,13 +40,11 @@ function LinkBanner({ showButton, onGo }) {
   );
 }
 
-function CloudPhoneLogo() {
+// ĐÃ SỬA LẠI LOGO THÀNH NXX315 CREATOR
+function Nxx315Logo() {
   return (
-    <div className="flex items-center gap-1.5 text-[17px] font-extrabold tracking-tight text-slate-900">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500">
-        <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
-      </svg>
-      CloudPhone
+    <div className="flex items-center gap-1 text-[18px] font-extrabold tracking-tight text-slate-900">
+      Nxx315 <span className="text-cyan-600">Creator</span>
     </div>
   );
 }
@@ -71,7 +69,7 @@ export default function AppLayout() {
     if (hasUpdate) {
       const timer = setTimeout(() => {
         window.location.reload();
-      }, 3000); // 3000ms = 3 giây
+      }, 3000); 
       return () => clearTimeout(timer);
     }
   }, [hasUpdate]);
@@ -126,7 +124,7 @@ export default function AppLayout() {
               <span className="text-[13px] font-semibold">Đang cập nhật phiên bản mới...</span>
             </div>
             {/* Thanh loading chạy ngang 3 giây */}
-            <div className="absolute bottom-0 left-0 h-[3px] bg-cyan-400 animate-[width_3s_linear_forwards]" style={{ width: "0%", animation: "progress 3s linear forwards" }} />
+            <div className="absolute bottom-0 left-0 h-[3px] bg-cyan-400" style={{ width: "0%", animation: "progress 3s linear forwards" }} />
           </div>
         </div>
       )}
@@ -134,7 +132,8 @@ export default function AppLayout() {
       <header className="sticky top-0 z-50 border-b border-white/50 bg-[#f4fbf9]/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-md items-center justify-between px-4 py-3 md:max-w-3xl">
           
-          <CloudPhoneLogo />
+          {/* DÙNG LOGO NXX315 CREATOR */}
+          <Nxx315Logo />
 
           <div className="flex items-center gap-3 sm:gap-4 text-slate-600">
             <button className="hidden sm:block hover:text-slate-900"><Download size={20} /></button>
@@ -234,4 +233,4 @@ export default function AppLayout() {
       </nav>
     </div>
   );
-  }
+}
