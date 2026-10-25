@@ -23,26 +23,31 @@ export default function SearchModal({ onClose }) {
   );
 
   return (
-    <div className="fixed inset-0 z-[100] flex justify-center bg-slate-900/40 backdrop-blur-sm px-4 pt-16 sm:pt-24 animate-in fade-in">
-      <div className="w-full max-w-lg h-fit max-h-[80vh] overflow-hidden rounded-2xl bg-[#e6f2f0] shadow-2xl flex flex-col border border-white/50">
+    <div className="fixed inset-0 z-[100] flex justify-center bg-slate-900/40 backdrop-blur-sm px-4 pt-16 sm:pt-24 animate-in fade-in" onClick={onClose}>
+      {/* Thêm stopPropagation để khi bấm vào trong khung không bị tắt modal */}
+      <div 
+        className="w-full max-w-lg flex flex-col rounded-2xl bg-[#e6f2f0] shadow-2xl border border-white/50 overflow-hidden" 
+        style={{ maxHeight: 'calc(100vh - 120px)' }}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Thanh nhập liệu */}
-        <div className="flex items-center gap-3 px-4 py-4 border-b border-slate-300/50">
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-300/50 shrink-0">
           <Search size={22} className="text-slate-500" />
           <input 
             type="text" 
-            placeholder="Đi tới... (thử: payout, ranking, admin)"
-            className="flex-1 bg-transparent text-slate-800 text-lg outline-none placeholder:text-slate-500"
+            placeholder="Đi tới... (thử: payout, ranking)"
+            className="flex-1 bg-transparent text-slate-800 text-[16px] outline-none placeholder:text-slate-400"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             autoFocus
           />
-          <button onClick={onClose} className="rounded-lg bg-white/50 px-2 py-1 text-xs font-bold text-slate-600 hover:bg-white">
+          <button onClick={onClose} className="rounded-lg bg-white px-2.5 py-1 text-[11px] font-bold text-slate-600 hover:bg-slate-100 shadow-sm border border-slate-200">
             ESC
           </button>
         </div>
         
-        {/* Danh sách menu */}
-        <div className="overflow-y-auto py-2">
+        {/* Danh sách menu - Thêm flex-1 để nó tự lấp đầy khoảng trống */}
+        <div className="overflow-y-auto py-2 flex-1">
           {filteredMenu.length > 0 ? (
             filteredMenu.map((item, idx) => (
               <button 
@@ -58,14 +63,14 @@ export default function SearchModal({ onClose }) {
               </button>
             ))
           ) : (
-            <div className="py-10 text-center text-slate-500">
+            <div className="py-10 text-center text-slate-500 text-sm">
               Không tìm thấy kết quả cho "{searchQuery}"
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-4 py-2 bg-slate-200/50 text-[10px] font-bold text-slate-500 uppercase tracking-widest border-t border-slate-300/50">
+        <div className="flex items-center justify-between px-4 py-2.5 bg-slate-200/60 text-[10px] font-bold text-slate-500 uppercase tracking-widest border-t border-slate-300/50 shrink-0">
           <span className="flex items-center gap-1"><ArrowUpDown size={12}/> DI CHUYỂN</span>
           <span className="flex items-center gap-1">↵ MỞ</span>
           <span className="flex items-center gap-1">⌘K BẬT/TẮT</span>
