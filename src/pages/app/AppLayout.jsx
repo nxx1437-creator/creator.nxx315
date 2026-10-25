@@ -6,7 +6,6 @@ import {
 } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
 import useSession from "../../hooks/useSession.js";
-import useAppVersion from "../../hooks/useAppVersion.js"; 
 
 const TABS = [
   { to: "/app", end: true, label: "TỔNG QUAN", Icon: LayoutDashboard },
@@ -51,7 +50,6 @@ function Nxx315Logo() {
 export default function AppLayout() {
   const navigate = useNavigate();
   const { session } = useSession();
-  const { hasUpdate } = useAppVersion(); 
   
   const [ov, setOv] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -62,14 +60,6 @@ export default function AppLayout() {
   
   const langRef = useRef(null);
   const profileRef = useRef(null);
-
-  // Lắng nghe tín hiệu có code mới
-  useEffect(() => {
-    if (hasUpdate) {
-      // Lưu lại mã hash mới để không bị kích hoạt lại lần nữa
-      sessionStorage.setItem("app_version_hash", "updated");
-    }
-  }, [hasUpdate]);
 
   const reload = useCallback(async () => {
     const { data } = await supabase.rpc("get_creator_overview");
@@ -109,9 +99,7 @@ export default function AppLayout() {
   };
 
   return (
-    // BÍ QUYẾT NẰM Ở ĐÂY: Dùng key={hasUpdate} 
-    // Khi hasUpdate thay đổi từ false -> true, React sẽ tự động reset lại toàn bộ giao diện
-    <div key={hasUpdate} className="min-h-screen bg-gradient-to-b from-[#f4fbf9] to-[#e6f7fa] pb-28 text-slate-800 font-sans">
+    <div className="min-h-screen bg-gradient-to-b from-[#f4fbf9] to-[#e6f7fa] pb-28 text-slate-800 font-sans">
       <div className="pointer-events-none fixed inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(0,0,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
 
       <header className="sticky top-0 z-50 border-b border-white/50 bg-[#f4fbf9]/90 backdrop-blur-md">
@@ -217,4 +205,4 @@ export default function AppLayout() {
       </nav>
     </div>
   );
-    }
+                                                                           }
