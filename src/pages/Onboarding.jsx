@@ -1,15 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
-  ArrowRight, ArrowLeft, Check, Sparkles, User, MessageSquare, Youtube, ShieldCheck
+  ArrowRight, ArrowLeft, Check, Sparkles, User, MessageSquare, Youtube, AlertCircle
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient.js";
 
-// Component bọc ngoài để tạo khung thẻ (Card) cho từng bước
 function StepCard({ children, iconBg }) {
   return (
     <div className="relative z-10 overflow-hidden rounded-[2rem] border border-white bg-white/90 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl">
-      {/* Background Icon mờ lớn (giống ảnh mẫu) */}
       <div className="pointer-events-none absolute -right-4 -top-4 text-[150px] text-cyan-500/5">
         {iconBg}
       </div>
@@ -24,33 +22,59 @@ export default function Onboarding() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
-  // States lưu trữ dữ liệu người dùng nhập
-  const [profile, setProfile] = useState({ username: "", displayName: "", country: "VN" });
-  const [channels, setChannels] = useState({ youtube: "", tiktok: "" });
+  // State lưu link kênh
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [tiktokUrl, setTiktokUrl] = useState("");
 
   const nextStep = () => setStep((s) => Math.min(s + 1, 4));
   const prevStep = () => setStep((s) => Math.max(s - 1, 1));
 
-  const handleFinish = async () => {
+  // Hàm gọi API Liên kết kênh (Edge Function creator-verify)
+  const handleLinkChannel = async (platform, url) => {
+    if (!url) return { ok: true }; // Bỏ trống thì bỏ qua
     setLoading(true);
-    setError("");
+    setErrorMsg("");
+    
     try {
-      // TODO: Lưu dữ liệu vào Supabase (Bảng profiles hoặc creators)
-      // const { error } = await supabase.from('profiles').upsert({...})
-      
-      // Giả lập lưu thành công thì chuyển vào trang chính /app
-      setTimeout(() => {
-        navigate("/app", { replace: true });
-      }, 1000);
+      const { data, error } = await supabase.functions.invoke("creator-verify", {
+        body: { action: "link_channel", platform, url }
+      });
+
+      if (error) throw error;
+      if (!data.ok) throw new Error(data.message || "Kênh không hợp lệ");
+
+      return { ok: true };
     } catch (err) {
-      setError("Có lỗi xảy ra, vui lòng thử lại.");
+      setErrorMsg(`Lỗi liên kết ${platform}: ${err.message}`);
+      return { ok: false };
+    } finally {
       setLoading(false);
     }
   };
 
-  // --- RENDER CÁC BƯỚC ---
+  // Hàm hoàn tất Onboarding
+  const handleFinish = async () => {
+    setErrorMsg("");
+    
+    // 1. Liên kết YouTube (nếu có nhập)
+    if (youtubeUrl) {
+      const ytRes = await handleLinkChannel("youtube", youtubeUrl);
+      if (!ytRes.ok) return; // Dừng lại nếu lỗi
+    }
+
+    // 2. Liên kết TikTok (nếu có nhập)
+    if (tiktokUrl) {
+      const ttRes = await handleLinkChannel("tiktok", tiktokUrl);
+      if (!ttRes.ok) return;
+    }
+
+    // 3. Chuyển vào App
+    navigate("/app", { replace: true });
+  };
+
+  // --- GIAO DIỆN CÁC BƯỚC ---
 
   const renderStep1 = () => (
     <StepCard iconBg={<Sparkles />}>
@@ -95,48 +119,12 @@ export default function Onboarding() {
   const renderStep2 = () => (
     <StepCard iconBg={<User />}>
       <p className="font-mono text-[10px] font-bold tracking-widest text-slate-400 uppercase">Step 02 . Profile</p>
-      <h2 className="mt-2 text-2xl font-extrabold text-slate-900">Kể chúng tôi nghe về bạn</h2>
-
-      <div className="mt-6 space-y-4">
-        <div>
-          <label className="text-[13px] font-semibold text-slate-700">Tên người dùng</label>
-          <input 
-            type="text" 
-            value={profile.username}
-            onChange={(e) => setProfile({...profile, username: e.target.value})}
-            placeholder="xx315_n"
-            className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[14px] text-slate-900 outline-none transition focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-500/20"
-          />
-          {profile.username && (
-            <p className="mt-1.5 flex items-center gap-1 text-[11px] font-medium text-emerald-600">
-              <Check size={12} /> @{profile.username.toUpperCase()} — KHẢ DỤNG
-            </p>
-          )}
-        </div>
-        
-        <div>
-          <label className="text-[13px] font-semibold text-slate-700">Tên hiển thị</label>
-          <input 
-            type="text" 
-            value={profile.displayName}
-            onChange={(e) => setProfile({...profile, displayName: e.target.value})}
-            placeholder="Xx315 N"
-            className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[14px] text-slate-900 outline-none transition focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-500/20"
-          />
-        </div>
-
-        <div>
-          <label className="text-[13px] font-semibold text-slate-700">Quốc gia</label>
-          <select 
-            value={profile.country}
-            onChange={(e) => setProfile({...profile, country: e.target.value})}
-            className="mt-1.5 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[14px] text-slate-900 outline-none transition focus:border-cyan-500 focus:bg-white focus:ring-2 focus:ring-cyan-500/20"
-          >
-            <option value="VN">🇻🇳 VN — Vietnam</option>
-            <option value="US">🇺🇸 US — United States</option>
-            <option value="JP">🇯🇵 JP — Japan</option>
-          </select>
-        </div>
+      <h2 className="mt-2 text-2xl font-extrabold text-slate-900">Hồ sơ của bạn</h2>
+      
+      <div className="mt-6 rounded-xl border border-cyan-100 bg-cyan-50/50 p-4">
+        <p className="text-[13px] leading-relaxed text-cyan-800">
+          Tài khoản của bạn đã được đồng bộ với <strong>Nxx315 Studio</strong>. Bạn không cần tạo lại hồ sơ ở đây.
+        </p>
       </div>
 
       <div className="mt-8 flex items-center justify-between">
@@ -156,12 +144,15 @@ export default function Onboarding() {
       <h2 className="mt-2 text-2xl font-extrabold text-slate-900">Liên kết Discord</h2>
 
       <p className="mt-3 text-[14px] leading-relaxed text-slate-600">
-        Chương trình creator chạy trên Discord: thông báo, hỗ trợ, thể lệ và các kèo riêng đều ở đó. Bạn cần liên kết tài khoản và tham gia server cộng đồng mới tiếp tục được.
+        Chương trình creator chạy trên Discord: thông báo, hỗ trợ, thể lệ và các kèo riêng đều ở đó.
       </p>
 
-      <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-full border border-[#5865F2] bg-[#5865F2]/10 px-5 py-3 text-[14px] font-bold text-[#5865F2] transition hover:bg-[#5865F2] hover:text-white">
-        <MessageSquare size={18} /> Liên kết Discord
-      </button>
+      <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 flex gap-3 items-start">
+        <AlertCircle size={18} className="text-amber-500 shrink-0 mt-0.5" />
+        <p className="text-[13px] leading-relaxed text-amber-700">
+          Tính năng liên kết Discord sẽ sớm được cập nhật. Bạn có thể bỏ qua bước này và liên kết sau trong phần Cài đặt.
+        </p>
+      </div>
 
       <div className="mt-8 flex items-center justify-between">
         <button onClick={prevStep} className="flex items-center gap-2 text-[14px] font-semibold text-slate-500 hover:text-slate-900">
@@ -187,9 +178,9 @@ export default function Onboarding() {
           </label>
           <input 
             type="text" 
-            value={channels.youtube}
-            onChange={(e) => setChannels({...channels, youtube: e.target.value})}
-            placeholder="https://youtube.com/@kenh-cua-ban"
+            value={youtubeUrl}
+            onChange={(e) => setYoutubeUrl(e.target.value)}
+            placeholder="https://youtube.com/@ten"
             className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[14px] text-slate-900 outline-none transition focus:border-cyan-500 focus:bg-white"
           />
         </div>
@@ -200,9 +191,9 @@ export default function Onboarding() {
           </label>
           <input 
             type="text" 
-            value={channels.tiktok}
-            onChange={(e) => setChannels({...channels, tiktok: e.target.value})}
-            placeholder="https://tiktok.com/@handle-cua-ban"
+            value={tiktokUrl}
+            onChange={(e) => setTiktokUrl(e.target.value)}
+            placeholder="https://tiktok.com/@handle"
             className="mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[14px] text-slate-900 outline-none transition focus:border-cyan-500 focus:bg-white"
           />
         </div>
@@ -212,27 +203,26 @@ export default function Onboarding() {
         ▸ LIÊN KẾT YOUTUBE VÀ/HOẶC TIKTOK. BẠN CÓ THỂ THÊM/ĐỔI KÊNH SAU TRONG SETTINGS.
       </p>
 
+      {errorMsg && <p className="mt-3 text-xs font-semibold text-rose-500">{errorMsg}</p>}
+
       <div className="mt-8 flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <button onClick={prevStep} className="flex items-center gap-2 text-[14px] font-semibold text-slate-500 hover:text-slate-900">
+          <button onClick={prevStep} disabled={loading} className="flex items-center gap-2 text-[14px] font-semibold text-slate-500 hover:text-slate-900 disabled:opacity-50">
             <ArrowLeft size={16} /> Quay lại
           </button>
           <button onClick={handleFinish} disabled={loading} className="flex items-center gap-2 rounded-full bg-cyan-600 px-6 py-3 text-[14px] font-bold text-white transition hover:bg-cyan-700 active:scale-95 shadow-md shadow-cyan-600/20 disabled:opacity-70">
-            {loading ? "Đang lưu..." : "Liên kết & hoàn tất"} <Check size={16} />
+            {loading ? "Đang liên kết..." : "Liên kết & hoàn tất"} <Check size={16} />
           </button>
         </div>
-        <button onClick={handleFinish} className="w-full text-center text-[13px] font-semibold text-slate-500 hover:text-slate-800 mt-2">
+        <button onClick={() => navigate("/app")} disabled={loading} className="w-full text-center text-[13px] font-semibold text-slate-500 hover:text-slate-800 mt-2 disabled:opacity-50">
           Bỏ qua & hoàn tất
         </button>
       </div>
-      
-      {error && <p className="mt-3 text-center text-xs font-semibold text-rose-500">{error}</p>}
     </StepCard>
   );
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-b from-[#f4fbf9] to-[#e6f7fa] text-slate-800 font-sans flex flex-col items-center pt-8 px-4 pb-12">
-      {/* Background Grid */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.04]"
         style={{
@@ -242,7 +232,6 @@ export default function Onboarding() {
       />
 
       <div className="w-full max-w-md relative z-10">
-        {/* Thanh Progress (Các bước) - Giống ảnh mẫu */}
         <div className="mb-6 flex flex-wrap gap-2">
           {[1, 2, 3, 4].map((num) => {
             const isActive = step === num;
@@ -256,7 +245,7 @@ export default function Onboarding() {
                     'border-slate-200 bg-white text-slate-400'}`}
               >
                 {isPast ? <Check size={14} /> : <span>{num}.</span>}
-                {num === 1 && "CHÀO MỪNG"}
+                {num === 1 && "BẮT ĐẦU"}
                 {num === 2 && "HỒ SƠ"}
                 {num === 3 && "DISCORD"}
                 {num === 4 && "KÊNH"}
@@ -265,13 +254,11 @@ export default function Onboarding() {
           })}
         </div>
 
-        {/* Nội dung thay đổi theo Step */}
         {step === 1 && renderStep1()}
         {step === 2 && renderStep2()}
         {step === 3 && renderStep3()}
         {step === 4 && renderStep4()}
-        
       </div>
     </div>
   );
-}
+    }
