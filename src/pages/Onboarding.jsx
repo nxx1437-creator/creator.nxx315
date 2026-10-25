@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient.js";
 
-// Tạm thời hiển thị toàn bộ data để debug
+// Component hiển thị thông tin kênh (Đã thêm khung Debug màu vàng)
 function ChannelPreview({ data }) {
   if (!data) return null;
   
@@ -16,7 +16,7 @@ function ChannelPreview({ data }) {
   const initial = name.charAt(0).toUpperCase();
 
   return (
-    <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+    <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3 relative z-20">
       <div className="flex items-center gap-3">
         {avatar ? (
           <img src={avatar} alt="Avatar" className="h-10 w-10 rounded-full object-cover border border-emerald-200" />
@@ -46,6 +46,52 @@ function ChannelPreview({ data }) {
   );
 }
 
+/* ---------- CÁC HÌNH TRANG TRÍ 4 GÓC ---------- */
+function OrnTarget() {
+  return (
+    <svg width="90" height="90" viewBox="0 0 100 100" fill="none" className="opacity-40 text-cyan-500">
+      <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 8" />
+      <circle cx="50" cy="50" r="20" stroke="currentColor" strokeWidth="2" />
+      <path d="M50 0v20M50 80v20M0 50h20M80 50h20" stroke="currentColor" strokeWidth="2.5" />
+      <circle cx="50" cy="50" r="4" fill="currentColor" />
+    </svg>
+  );
+}
+
+function OrnStar() {
+  return (
+    <svg width="110" height="110" viewBox="0 0 120 120" fill="none" className="opacity-70">
+      <defs>
+        <linearGradient id="starGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#a5f3fc" />
+          <stop offset="100%" stopColor="#60a5fa" />
+        </linearGradient>
+      </defs>
+      <path d="M60 10 L75 45 L110 60 L75 75 L60 110 L45 75 L10 60 L45 45 Z" fill="url(#starGrad)" fillOpacity="0.8" />
+      <path d="M60 30 L68 52 L90 60 L68 68 L60 90 L52 68 L30 60 L52 52 Z" fill="#ffffff" fillOpacity="0.9" />
+    </svg>
+  );
+}
+
+function OrnGem() {
+  return (
+    <svg width="90" height="100" viewBox="0 0 84 96" fill="none" className="opacity-60 -rotate-12">
+      <path d="M42 6l32 26-32 58L10 32z" fill="#22D3EE" fillOpacity=".4" stroke="#06B6D4" strokeWidth="2.5" />
+      <path d="M10 32h64M42 6l-14 26 14 58 14-58z" stroke="#ffffff" strokeOpacity=".8" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+function OrnHex() {
+  return (
+    <svg width="90" height="100" viewBox="0 0 100 100" fill="none" className="opacity-60 rotate-12">
+      <path d="M50 5l40 25v40L50 95 10 70V30z" fill="#60A5FA" fillOpacity=".2" stroke="#3B82F6" strokeWidth="3" />
+      <path d="M50 25l20 12.5v25L50 75 30 62.5v-25z" fill="#BFDBFE" fillOpacity=".6" stroke="#60A5FA" strokeWidth="2" />
+    </svg>
+  );
+}
+
+// Thẻ chính có icon mờ to đằng sau
 function StepCard({ children, bgIcon }) {
   return (
     <div className="relative z-10 rounded-[2rem] border border-white bg-white/95 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl overflow-hidden">
@@ -83,10 +129,9 @@ export default function Onboarding() {
   const nextStep = () => changeStep(Math.min(step + 1, 4));
   const prevStep = () => changeStep(Math.max(step - 1, 1));
 
-  // SỬA LỖI 2: Kiểm tra Discord kỹ hơn, có độ trễ để chờ Supabase cập nhật session
+  // Kiểm tra Discord có độ trễ
   useEffect(() => {
     const checkDiscordStatus = async () => {
-      // Đợi 0.5s để Supabase kịp xử lý OAuth callback khi từ Discord quay về
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const { data: { user } } = await supabase.auth.getUser();
@@ -94,7 +139,6 @@ export default function Onboarding() {
       
       if (discordIdentity) {
         setIsDiscordLinked(true);
-        // Tự động nhảy sang bước 4 nếu đang ở bước 3 hoặc ít hơn
         if (step < 4) {
           changeStep(4);
         }
@@ -120,7 +164,6 @@ export default function Onboarding() {
     }
   };
 
-  // Hàm lấy dữ liệu kênh, thêm log để kiểm tra
   const verifyChannel = async (platform, url) => {
     if (!url) return null;
     setLoading(true);
@@ -134,8 +177,6 @@ export default function Onboarding() {
       if (data && data.ok === false) throw new Error(data.message || "Kênh không hợp lệ.");
       
       console.log(`Dữ liệu ${platform} trả về:`, data);
-      
-      // Trả về nguyên gốc data để hiển thị lên khung Debug
       return data.channel || data; 
     } catch (err) {
       setErrorMsg(`Lỗi kênh ${platform}: ${err.message || "Không thể xác minh"}`);
@@ -354,6 +395,7 @@ export default function Onboarding() {
         </div>
 
         <div className="relative mt-2">
+          {/* Các hình trang trí 4 góc đã được gọi lại đầy đủ */}
           <div className="absolute -top-10 -left-8 z-0 pointer-events-none"><OrnTarget /></div>
           <div className="absolute -top-12 -right-8 z-0 pointer-events-none"><OrnStar /></div>
           <div className="absolute -bottom-8 -left-8 z-0 pointer-events-none"><OrnGem /></div>
@@ -369,4 +411,4 @@ export default function Onboarding() {
       </div>
     </div>
   );
-  }
+            }
