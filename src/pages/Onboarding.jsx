@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
-  ArrowRight, ArrowLeft, Check, Sparkles, User, MessageSquare, Youtube, AlertCircle, Loader2
+  ArrowRight, ArrowLeft, Check, Sparkles, User, MessageSquare, Youtube, Loader2, Diamond, Target
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient.js";
 
-// Component hiển thị thông tin kênh (Đã sửa để đọc được mọi cấu trúc data)
+// Component hiển thị thông tin kênh
 function ChannelPreview({ data }) {
   if (!data) return null;
   
-  // Cố gắng lấy tên hiển thị từ nhiều trường khác nhau phòng trường hợp backend đổi tên
   const name = data.display_name || data.name || data.channel_name || data.handle || "Kênh đã liên kết";
   const handle = data.handle || data.channel_url || "";
   const followers = data.followers || data.subscriber_count || 0;
@@ -40,11 +39,13 @@ function ChannelPreview({ data }) {
   );
 }
 
-function StepCard({ children, iconBg }) {
+// Component thẻ chính, nhận vào icon to chà bá ở background
+function StepCard({ children, bgIcon }) {
   return (
     <div className="relative z-10 overflow-hidden rounded-[2rem] border border-white bg-white/90 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl">
-      <div className="pointer-events-none absolute -right-4 -top-4 text-[150px] text-cyan-500/5">
-        {iconBg}
+      {/* Icon to chà bá mờ phía sau */}
+      <div className="pointer-events-none absolute -right-8 -top-8 text-[180px] text-cyan-500/[0.04] rotate-12">
+        {bgIcon}
       </div>
       <div className="relative z-10">
         {children}
@@ -56,11 +57,12 @@ function StepCard({ children, iconBg }) {
 export default function Onboarding() {
   const navigate = useNavigate();
   
-  const savedStep = sessionStorage.getItem("onboarding_step");
+  const savedStep = localStorage.getItem("onboarding_step");
   const [step, setStep] = useState(savedStep ? parseInt(savedStep) : 1);
   
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [tiktokUrl, setTiktokUrl] = useState("");
@@ -70,7 +72,7 @@ export default function Onboarding() {
 
   const changeStep = (newStep) => {
     setStep(newStep);
-    sessionStorage.setItem("onboarding_step", newStep);
+    localStorage.setItem("onboarding_step", newStep);
   };
 
   const nextStep = () => changeStep(Math.min(step + 1, 4));
@@ -83,15 +85,15 @@ export default function Onboarding() {
       
       if (discordIdentity) {
         setIsDiscordLinked(true);
-        if (step === 3) {
+        if (step < 4) {
           changeStep(4);
-          sessionStorage.removeItem("onboarding_step");
         }
       }
+      setIsCheckingAuth(false);
     };
     
     checkDiscordStatus();
-  }, [step]);
+  }, []);
 
   const handleLinkDiscord = async () => {
     setLoading(true);
@@ -108,7 +110,6 @@ export default function Onboarding() {
     }
   };
 
-  // Hàm gọi API kiểm tra kênh - Sửa lại để bắt mọi lỗi từ Backend
   const verifyChannel = async (platform, url) => {
     if (!url) return null;
     setLoading(true);
@@ -119,13 +120,7 @@ export default function Onboarding() {
       });
 
       if (error) throw error;
-      
-      // Nếu backend trả về lỗi ok: false
-      if (data && data.ok === false) {
-        throw new Error(data.message || "Kênh không hợp lệ hoặc không tìm thấy.");
-      }
-
-      // Trả về dữ liệu kênh (data.channel hoặc chính data)
+      if (data && data.ok === false) throw new Error(data.message || "Kênh không hợp lệ.");
       return data.channel || data; 
     } catch (err) {
       setErrorMsg(`Lỗi kênh ${platform}: ${err.message || "Không thể xác minh"}`);
@@ -149,30 +144,40 @@ export default function Onboarding() {
     }
   };
 
-  // Hàm hoàn tất được viết lại để không bị treo
   const handleFinish = async () => {
     setErrorMsg("");
     
-    // Chỉ kiểm tra nếu có nhập link mà chưa có preview (nghĩa là chưa verify)
     if (youtubeUrl && !ytPreview) {
       const res = await verifyChannel("youtube", youtubeUrl);
-      if (!res) return; // Dừng nếu lỗi
+      if (!res) return; 
     }
     
     if (tiktokUrl && !ttPreview) {
       const res = await verifyChannel("tiktok", tiktokUrl);
-      if (!res) return; // Dừng nếu lỗi
+      if (!res) return; 
     }
 
-    // Mọi thứ OK -> Chuyển vào App
-    sessionStorage.removeItem("onboarding_step");
+    localStorage.removeItem("onboarding_step");
     navigate("/app", { replace: true });
   };
 
+  const skipAndFinish = () => {
+    localStorage.removeItem("onboarding_step");
+    navigate("/app", { replace: true });
+  };
+
+  if (isCheckingAuth) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#f4fbf9] to-[#e6f7fa]">
+        <Loader2 size={32} className="animate-spin text-cyan-600" />
+      </div>
+    );
+  }
+
   const renderStep1 = () => (
-    <StepCard iconBg={<Sparkles />}>
+    <StepCard bgIcon={<Sparkles />}>
       <div className="inline-flex items-center gap-2 rounded-full border border-cyan-600/20 bg-cyan-50 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-cyan-700">
-        <span className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" /> Onboarding
+        <span className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" /> ONBOARDING
       </div>
       
       <h1 className="mt-5 text-3xl font-extrabold tracking-tight text-slate-900 leading-tight">
@@ -198,7 +203,7 @@ export default function Onboarding() {
         <button onClick={nextStep} className="flex items-center gap-2 rounded-full bg-cyan-600 px-6 py-3 text-[14px] font-bold text-white transition hover:bg-cyan-700 active:scale-95 shadow-md shadow-cyan-600/20">
           Bắt đầu <ArrowRight size={16} />
         </button>
-        <button onClick={() => navigate("/app")} className="text-[14px] font-semibold text-slate-500 hover:text-slate-800">
+        <button onClick={skipAndFinish} className="text-[14px] font-semibold text-slate-500 hover:text-slate-800">
           Bỏ qua
         </button>
       </div>
@@ -206,8 +211,8 @@ export default function Onboarding() {
   );
 
   const renderStep2 = () => (
-    <StepCard iconBg={<User />}>
-      <p className="font-mono text-[10px] font-bold tracking-widest text-slate-400 uppercase">Step 02 . Profile</p>
+    <StepCard bgIcon={<User />}>
+      <p className="font-mono text-[10px] font-bold tracking-widest text-slate-400 uppercase">STEP 02 . PROFILE</p>
       <h2 className="mt-2 text-2xl font-extrabold text-slate-900">Hồ sơ của bạn</h2>
       
       <div className="mt-6 rounded-xl border border-cyan-100 bg-cyan-50/50 p-4">
@@ -228,8 +233,8 @@ export default function Onboarding() {
   );
 
   const renderStep3 = () => (
-    <StepCard iconBg={<MessageSquare />}>
-      <p className="font-mono text-[10px] font-bold tracking-widest text-slate-400 uppercase">Step 03 . Discord</p>
+    <StepCard bgIcon={<MessageSquare />}>
+      <p className="font-mono text-[10px] font-bold tracking-widest text-slate-400 uppercase">STEP 03 . DISCORD</p>
       <h2 className="mt-2 text-2xl font-extrabold text-slate-900">Liên kết Discord</h2>
 
       <p className="mt-3 text-[14px] leading-relaxed text-slate-600">
@@ -267,8 +272,8 @@ export default function Onboarding() {
   );
 
   const renderStep4 = () => (
-    <StepCard iconBg={<Youtube />}>
-      <p className="font-mono text-[10px] font-bold tracking-widest text-slate-400 uppercase">Step 04 . Channel</p>
+    <StepCard bgIcon={<Youtube />}>
+      <p className="font-mono text-[10px] font-bold tracking-widest text-slate-400 uppercase">STEP 04 . CHANNEL</p>
       <h2 className="mt-2 text-2xl font-extrabold text-slate-900">Liên kết kênh của bạn</h2>
       <p className="mt-2 text-[13px] text-slate-600">Bot quét cả hai kênh mỗi ngày, video mới có hashtag yêu cầu sẽ tự được ghi nhận.</p>
 
@@ -336,10 +341,7 @@ export default function Onboarding() {
         </div>
         
         <button 
-          onClick={() => {
-            sessionStorage.removeItem("onboarding_step");
-            navigate("/app");
-          }} 
+          onClick={skipAndFinish} 
           disabled={loading} 
           className="w-full text-center text-[13px] font-semibold text-slate-500 hover:text-slate-800 disabled:opacity-50"
         >
@@ -356,8 +358,9 @@ export default function Onboarding() {
       <div className="w-full max-w-md relative z-10">
         <div className="mb-6 flex flex-wrap gap-2">
           {[1, 2, 3, 4].map((num) => {
-            const isActive = step === num;
-            const isPast = step > num;
+            const isPast = step > num || (num === 3 && isDiscordLinked);
+            const isActive = step === num && !isPast;
+            
             return (
               <div key={num} className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-[12px] font-semibold transition-colors ${isActive ? 'border-cyan-600 bg-cyan-50 text-cyan-700' : isPast ? 'border-emerald-200 bg-emerald-50 text-emerald-600' : 'border-slate-200 bg-white text-slate-400'}`}>
                 {isPast ? <Check size={14} /> : <span>{num}.</span>}
@@ -377,4 +380,4 @@ export default function Onboarding() {
       </div>
     </div>
   );
-                                                     }
+    }
