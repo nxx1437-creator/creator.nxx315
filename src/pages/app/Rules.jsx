@@ -1,7 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { 
-  Clock, Video, Globe, Hash, Award, Gift, ShieldAlert, HelpCircle 
+  Clock, Video, Globe, Hash, Award, Gift, ShieldAlert, HelpCircle, 
+  CheckCircle2, ArrowRight, MessageSquare
 } from "lucide-react";
 import { Eyebrow } from "../../components/creator/creatorUi.jsx";
 
@@ -43,39 +44,56 @@ export default function Rules() {
         </p>
       </div>
 
-      {/* MỤC 1: YÊU CẦU VIDEO */}
+      {/* 1. YÊU CẦU VIDEO (Hiển thị dạng Grid cho gọn) */}
       <div className="mb-6">
         <h2 className="font-mono text-[11px] font-bold uppercase tracking-widest text-slate-400 px-1 mb-2">Yêu cầu Video</h2>
         
-        <InfoCard icon={Clock} title="Thời lượng">
-          Tối thiểu 1 phút
-        </InfoCard>
-        
-        <InfoCard icon={Video} title="Nền tảng">
-          TikTok hoặc YouTube
-        </InfoCard>
-        
-        <InfoCard icon={Globe} title="Trạng thái">
-          Công khai · Không xóa · không ẩn
-        </InfoCard>
-        
-        <InfoCard icon={Hash} title="Hashtag bắt buộc">
-          <div className="flex flex-wrap gap-2 mt-1">
-            <span className="rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-[12px] font-bold tracking-wider text-cyan-700">
-              #NXX315STUDIO
-            </span>
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm flex flex-col items-center text-center">
+            <Clock size={20} className="text-cyan-600 mb-1.5" />
+            <p className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Thời lượng</p>
+            <p className="text-[13px] font-bold text-slate-800 mt-0.5">Tối thiểu 1 phút</p>
           </div>
-        </InfoCard>
+          <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm flex flex-col items-center text-center">
+            <Video size={20} className="text-cyan-600 mb-1.5" />
+            <p className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Nền tảng</p>
+            <p className="text-[13px] font-bold text-slate-800 mt-0.5">TikTok / YouTube</p>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm mb-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center"><Globe size={16} className="text-slate-600"/></div>
+            <div>
+              <p className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">Trạng thái</p>
+              <p className="text-[13px] font-bold text-slate-800">Công khai · Không xóa</p>
+            </div>
+          </div>
+          <CheckCircle2 size={20} className="text-emerald-500" />
+        </div>
+
+        <div className="rounded-2xl border border-cyan-200 bg-cyan-50/50 p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-lg bg-cyan-100 flex items-center justify-center"><Hash size={16} className="text-cyan-700"/></div>
+            <div>
+              <p className="text-[10px] font-bold tracking-wider text-cyan-600 uppercase">Hashtag bắt buộc</p>
+              <p className="text-[13px] font-bold text-cyan-800">Gắn trong tiêu đề/mô tả</p>
+            </div>
+          </div>
+          <span className="inline-block rounded-full border border-cyan-300 bg-white px-4 py-1.5 text-[13px] font-extrabold tracking-widest text-cyan-700 shadow-sm">
+            #NXX315STUDIO
+          </span>
+        </div>
       </div>
 
-      {/* MỤC 2: ĐIỀU KIỆN NHẬN THƯỞNG */}
+      {/* 2. ĐIỀU KIỆN & PHẦN THƯỞNG */}
       <div className="mb-6">
-        <h2 className="font-mono text-[11px] font-bold uppercase tracking-widest text-slate-400 px-1 mb-2">Điều kiện nhận thưởng</h2>
+        <h2 className="font-mono text-[11px] font-bold uppercase tracking-widest text-slate-400 px-1 mb-2">Điều kiện & Phần thưởng</h2>
         
         <InfoCard icon={Award} title="Mốc nhận thưởng top tháng" iconColor="text-amber-600" iconBg="bg-amber-50">
           <p className="mb-2">Đứng top bảng xếp hạng chưa đủ — bạn cần đạt các mốc dưới đây thì admin mới mở thưởng:</p>
           <ul className="list-disc pl-4 space-y-1 mb-2">
-            <li>Tối thiểu 5 video đã được duyệt trong campaign này.</li>
+            <li>Tối thiểu <strong>5 video</strong> đã được duyệt trong campaign này.</li>
           </ul>
           <p className="text-xs text-slate-500 italic">Mỗi campaign có thể đặt mốc riêng — đọc kỹ trang chi tiết campaign trước khi tham gia.</p>
         </InfoCard>
@@ -86,121 +104,148 @@ export default function Rules() {
             <li>Video đạt chuẩn — nhận mức giờ tối đa của chiến dịch.</li>
             <li>Video vẫn được duyệt nhưng còn cần cải thiện — nhận một phần mức đó (vd 50% hoặc 25%).</li>
           </ul>
-          <p className="text-xs text-slate-500 italic">Mẹo đạt tối đa: quay rõ nét, đủ thời lượng, đúng hashtag yêu cầu và nội dung tập trung quảng bá Nxx315 Studio.</p>
+          <div className="mt-3 rounded-lg bg-emerald-50 border border-emerald-100 p-3">
+            <p className="text-[12px] text-emerald-700 font-medium">💡 <strong>Mẹo:</strong> Quay rõ nét, đủ thời lượng, đúng hashtag yêu cầu và nội dung tập trung quảng bá Nxx315 Studio.</p>
+          </div>
         </InfoCard>
       </div>
 
-      {/* MỤC 3: QUY TRÌNH THAM GIA */}
+      {/* 3. QUY TRÌNH THAM GIA (Dạng Timeline) */}
       <div className="mb-6">
         <h2 className="font-mono text-[11px] font-bold uppercase tracking-widest text-slate-400 px-1 mb-2">Quy trình tham gia</h2>
+        
         <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
-          <ol className="list-decimal pl-4 space-y-3 text-[14px] text-slate-700">
-            <li>Đăng nhập bằng Google tại trang Creator. Lần đầu đăng nhập, hệ thống tự tạo tài khoản, dùng chung với Nxx315 Studio.</li>
-            <li>Vào <strong>Cài đặt</strong>, liên kết kênh TikTok và/hoặc YouTube của chính bạn bằng cách dán link kênh. Mỗi kênh chỉ liên kết được với <strong>một tài khoản</strong>.</li>
-            <li>Làm video giới thiệu Nxx315 Studio, đăng lên kênh đã liên kết.</li>
-            <li>Gửi video: với YouTube, hệ thống có thể tự tìm video mới của bạn; với TikTok, bạn dán link video. Bạn cũng có thể dán link YouTube thủ công.</li>
-          </ol>
+          <div className="relative border-l-2 border-slate-100 ml-3 space-y-6 pb-2">
+            
+            <div className="relative pl-6">
+              <span className="absolute -left-[17px] top-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-cyan-100 text-[13px] font-bold text-cyan-700 ring-4 ring-white">1</span>
+              <p className="text-[14px] font-medium text-slate-800">Đăng nhập bằng Google tại trang Creator.</p>
+              <p className="text-[13px] text-slate-500 mt-1">Lần đầu đăng nhập, hệ thống tự tạo tài khoản, dùng chung với Nxx315 Studio.</p>
+            </div>
+
+            <div className="relative pl-6">
+              <span className="absolute -left-[17px] top-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-cyan-100 text-[13px] font-bold text-cyan-700 ring-4 ring-white">2</span>
+              <p className="text-[14px] font-medium text-slate-800">Liên kết kênh mạng xã hội.</p>
+              <p className="text-[13px] text-slate-500 mt-1">Vào <strong>Cài đặt</strong>, dán link kênh TikTok/YouTube. Mỗi kênh chỉ liên kết được với một tài khoản.</p>
+            </div>
+
+            <div className="relative pl-6">
+              <span className="absolute -left-[17px] top-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-cyan-100 text-[13px] font-bold text-cyan-700 ring-4 ring-white">3</span>
+              <p className="text-[14px] font-medium text-slate-800">Làm video & Gửi link.</p>
+              <p className="text-[13px] text-slate-500 mt-1">Đăng video giới thiệu lên kênh. Hệ thống tự tìm video YouTube hoặc bạn dán link video TikTok/YouTube thủ công.</p>
+            </div>
+
+          </div>
         </div>
       </div>
 
-      {/* MỤC 4: GIỚI HẠN GỬI VIDEO */}
+      {/* 4. KIỂM TRA & DUYỆT */}
+      <div className="mb-6">
+        <h2 className="font-mono text-[11px] font-bold uppercase tracking-widest text-slate-400 px-1 mb-2">Kiểm tra và duyệt</h2>
+        <InfoCard icon={ShieldAlert} title="Quy trình duyệt" iconColor="text-slate-600" iconBg="bg-slate-100">
+          <ul className="space-y-2 text-[13px]">
+            <li className="flex gap-2"><span className="text-slate-400">•</span> <span><strong>Hệ thống kiểm tra:</strong> Video phải đúng kênh đã liên kết và đủ hashtag. Sai sẽ bị từ chối kèm lý do.</span></li>
+            <li className="flex gap-2"><span className="text-slate-400">•</span> <span><strong>Admin duyệt:</strong> Video đạt sẽ chờ admin duyệt thủ công (từ chối nếu nội dung kém, sai lệch, gian lận).</span></li>
+            <li className="flex gap-2"><span className="text-slate-400">•</span> <span><strong>Thời gian:</strong> Dự kiến <FillIn text="[1-2 ngày]" />.</span></li>
+            <li className="flex gap-2"><span className="text-slate-400">•</span> <span>Video bị từ chối có thể sửa tiêu đề/mô tả rồi gửi lại.</span></li>
+          </ul>
+        </InfoCard>
+      </div>
+
+      {/* 5. GIỚI HẠN GỬI */}
       <div className="mb-6">
         <h2 className="font-mono text-[11px] font-bold uppercase tracking-widest text-slate-400 px-1 mb-2">Giới hạn gửi video</h2>
-        <InfoCard icon={Clock} title="Quy định">
-          <ul className="list-disc pl-4 space-y-1">
-            <li>Tối đa <strong>3 video trong 24 giờ</strong>.</li>
-            <li>Tối đa <strong>5 video đang chờ duyệt</strong> cùng lúc.</li>
-            <li>Link TikTok có thể là link đầy đủ hoặc link chia sẻ (<code>vt.tiktok.com</code>, <code>vm.tiktok.com</code>).</li>
-          </ul>
-        </InfoCard>
+        <div className="rounded-2xl border-l-4 border-rose-400 bg-rose-50/50 p-4 shadow-sm">
+          <p className="text-[13px] text-rose-700 leading-relaxed">
+            Chỉ nhận tối đa <strong>3 video / 24 giờ</strong>.<br/>
+            Tối đa <strong>5 video đang chờ duyệt</strong> cùng lúc.<br/>
+            Hỗ trợ link TikTok đầy đủ hoặc link rút gọn (vt.tiktok.com).
+          </p>
+        </div>
       </div>
 
-      {/* MỤC 5: KIỂM TRA & DUYỆT */}
+      {/* 6. CODE XU */}
       <div className="mb-6">
-        <h2 className="font-mono text-[11px] font-bold uppercase tracking-widest text-slate-400 px-1 mb-2">Kiểm tra và duyệt video</h2>
-        <InfoCard icon={ShieldAlert} title="Quy trình duyệt">
-          <ul className="list-disc pl-4 space-y-1">
-            <li>Hệ thống tự kiểm tra video có thuộc <strong>đúng kênh bạn đã liên kết</strong> và có <strong>đủ hashtag</strong> hay không. Video không đạt sẽ bị từ chối kèm ghi chú lý do.</li>
-            <li>Video đạt kiểm tra sẽ vào trạng thái <strong>Đang chờ</strong> để <strong>admin duyệt thủ công</strong>.</li>
-            <li>Admin có quyền từ chối video không giới thiệu đúng Nxx315 Studio, nội dung kém chất lượng, sao chép hoặc có dấu hiệu gian lận.</li>
-            <li>Thời gian duyệt dự kiến: <FillIn text="[Điền thời gian, VD: 1-2 ngày]" />.</li>
-            <li>Video bị từ chối có thể sửa tiêu đề/mô tả cho đủ điều kiện rồi gửi lại.</li>
-          </ul>
-        </InfoCard>
-      </div>
-
-      {/* MỤC 6: PHẦN THƯỞNG */}
-      <div className="mb-6">
-        <h2 className="font-mono text-[11px] font-bold uppercase tracking-widest text-slate-400 px-1 mb-2">Phần thưởng</h2>
-        <InfoCard icon={Gift} title="Code xu" iconColor="text-emerald-600" iconBg="bg-emerald-50">
-          <ul className="list-disc pl-4 space-y-1">
-            <li>Mỗi video được duyệt nhận <strong>01 code xu</strong>, số xu do admin quyết định.</li>
-            <li>Code hiển thị trong <strong>Lịch sử video</strong> và tab <strong>Thưởng</strong>. Code chỉ <strong>dùng được 1 lần</strong> và <strong>chỉ tài khoản của bạn nhập được</strong>, không chuyển nhượng.</li>
-            <li>Cách nhận xu: vào web chính Nxx315 Studio → <strong>Ví → Nhập Gift Code</strong>.</li>
-            <li>Nhập sai code quá 5 lần trong 10 phút sẽ bị khóa 10 phút.</li>
-            <li>Xu nhận được sử dụng theo quy định chung của Nxx315 Studio (đổi quà, các dịch vụ trong cửa hàng).</li>
-          </ul>
-        </InfoCard>
-      </div>
-
-      {/* MỤC 7: BẢNG XẾP HẠNG */}
-      <div className="mb-6">
-        <h2 className="font-mono text-[11px] font-bold uppercase tracking-widest text-slate-400 px-1 mb-2">Bảng xếp hạng và giải tháng</h2>
-        <InfoCard icon={Award} title="Cách tính điểm" iconColor="text-amber-600" iconBg="bg-amber-50">
-          <ul className="list-disc pl-4 space-y-1">
-            <li>Mỗi video được duyệt = <strong>100 điểm</strong>.</li>
-            <li>Hạng tính theo <strong>số video được duyệt trong tháng</strong>. Bằng nhau thì ai có video được duyệt sớm hơn xếp trên.</li>
-            <li>Bảng xếp hạng tính theo tháng dương lịch, <strong>giờ Việt Nam</strong>, làm mới vào 00:00 ngày 1 hàng tháng.</li>
-            <li>Giải thưởng top tháng: <FillIn text="[Điền giải thưởng Top 1, 2, 3...]" />.</li>
-            <li>Điều kiện nhận giải top: <FillIn text="[VD: tối thiểu 5 video được duyệt trong tháng]" />.</li>
-            <li>Giải được công bố và trao trong vòng <FillIn text="[Điền số ngày]" /> ngày sau khi kết thúc tháng.</li>
-          </ul>
-        </InfoCard>
-      </div>
-
-      {/* MỤC 8 & 9: CẤM & QUYỀN BTC */}
-      <div className="mb-6">
-        <h2 className="font-mono text-[11px] font-bold uppercase tracking-widest text-slate-400 px-1 mb-2">Quy định & Hành vi bị cấm</h2>
-        <InfoCard icon={ShieldAlert} title="Hành vi bị cấm" iconColor="text-rose-600" iconBg="bg-rose-50">
-          <ul className="list-disc pl-4 space-y-1 text-rose-700">
-            <li>Mua hoặc dùng bot/dịch vụ tăng view, like, bình luận.</li>
-            <li>Dùng video của người khác, hoặc liên kết kênh không thuộc quyền sở hữu của bạn.</li>
-            <li>Tạo nhiều tài khoản để nhận thưởng nhiều lần.</li>
-            <li>Đăng nội dung vi phạm pháp luật, bản quyền, xúc phạm, nhạy cảm; đưa thông tin sai sự thật về Nxx315 Studio.</li>
-            <li>Lợi dụng lỗi hệ thống hoặc tìm cách vượt qua kiểm tra.</li>
-          </ul>
-        </InfoCard>
-
-        <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm mb-3">
-          <h3 className="font-bold text-slate-800 text-sm mb-2">Quyền của ban tổ chức</h3>
-          <ul className="list-disc pl-4 space-y-1 text-[13px] text-slate-600">
-            <li>Từ chối video, <strong>thu hồi code/xu, huỷ thành tích và khoá tài khoản</strong> nếu phát hiện vi phạm.</li>
-            <li>Kết quả duyệt video và xếp hạng của ban tổ chức là quyết định cuối cùng. Thắc mắc, khiếu nại gửi qua: Zalo <strong>0865245988</strong>, email: <strong>nxx315hub@gmail.com</strong>.</li>
-            <li>Tạm dừng hoặc kết thúc chương trình khi cần thiết, có thông báo trước trên website.</li>
+        <h2 className="font-mono text-[11px] font-bold uppercase tracking-widest text-slate-400 px-1 mb-2">Phần thưởng Code Xu</h2>
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm">
+          <ul className="list-disc pl-4 space-y-2 text-[13px] text-emerald-800">
+            <li>Mỗi video duyệt nhận <strong>01 code xu</strong> (số xu do admin quyết định).</li>
+            <li>Code hiện trong <strong>Lịch sử video</strong> & tab <strong>Thưởng</strong>. Dùng 1 lần, không chuyển nhượng.</li>
+            <li>Nhập tại web chính: <strong>Ví → Nhập Gift Code</strong>.</li>
+            <li>Sai 5 lần / 10 phút sẽ bị khóa nhập 10 phút.</li>
           </ul>
         </div>
       </div>
 
-      {/* MỤC 10 & 11: DỮ LIỆU & THAY ĐỔI */}
+      {/* 7. BẢNG XẾP HẠNG */}
       <div className="mb-6">
-        <InfoCard icon={Globe} title="Dữ liệu và hiển thị công khai">
-          <ul className="list-disc pl-4 space-y-1">
-            <li>Tên người dùng, ảnh đại diện kênh và điểm số của bạn có thể <strong>hiển thị công khai</strong> trên bảng xếp hạng và mục "Vừa được duyệt" (tên hiển thị dạng rút gọn).</li>
-            <li>Hệ thống chỉ dùng Google để xác minh danh tính, <strong>không đọc email và không đăng bài thay bạn</strong>.</li>
-            <li>Link kênh, video và số liệu (lượt xem, thích, bình luận) được lấy từ thông tin công khai của nền tảng để phục vụ việc xét duyệt.</li>
+        <h2 className="font-mono text-[11px] font-bold uppercase tracking-widest text-slate-400 px-1 mb-2">Bảng xếp hạng tháng</h2>
+        <InfoCard icon={Award} title="Cách tính điểm" iconColor="text-amber-600" iconBg="bg-amber-50">
+          <ul className="list-disc pl-4 space-y-1 mb-3 text-[13px]">
+            <li>Mỗi video duyệt = <strong>100 điểm</strong>.</li>
+            <li>Hạng tính theo số video duyệt trong tháng (bằng nhau xét ai duyệt sớm hơn).</li>
+            <li>Chốt sổ lúc <strong>00:00 ngày 1 hàng tháng</strong> (giờ VN).</li>
+          </ul>
+          <div className="bg-amber-50 rounded-lg p-3 text-[13px] border border-amber-100 text-amber-800 space-y-1">
+            <p><strong>Giải thưởng:</strong> <FillIn text="[Top 1: ..., Top 2: ..., Top 3: ...]" /></p>
+            <p><strong>Điều kiện nhận:</strong> <FillIn text="[VD: Tối thiểu 5 video duyệt]" /></p>
+            <p><strong>Trao giải:</strong> Trong vòng <FillIn text="[X]" /> ngày sau khi kết thúc tháng.</p>
+          </div>
+        </InfoCard>
+      </div>
+
+      {/* 8. CẤM & QUYỀN BTC */}
+      <div className="mb-6">
+        <h2 className="font-mono text-[11px] font-bold uppercase tracking-widest text-slate-400 px-1 mb-2">Quy định & Xử phạt</h2>
+        
+        <div className="rounded-2xl border border-rose-200 bg-white p-5 shadow-sm mb-3">
+          <h3 className="font-bold text-rose-600 text-sm mb-3 flex items-center gap-2"><ShieldAlert size={16}/> Hành vi bị cấm</h3>
+          <ul className="list-disc pl-4 space-y-1 text-[13px] text-slate-700">
+            <li>Mua hoặc dùng bot tăng view, like, bình luận.</li>
+            <li>Reup video người khác, liên kết kênh không thuộc sở hữu.</li>
+            <li>Tạo nhiều tài khoản để nhận thưởng nhiều lần.</li>
+            <li>Đăng nội dung vi phạm pháp luật, bản quyền, xúc phạm, nhạy cảm, sai sự thật.</li>
+            <li>Lợi dụng lỗi hệ thống hoặc tìm cách vượt qua kiểm tra.</li>
+          </ul>
+        </div>
+
+        <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+          <h3 className="font-bold text-slate-800 text-sm mb-2">Quyền của Ban Tổ Chức</h3>
+          <ul className="list-disc pl-4 space-y-1.5 text-[13px] text-slate-600">
+            <li>Có quyền <strong>từ chối video, thu hồi code/xu, hủy thành tích, khóa tài khoản</strong> nếu phát hiện vi phạm.</li>
+            <li>Quyết định của BTC là cuối cùng. Khiếu nại gửi qua Zalo <strong>0865245988</strong> hoặc email <strong>nxx315hub@gmail.com</strong>.</li>
+            <li>BTC có thể tạm dừng hoặc kết thúc chương trình, sẽ thông báo trước trên website.</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* 9. DỮ LIỆU */}
+      <div className="mb-6">
+        <InfoCard icon={Globe} title="Dữ liệu và hiển thị" iconColor="text-slate-600" iconBg="bg-slate-100">
+          <ul className="list-disc pl-4 space-y-1.5 text-[13px]">
+            <li>Tên, avatar kênh, điểm số có thể hiển thị công khai trên BXH.</li>
+            <li>Hệ thống chỉ dùng Google xác minh danh tính, không đọc email, không đăng bài thay bạn.</li>
+            <li>Link kênh, video, số liệu tương tác lấy từ thông tin công khai của nền tảng.</li>
           </ul>
         </InfoCard>
-        
-        <p className="text-[13px] text-slate-500 italic px-1">
-          <strong>Thay đổi thể lệ:</strong> Ban tổ chức có thể điều chỉnh thể lệ. Nội dung mới được đăng trên website và có hiệu lực từ thời điểm đăng.
+        <p className="text-[12px] text-slate-500 italic px-2">
+          * BTC có thể điều chỉnh thể lệ. Nội dung mới đăng tải trên website sẽ có hiệu lực ngay lập tức.
         </p>
       </div>
 
       {/* HỖ TRỢ */}
-      <div className="mt-8 text-center rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
-        <HelpCircle size={28} className="text-cyan-500 mx-auto mb-2" />
-        <h3 className="font-bold text-slate-800 text-sm mb-1">Cần hỗ trợ?</h3>
-        <p className="text-[13px] text-slate-500 mb-4">Liên hệ Zalo 0865245988 hoặc email nxx315hub@gmail.com.</p>
+      <div className="mt-8 rounded-2xl border border-slate-100 bg-gradient-to-br from-cyan-50 to-white p-6 shadow-sm text-center">
+        <HelpCircle size={32} className="text-cyan-500 mx-auto mb-2 opacity-80" />
+        <h3 className="font-bold text-slate-800 text-base mb-1">Bạn cần hỗ trợ thêm?</h3>
+        <p className="text-[13px] text-slate-500 mb-5">Nếu có bất kỳ thắc mắc nào về thể lệ hoặc quá trình duyệt video, hãy liên hệ ngay cho Admin.</p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <a href="https://zalo.me/0865245988" target="_blank" rel="noreferrer" className="flex items-center gap-2 rounded-full bg-blue-500 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-blue-600 shadow-sm w-full sm:w-auto justify-center">
+            <MessageSquare size={16} /> Chat Zalo
+          </a>
+          <a href="mailto:nxx315hub@gmail.com" className="flex items-center gap-2 rounded-full bg-slate-800 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-slate-900 shadow-sm w-full sm:w-auto justify-center">
+            Gửi Email
+          </a>
+        </div>
       </div>
     </div>
   );
