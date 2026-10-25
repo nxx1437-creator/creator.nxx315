@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
 import useSession from "../../hooks/useSession.js";
+import useAppVersion from "../../hooks/useAppVersion.js"; 
 
 const TABS = [
   { to: "/app", end: true, label: "TỔNG QUAN", Icon: LayoutDashboard },
@@ -50,6 +51,7 @@ function Nxx315Logo() {
 export default function AppLayout() {
   const navigate = useNavigate();
   const { session } = useSession();
+  const { hasUpdate } = useAppVersion(); 
   
   const [ov, setOv] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -60,6 +62,16 @@ export default function AppLayout() {
   
   const langRef = useRef(null);
   const profileRef = useRef(null);
+
+  // TỰ ĐỘNG F5 NGẦM SAU 1 GIÂY (KHÔNG THÔNG BÁO)
+  useEffect(() => {
+    if (hasUpdate) {
+      const timer = setTimeout(() => {
+        window.location.reload();
+      }, 1000); // 1000ms = 1 giây
+      return () => clearTimeout(timer);
+    }
+  }, [hasUpdate]);
 
   const reload = useCallback(async () => {
     const { data } = await supabase.rpc("get_creator_overview");
@@ -205,4 +217,4 @@ export default function AppLayout() {
       </nav>
     </div>
   );
-                                                                           }
+            }
