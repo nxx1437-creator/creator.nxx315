@@ -25,31 +25,32 @@ function useMonthEnd() {
   return left;
 }
 
-// Component Avatar xử lý Skeleton (Chống nháy ảnh 100%)
+// Component Avatar: Chỉ tải ảnh khi đã có seed (tên người dùng)
 function AvatarWithSkeleton({ seed }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [imageSrc, setImageSrc] = useState("");
-  const imgUrl = `https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${seed || 'Nxx315'}&radius=50`;
-
+  
   useEffect(() => {
-    // Kỹ thuật Preload: Tải ảnh vào bộ nhớ ngầm
+    // Nếu chưa có seed (dữ liệu chưa tải xong) thì không làm gì cả
+    if (!seed) return; 
+
+    const imgUrl = `https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${seed}&radius=50`;
     const img = new Image();
     img.src = imgUrl;
     img.onload = () => {
       setImageSrc(imgUrl);
-      // Đợi thêm 50ms cho mượt rồi mới tắt Skeleton
       setTimeout(() => setIsLoaded(true), 50); 
     };
-  }, [imgUrl]);
+  }, [seed]);
 
   return (
     <div className="relative h-full w-full">
-      {/* Skeleton hiện lên trước khi ảnh tải xong hoàn toàn */}
+      {/* Skeleton hiện lên khi ảnh chưa tải xong */}
       {!isLoaded && (
         <div className="absolute inset-0 animate-pulse rounded-full bg-slate-200"></div>
       )}
       
-      {/* Ảnh chỉ được render ra khi đã tải xong xuôi */}
+      {/* Ảnh chỉ được render ra khi đã tải xong */}
       {imageSrc && (
         <img 
           src={imageSrc} 
@@ -65,7 +66,6 @@ function AvatarWithSkeleton({ seed }) {
 function OverviewSkeleton() {
   return (
     <div className="space-y-4 animate-pulse">
-      {/* Card 1 */}
       <div className="rounded-[2rem] border border-white bg-white/80 p-5 shadow-sm h-64">
         <div className="flex gap-4">
           <div className="h-20 w-20 rounded-full bg-slate-200"></div>
@@ -78,24 +78,12 @@ function OverviewSkeleton() {
         <div className="mt-6 h-10 w-full rounded-full bg-slate-200"></div>
         <div className="mt-3 h-10 w-full rounded-full bg-slate-200"></div>
       </div>
-      {/* Card 2 */}
       <div className="rounded-[2rem] border border-white bg-white/80 p-5 shadow-sm h-48">
         <div className="h-4 w-1/3 rounded bg-slate-200 mb-4"></div>
         <div className="h-12 w-1/2 rounded bg-slate-200 mb-6"></div>
         <div className="grid grid-cols-2 gap-4 border-t border-slate-100 pt-4">
           <div className="h-10 w-full rounded bg-slate-200"></div>
           <div className="h-10 w-full rounded bg-slate-200"></div>
-        </div>
-      </div>
-      {/* Card 3 */}
-      <div className="rounded-[2rem] border border-white bg-white/80 p-5 shadow-sm h-40">
-        <div className="h-4 w-1/3 rounded bg-slate-200 mb-4"></div>
-        <div className="h-8 w-1/2 rounded bg-slate-200 mb-4"></div>
-        <div className="grid grid-cols-4 gap-2">
-          <div className="h-12 w-full rounded bg-slate-200"></div>
-          <div className="h-12 w-full rounded bg-slate-200"></div>
-          <div className="h-12 w-full rounded bg-slate-200"></div>
-          <div className="h-12 w-full rounded bg-slate-200"></div>
         </div>
       </div>
     </div>
@@ -133,16 +121,19 @@ export default function Overview() {
     return <OverviewSkeleton />;
   }
 
+  // Xác định seed cho avatar (ưu tiên username, nếu chưa có thì dùng id)
+  const avatarSeed = profile?.username || profile?.id;
+
   return (
     <div className="space-y-4">
       {/* Card Profile & Quick Actions */}
       <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/80 p-5 shadow-sm">
         <div className="flex items-center gap-4">
           
-          {/* KHỐI AVATAR CÓ PRELOAD CHỐNG NHÁY */}
+          {/* KHỐI AVATAR - Chỉ hiện khi đã có seed */}
           <div className="relative shrink-0">
             <div className="h-20 w-20 rounded-full border-[3px] border-slate-100 overflow-hidden bg-white shadow-sm flex items-center justify-center relative">
-              <AvatarWithSkeleton seed={profile?.id || profile?.username} />
+              <AvatarWithSkeleton seed={avatarSeed} />
             </div>
             <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-md bg-slate-600 px-2 py-0.5 text-[9px] font-bold tracking-widest text-white uppercase shadow-sm whitespace-nowrap z-10">
               🔍 COMMON
@@ -299,4 +290,4 @@ export default function Overview() {
       </div>
     </div>
   );
-      }
+    }
