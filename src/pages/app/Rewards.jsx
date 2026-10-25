@@ -40,10 +40,8 @@ export default function Rewards() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-10">
-          <Loader2 size={22} className="animate-spin text-cyan-600" />
-        </div>
-      ) : approved.length === 0 ? (
+  <div className="h-40"></div> // Khung trống, không xoay
+) : approved.length === 0 ? (
         <Card>
           <div className="rounded-2xl border border-dashed border-slate-300 px-4 py-10 text-center">
             <Gift size={34} className="mx-auto text-slate-300" />
