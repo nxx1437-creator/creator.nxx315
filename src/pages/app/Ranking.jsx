@@ -13,9 +13,9 @@ export default function Ranking() {
   }, []);
 
   if (!data) {
-    return <div className="flex justify-center py-20"><Loader2 size={24} className="animate-spin text-cyan-600" /></div>;
+  return <div className="h-40"></div>; // Khung trống
   }
-
+  
   return (
     <div className="space-y-4">
       <div className="px-1">
