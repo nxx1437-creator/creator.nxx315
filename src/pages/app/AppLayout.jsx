@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { NavLink, Outlet, useNavigate, Link } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard, Trophy, Film, Gift, Settings, ArrowLeft, Loader2, AlertTriangle,
-  Download, Search, Bell, Globe, LogOut, User
+  LayoutDashboard, Trophy, Film, Gift, Settings, Loader2, AlertTriangle,
+  Download, Search, Bell, Globe, LogOut, User, RefreshCw
 } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
 import useSession from "../../hooks/useSession.js";
+import useAppVersion from "../../hooks/useAppVersion.js"; 
 
 const TABS = [
   { to: "/app", end: true, label: "TỔNG QUAN", Icon: LayoutDashboard },
@@ -39,7 +40,6 @@ function LinkBanner({ showButton, onGo }) {
   );
 }
 
-// Logo CloudPhone giống web chính
 function CloudPhoneLogo() {
   return (
     <div className="flex items-center gap-1.5 text-[17px] font-extrabold tracking-tight text-slate-900">
@@ -54,16 +54,27 @@ function CloudPhoneLogo() {
 export default function AppLayout() {
   const navigate = useNavigate();
   const { session } = useSession();
+  const { hasUpdate } = useAppVersion(); 
+  
   const [ov, setOv] = useState(null);
   const [loading, setLoading] = useState(true);
   const [synced, setSynced] = useState(false);
 
-  // State cho menu thả xuống
   const [showLang, setShowLang] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   
   const langRef = useRef(null);
   const profileRef = useRef(null);
+
+  // TỰ ĐỘNG TẢI LẠI SAU 3 GIÂY KHI CÓ BẢN CẬP NHẬT
+  useEffect(() => {
+    if (hasUpdate) {
+      const timer = setTimeout(() => {
+        window.location.reload();
+      }, 3000); // 3000ms = 3 giây
+      return () => clearTimeout(timer);
+    }
+  }, [hasUpdate]);
 
   const reload = useCallback(async () => {
     const { data } = await supabase.rpc("get_creator_overview");
@@ -75,7 +86,6 @@ export default function AppLayout() {
     reload();
   }, [reload]);
 
-  // Đóng menu khi click ra ngoài
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (langRef.current && !langRef.current.contains(event.target)) setShowLang(false);
@@ -107,7 +117,20 @@ export default function AppLayout() {
     <div className="min-h-screen bg-gradient-to-b from-[#f4fbf9] to-[#e6f7fa] pb-28 text-slate-800 font-sans">
       <div className="pointer-events-none fixed inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(0,0,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
 
-      {/* HEADER MỚI THEO ẢNH MẪU */}
+      {/* TOAST THÔNG BÁO CẬP NHẬT TỰ ĐỘNG */}
+      {hasUpdate && (
+        <div className="fixed top-16 left-1/2 z-[100] -translate-x-1/2 w-[90%] max-w-sm animate-in slide-in-from-top-4 fade-in">
+          <div className="relative overflow-hidden rounded-2xl bg-slate-900 px-4 py-3 shadow-2xl flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 text-white">
+              <RefreshCw size={16} className="animate-spin text-cyan-400" />
+              <span className="text-[13px] font-semibold">Đang cập nhật phiên bản mới...</span>
+            </div>
+            {/* Thanh loading chạy ngang 3 giây */}
+            <div className="absolute bottom-0 left-0 h-[3px] bg-cyan-400 animate-[width_3s_linear_forwards]" style={{ width: "0%", animation: "progress 3s linear forwards" }} />
+          </div>
+        </div>
+      )}
+
       <header className="sticky top-0 z-50 border-b border-white/50 bg-[#f4fbf9]/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-md items-center justify-between px-4 py-3 md:max-w-3xl">
           
@@ -118,7 +141,6 @@ export default function AppLayout() {
             <button className="hover:text-slate-900"><Search size={20} /></button>
             <button className="hover:text-slate-900"><Bell size={20} /></button>
             
-            {/* Nút chuyển ngôn ngữ */}
             <div className="relative" ref={langRef}>
               <button onClick={() => setShowLang(!showLang)} className="hover:text-slate-900 flex items-center">
                 <Globe size={20} />
@@ -131,7 +153,6 @@ export default function AppLayout() {
               )}
             </div>
 
-            {/* Nút Avatar / Profile */}
             <div className="relative" ref={profileRef}>
               <button onClick={() => setShowProfile(!showProfile)} className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-slate-200 shadow-sm">
                 {session?.user?.user_metadata?.avatar_url ? (
@@ -192,7 +213,6 @@ export default function AppLayout() {
         )}
       </main>
 
-      {/* Thanh điều hướng dưới cùng */}
       <nav className="fixed inset-x-3 bottom-3 z-40 mx-auto max-w-md rounded-[2rem] border border-white bg-white/95 px-2 py-2 shadow-[0_8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl md:max-w-xl">
         <div className="grid grid-cols-5">
           {TABS.map(({ to, end, label, Icon }) => (
@@ -214,4 +234,4 @@ export default function AppLayout() {
       </nav>
     </div>
   );
-            }
+  }
