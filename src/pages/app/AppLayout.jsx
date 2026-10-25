@@ -61,11 +61,11 @@ export default function AppLayout() {
   const [showLang, setShowLang] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showSearch, setShowSearch] = useState(false); 
-  const [showNotify, setShowNotify] = useState(false); 
   
-  // State chứa danh sách thông báo và trạng thái chưa đọc
+  // State quản lý thông báo
+  const [showNotify, setShowNotify] = useState(false);
   const [notifications, setNotifications] = useState([]);
-  const [hasUnread, setHasUnread] = useState(false);
+  const [notifLoading, setNotifLoading] = useState(false);
 
   const langRef = useRef(null);
   const profileRef = useRef(null);
@@ -80,40 +80,27 @@ export default function AppLayout() {
     reload();
   }, [reload]);
 
-  // Lấy danh sách thông báo từ Supabase
-  const fetchNotifications = useCallback(async () => {
-    if (!session?.user?.id) return;
-    const { data, error } = await supabase
+  // --- CÁC HÀM XỬ LÝ THÔNG BÁO ---
+  const fetchNotifications = async () => {
+    setNotifLoading(true);
+    const { data } = await supabase
       .from("notifications")
-      .select("*")
-      .eq("user_id", session.user.id)
+      .select("id, title, body, type, is_read, action_url, created_at")
       .order("created_at", { ascending: false })
-      .limit(10);
-
-    if (!error && data) {
-      setNotifications(data);
-      // Kiểm tra xem có thông báo nào chưa đọc không
-      setHasUnread(data.some(n => !n.is_read));
-    }
-  }, [session]);
-
-  useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
-
-  // Hàm đánh dấu đã đọc tất cả thông báo
-  const markAllAsRead = async () => {
-    if (hasUnread && session?.user?.id) {
-      await supabase
-        .from("notifications")
-        .update({ is_read: true })
-        .eq("user_id", session.user.id)
-        .eq("is_read", false);
-      setHasUnread(false); // Tắt chấm đỏ ngay lập tức
-    }
+      .limit(30);
+    setNotifications(data || []);
+    setNotifLoading(false);
   };
 
-  // Đóng menu khi click ra ngoài
+  const markRead = async (ids) => {
+    if (!ids || !ids.length) return;
+    await supabase.from("notifications").update({ is_read: true }).in("id", ids);
+    setNotifications((list) => list.map((n) => (ids.includes(n.id) ? { ...n, is_read: true } : n)));
+  };
+
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
+
+  // Đóng menu khi click ra ngoài (Ngôn ngữ & Profile)
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (langRef.current && !langRef.current.contains(event.target)) setShowLang(false);
@@ -141,14 +128,6 @@ export default function AppLayout() {
     navigate("/login", { replace: true });
   };
 
-  // Khi mở thông báo, tự động đánh dấu là đã đọc
-  const handleOpenNotify = () => {
-    setShowNotify(!showNotify);
-    if (!showNotify) {
-      markAllAsRead();
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f4fbf9] to-[#e6f7fa] pb-28 text-slate-800 font-sans">
       <div className="pointer-events-none fixed inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(0,0,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
@@ -172,20 +151,38 @@ export default function AppLayout() {
               <Search size={20} />
             </button>
 
-            {/* Nút Thông báo - Đã nối chức năng */}
-            <button onClick={handleOpenNotify} className="hover:text-slate-900 flex items-center relative">
+            {/* Nút Thông báo - Đã thêm data-notif-toggle */}
+            <button 
+              data-notif-toggle
+              aria-label="Thông báo"
+              onClick={() => {
+                setShowNotify((o) => !o);
+                if (!showNotify) fetchNotifications();
+              }} 
+              className="hover:text-slate-900 flex items-center relative"
+            >
               <Bell size={20} />
-              {/* Chỉ hiện chấm đỏ nếu có thông báo chưa đọc */}
-              {hasUnread && (
-                <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-rose-500 border border-white"></span>
+              {unreadCount > 0 && (
+                <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-rose-500 border border-white"></span>
               )}
             </button>
             
             {/* Dropdown Thông báo */}
             {showNotify && (
               <NotificationDropdown 
-                notifications={notifications} 
+                notifications={notifications}
+                loading={notifLoading}
                 onClose={() => setShowNotify(false)} 
+                onItemClick={(g) => {
+                  markRead(g.ids);
+                  setShowNotify(false);
+                  if (g.action_url) navigate(g.action_url);
+                }}
+                onMarkAllRead={() => markRead(notifications.filter((n) => !n.is_read).map((n) => n.id))}
+                onViewAll={() => {
+                  setShowNotify(false);
+                  navigate("/app/notifications"); // Đảm bảo anh/chị có route này
+                }}
               />
             )}
             
@@ -194,7 +191,7 @@ export default function AppLayout() {
                 <Globe size={20} />
               </button>
               {showLang && (
-                <div className="absolute right-0 mt-3 w-40 rounded-2xl border border-slate-100 bg-white p-2 shadow-xl animate-in fade-in slide-in-from-top-2">
+                <div className="absolute right-0 mt-3 w-40 rounded-2xl border border-slate-100 bg-white p-2 shadow-xl">
                   <button className="w-full text-left px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg">EN — English</button>
                   <button className="w-full text-left px-3 py-2 text-sm font-medium text-emerald-600 bg-emerald-50 rounded-lg">VI — Tiếng Việt</button>
                 </div>
@@ -213,7 +210,7 @@ export default function AppLayout() {
               </button>
               
               {showProfile && (
-                <div className="absolute right-0 mt-3 w-56 rounded-2xl border border-slate-100 bg-white py-2 shadow-xl animate-in fade-in slide-in-from-top-2">
+                <div className="absolute right-0 mt-3 w-56 rounded-2xl border border-slate-100 bg-white py-2 shadow-xl">
                   <div className="px-4 py-2 border-b border-slate-100 mb-1">
                     <p className="font-bold text-slate-800 truncate">{session?.user?.user_metadata?.full_name || "Creator"}</p>
                     <p className="text-xs text-slate-500 truncate">{session?.user?.email}</p>
@@ -282,4 +279,4 @@ export default function AppLayout() {
       </nav>
     </div>
   );
-         }
+}
