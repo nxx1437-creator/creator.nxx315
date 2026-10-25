@@ -14,7 +14,7 @@ import Videos from "./pages/app/Videos.jsx";
 import Rewards from "./pages/app/Rewards.jsx";
 import Settings from "./pages/app/Settings.jsx";
 
-// Component bảo vệ: Yêu cầu đăng nhập VÀ đã hoàn thành Onboarding
+// Component bảo vệ: Yêu cầu đăng nhập
 function Protected({ children }) {
   const { session, loading } = useSession();
   const [checkingStatus, setCheckingStatus] = useState(true);
@@ -28,24 +28,34 @@ function Protected({ children }) {
 
     const checkUserStatus = async () => {
       try {
-        // Kiểm tra xem user đã liên kết kênh nào chưa (bảng creator_channels)
-        const { data: channels, error } = await supabase
-          .from("creator_channels")
-          .select("platform")
-          .eq("user_id", session.user.id)
-          .limit(1);
-
-        if (error) throw error;
-
-        // Nếu chưa có kênh nào (mảng rỗng) -> Bắt buộc Onboarding
-        if (!channels || channels.length === 0) {
-          setNeedsOnboarding(true);
-        } else {
+        // 1. Kiểm tra xem trình duyệt này đã lưu cờ hoàn thành Onboarding chưa
+        const localOnboarded = localStorage.getItem(`onboarded_${session.user.id}`);
+        
+        // 2. Nếu chưa có trong localStorage, kiểm tra xem DB đã có kênh chưa (dự phòng)
+        if (localOnboarded === "true") {
           setNeedsOnboarding(false);
+        } else {
+          // Kiểm tra bảng creator_channels
+          const { data: channels, error } = await supabase
+            .from("creator_channels")
+            .select("platform")
+            .eq("user_id", session.user.id)
+            .limit(1);
+
+          if (error) throw error;
+
+          if (!channels || channels.length === 0) {
+            // Nếu chưa có kênh và chưa có cờ -> Cần Onboarding
+            setNeedsOnboarding(true);
+          } else {
+            // Đã có kênh -> Đánh dấu hoàn thành và cho vào App
+            localStorage.setItem(`onboarded_${session.user.id}`, "true");
+            setNeedsOnboarding(false);
+          }
         }
       } catch (err) {
         console.error("Lỗi kiểm tra trạng thái:", err);
-        // Nếu lỗi mạng, tạm thời cho qua để không chặn người dùng
+        // Nếu lỗi mạng, cứ cho vào App để tránh chặn người dùng
         setNeedsOnboarding(false);
       } finally {
         setCheckingStatus(false);
@@ -65,7 +75,7 @@ function Protected({ children }) {
 
   if (!session) return <Navigate to="/login" replace />;
 
-  // Nếu chưa có kênh -> Đẩy sang Onboarding
+  // Nếu cần onboarding thì đẩy sang đó
   if (needsOnboarding) return <Navigate to="/onboarding" replace />;
 
   return children;
