@@ -52,16 +52,16 @@ export default function Overview() {
       <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/80 p-5 shadow-sm">
         <div className="flex items-center gap-4">
           
-          {/* AVATAR ROBOT ĐÃ SỬA LỖI */}
-          <div className="relative shrink-0">
-            <div className="h-20 w-20 rounded-full border-[3px] border-slate-100 overflow-hidden bg-white shadow-sm flex items-center justify-center">
-              <img 
-                // Bỏ backgroundColor, thêm radius=50 để cắt tròn chuẩn
-                src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Nxx315&radius=50" 
-                alt="Avatar" 
-                className="h-full w-full object-cover"
-              />
-            </div>
+          {/* KHỐI AVATAR MẪU - BOTTS NEUTRAL */}
+<div className="relative shrink-0">
+  <div className="h-20 w-20 rounded-full border-[3px] border-slate-100 overflow-hidden bg-white shadow-sm flex items-center justify-center">
+    <img 
+      // Dùng profile.id hoặc profile.username để mỗi tài khoản ra 1 con robot khác nhau
+      src={`https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${profile?.id || profile?.username || 'Nxx315'}&radius=50`} 
+      alt="Avatar" 
+      className="h-full w-full object-cover"
+    />
+  </div>
             {/* Nhãn COMMON đè lên dưới */}
             <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-md bg-slate-600 px-2 py-0.5 text-[9px] font-bold tracking-widest text-white uppercase shadow-sm whitespace-nowrap">
               🔍 COMMON
