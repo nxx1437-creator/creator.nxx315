@@ -1,16 +1,18 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { NavLink, Outlet, useNavigate, useLocation, Link } from "react-router-dom";
+import React, { useEffect, useState, useCallback, useRef } from "react";
+import { NavLink, Outlet, useNavigate, Link } from "react-router-dom";
 import {
   LayoutDashboard, Trophy, Film, Gift, Settings, ArrowLeft, Loader2, AlertTriangle,
+  Download, Search, Bell, Globe, LogOut, User
 } from "lucide-react";
-import { supabase, MAIN_SITE } from "../../lib/supabaseClient.js";
+import { supabase } from "../../lib/supabaseClient.js";
+import useSession from "../../hooks/useSession.js";
 
 const TABS = [
-  { to: "/app", end: true, label: "Tổng quan", Icon: LayoutDashboard },
-  { to: "/app/ranking", label: "Xếp hạng", Icon: Trophy },
-  { to: "/app/videos", label: "Video", Icon: Film },
-  { to: "/app/rewards", label: "Thưởng", Icon: Gift },
-  { to: "/app/settings", label: "Thêm", Icon: Settings },
+  { to: "/app", end: true, label: "TỔNG QUAN", Icon: LayoutDashboard },
+  { to: "/app/ranking", label: "XẾP HẠNG", Icon: Trophy },
+  { to: "/app/videos", label: "VIDEO", Icon: Film },
+  { to: "/app/rewards", label: "PHẦN THƯỞNG", Icon: Gift },
+  { to: "/app/settings", label: "THÊM", Icon: Settings },
 ];
 
 function LinkBanner({ showButton, onGo }) {
@@ -37,12 +39,31 @@ function LinkBanner({ showButton, onGo }) {
   );
 }
 
+// Logo CloudPhone giống web chính
+function CloudPhoneLogo() {
+  return (
+    <div className="flex items-center gap-1.5 text-[17px] font-extrabold tracking-tight text-slate-900">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500">
+        <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
+      </svg>
+      CloudPhone
+    </div>
+  );
+}
+
 export default function AppLayout() {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const { session } = useSession();
   const [ov, setOv] = useState(null);
   const [loading, setLoading] = useState(true);
   const [synced, setSynced] = useState(false);
+
+  // State cho menu thả xuống
+  const [showLang, setShowLang] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  
+  const langRef = useRef(null);
+  const profileRef = useRef(null);
 
   const reload = useCallback(async () => {
     const { data } = await supabase.rpc("get_creator_overview");
@@ -53,6 +74,16 @@ export default function AppLayout() {
   useEffect(() => {
     reload();
   }, [reload]);
+
+  // Đóng menu khi click ra ngoài
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (langRef.current && !langRef.current.contains(event.target)) setShowLang(false);
+      if (profileRef.current && !profileRef.current.contains(event.target)) setShowProfile(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (!ov || synced) return;
@@ -66,23 +97,73 @@ export default function AppLayout() {
   }, [ov, synced, reload]);
 
   const linked = (ov?.channels || []).length > 0;
-  const onSettings = pathname.startsWith("/app/settings");
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f4fbf9] to-[#e6f7fa] pb-28 text-slate-800 font-sans">
       <div className="pointer-events-none fixed inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(0,0,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
 
-      <header className="sticky top-0 z-30 border-b border-white/50 bg-[#f4fbf9]/80 backdrop-blur-md">
+      {/* HEADER MỚI THEO ẢNH MẪU */}
+      <header className="sticky top-0 z-50 border-b border-white/50 bg-[#f4fbf9]/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-md items-center justify-between px-4 py-3 md:max-w-3xl">
-          <a
-            href={`${MAIN_SITE}/dashboard`}
-            className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-sm"
-          >
-            <ArrowLeft size={14} /> Web chính
-          </a>
-          <Link to="/" className="text-base font-bold text-slate-900">
-            CloudPhone <span className="text-emerald-500">Creator</span>
-          </Link>
+          
+          <CloudPhoneLogo />
+
+          <div className="flex items-center gap-3 sm:gap-4 text-slate-600">
+            <button className="hidden sm:block hover:text-slate-900"><Download size={20} /></button>
+            <button className="hover:text-slate-900"><Search size={20} /></button>
+            <button className="hover:text-slate-900"><Bell size={20} /></button>
+            
+            {/* Nút chuyển ngôn ngữ */}
+            <div className="relative" ref={langRef}>
+              <button onClick={() => setShowLang(!showLang)} className="hover:text-slate-900 flex items-center">
+                <Globe size={20} />
+              </button>
+              {showLang && (
+                <div className="absolute right-0 mt-3 w-40 rounded-2xl border border-slate-100 bg-white p-2 shadow-xl animate-in fade-in slide-in-from-top-2">
+                  <button className="w-full text-left px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg">EN — English</button>
+                  <button className="w-full text-left px-3 py-2 text-sm font-medium text-emerald-600 bg-emerald-50 rounded-lg">VI — Tiếng Việt</button>
+                </div>
+              )}
+            </div>
+
+            {/* Nút Avatar / Profile */}
+            <div className="relative" ref={profileRef}>
+              <button onClick={() => setShowProfile(!showProfile)} className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-slate-200 shadow-sm">
+                {session?.user?.user_metadata?.avatar_url ? (
+                  <img src={session.user.user_metadata.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
+                ) : (
+                  <div className="h-full w-full bg-cyan-600 text-white flex items-center justify-center font-bold text-xs uppercase">
+                    {session?.user?.email?.charAt(0) || "U"}
+                  </div>
+                )}
+              </button>
+              
+              {showProfile && (
+                <div className="absolute right-0 mt-3 w-56 rounded-2xl border border-slate-100 bg-white py-2 shadow-xl animate-in fade-in slide-in-from-top-2">
+                  <div className="px-4 py-2 border-b border-slate-100 mb-1">
+                    <p className="font-bold text-slate-800 truncate">{session?.user?.user_metadata?.full_name || "Creator"}</p>
+                    <p className="text-xs text-slate-500 truncate">{session?.user?.email}</p>
+                  </div>
+                  <button onClick={() => { setShowProfile(false); navigate("/app/settings"); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    <Settings size={16} /> Cài đặt
+                  </button>
+                  <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    <User size={16} /> Tài khoản
+                  </button>
+                  <div className="h-px bg-slate-100 my-1"></div>
+                  <button onClick={signOut} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-rose-500 hover:bg-rose-50">
+                    <LogOut size={16} /> Đăng xuất
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
         </div>
       </header>
 
@@ -104,7 +185,7 @@ export default function AppLayout() {
         ) : (
           <>
             {!linked && (
-              <LinkBanner showButton={!onSettings} onGo={() => navigate("/app/settings")} />
+              <LinkBanner showButton={true} onGo={() => navigate("/app/settings")} />
             )}
             <Outlet context={{ ov, reload }} />
           </>
@@ -112,7 +193,7 @@ export default function AppLayout() {
       </main>
 
       {/* Thanh điều hướng dưới cùng */}
-      <nav className="fixed inset-x-3 bottom-3 z-40 mx-auto max-w-md rounded-3xl border border-white bg-white/90 px-2 py-2 shadow-[0_8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl md:max-w-xl">
+      <nav className="fixed inset-x-3 bottom-3 z-40 mx-auto max-w-md rounded-[2rem] border border-white bg-white/95 px-2 py-2 shadow-[0_8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl md:max-w-xl">
         <div className="grid grid-cols-5">
           {TABS.map(({ to, end, label, Icon }) => (
             <NavLink
@@ -120,12 +201,12 @@ export default function AppLayout() {
               to={to}
               end={end}
               className={({ isActive }) =>
-                `flex flex-col items-center gap-1 rounded-2xl py-2 text-[10px] font-semibold uppercase tracking-wide transition-colors ${
-                  isActive ? "bg-emerald-50 text-emerald-600" : "text-slate-400 hover:text-slate-600"
+                `flex flex-col items-center gap-1 rounded-2xl py-2.5 text-[9px] font-bold tracking-wide transition-colors ${
+                  isActive ? "text-emerald-600" : "text-slate-400 hover:text-slate-600"
                 }`
               }
             >
-              <Icon size={19} />
+              <Icon size={20} strokeWidth={2.5} />
               {label}
             </NavLink>
           ))}
@@ -133,4 +214,4 @@ export default function AppLayout() {
       </nav>
     </div>
   );
-        }
+            }
