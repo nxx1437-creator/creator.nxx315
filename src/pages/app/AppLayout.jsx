@@ -7,7 +7,6 @@ import {
 import { supabase } from "../../lib/supabaseClient.js";
 import useSession from "../../hooks/useSession.js";
 
-// Import 2 component vừa tách
 import SearchModal from "../../components/SearchModal.jsx";
 import NotificationDropdown from "../../components/NotificationDropdown.jsx";
 
@@ -59,15 +58,17 @@ export default function AppLayout() {
   const [loading, setLoading] = useState(true);
   const [synced, setSynced] = useState(false);
 
-  // State quản lý đóng/mở
   const [showLang, setShowLang] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showSearch, setShowSearch] = useState(false); 
   const [showNotify, setShowNotify] = useState(false); 
   
+  // State chứa danh sách thông báo và trạng thái chưa đọc
+  const [notifications, setNotifications] = useState([]);
+  const [hasUnread, setHasUnread] = useState(false);
+
   const langRef = useRef(null);
   const profileRef = useRef(null);
-  const notifyRef = useRef(null);
 
   const reload = useCallback(async () => {
     const { data } = await supabase.rpc("get_creator_overview");
@@ -79,12 +80,44 @@ export default function AppLayout() {
     reload();
   }, [reload]);
 
-  // Đóng menu khi click ra ngoài (chỉ áp dụng cho thông báo, ngôn ngữ, profile)
+  // Lấy danh sách thông báo từ Supabase
+  const fetchNotifications = useCallback(async () => {
+    if (!session?.user?.id) return;
+    const { data, error } = await supabase
+      .from("notifications")
+      .select("*")
+      .eq("user_id", session.user.id)
+      .order("created_at", { ascending: false })
+      .limit(10);
+
+    if (!error && data) {
+      setNotifications(data);
+      // Kiểm tra xem có thông báo nào chưa đọc không
+      setHasUnread(data.some(n => !n.is_read));
+    }
+  }, [session]);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
+
+  // Hàm đánh dấu đã đọc tất cả thông báo
+  const markAllAsRead = async () => {
+    if (hasUnread && session?.user?.id) {
+      await supabase
+        .from("notifications")
+        .update({ is_read: true })
+        .eq("user_id", session.user.id)
+        .eq("is_read", false);
+      setHasUnread(false); // Tắt chấm đỏ ngay lập tức
+    }
+  };
+
+  // Đóng menu khi click ra ngoài
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (langRef.current && !langRef.current.contains(event.target)) setShowLang(false);
       if (profileRef.current && !profileRef.current.contains(event.target)) setShowProfile(false);
-      if (notifyRef.current && !notifyRef.current.contains(event.target)) setShowNotify(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -108,11 +141,18 @@ export default function AppLayout() {
     navigate("/login", { replace: true });
   };
 
+  // Khi mở thông báo, tự động đánh dấu là đã đọc
+  const handleOpenNotify = () => {
+    setShowNotify(!showNotify);
+    if (!showNotify) {
+      markAllAsRead();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f4fbf9] to-[#e6f7fa] pb-28 text-slate-800 font-sans">
       <div className="pointer-events-none fixed inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(0,0,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
 
-      {/* Gọi Modal Tìm kiếm */}
       {showSearch && <SearchModal onClose={() => setShowSearch(false)} />}
 
       <header className="sticky top-0 z-50 border-b border-white/50 bg-[#f4fbf9]/90 backdrop-blur-md">
@@ -132,16 +172,23 @@ export default function AppLayout() {
               <Search size={20} />
             </button>
 
-            {/* Nút Thông báo */}
-<button onClick={() => setShowNotify(!showNotify)} className="hover:text-slate-900 flex items-center relative">
-  <Bell size={20} />
-  <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-rose-500 border border-white"></span>
-</button>
-
-{/* Gọi Dropdown Thông báo (Đặt ở ngoài thẻ div relative) */}
-{showNotify && <NotificationDropdown onClose={() => setShowNotify(false)} />}
+            {/* Nút Thông báo - Đã nối chức năng */}
+            <button onClick={handleOpenNotify} className="hover:text-slate-900 flex items-center relative">
+              <Bell size={20} />
+              {/* Chỉ hiện chấm đỏ nếu có thông báo chưa đọc */}
+              {hasUnread && (
+                <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-rose-500 border border-white"></span>
+              )}
+            </button>
             
-            {/* Nút Ngôn ngữ */}
+            {/* Dropdown Thông báo */}
+            {showNotify && (
+              <NotificationDropdown 
+                notifications={notifications} 
+                onClose={() => setShowNotify(false)} 
+              />
+            )}
+            
             <div className="relative" ref={langRef}>
               <button onClick={() => setShowLang(!showLang)} className="hover:text-slate-900 flex items-center">
                 <Globe size={20} />
@@ -154,7 +201,6 @@ export default function AppLayout() {
               )}
             </div>
 
-            {/* Nút Profile */}
             <div className="relative" ref={profileRef}>
               <button onClick={() => setShowProfile(!showProfile)} className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-slate-200 shadow-sm">
                 {session?.user?.user_metadata?.avatar_url ? (
@@ -236,5 +282,4 @@ export default function AppLayout() {
       </nav>
     </div>
   );
-                    }
-
+         }
