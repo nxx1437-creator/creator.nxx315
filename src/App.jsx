@@ -15,6 +15,7 @@ import Videos from "./pages/app/Videos.jsx";
 import Rewards from "./pages/app/Rewards.jsx";
 import Settings from "./pages/app/Settings.jsx";
 
+// Component bảo vệ: Yêu cầu đăng nhập
 function Protected({ children }) {
   const { session, loading } = useSession();
   const [checkingStatus, setCheckingStatus] = useState(true);
@@ -25,20 +26,26 @@ function Protected({ children }) {
       setCheckingStatus(false);
       return;
     }
+
     const checkUserStatus = async () => {
       try {
+        // 1. Kiểm tra cờ đã hoàn thành Onboarding trong localStorage
         const localOnboarded = localStorage.getItem(`onboarded_${session.user.id}`);
+        
         if (localOnboarded === "true") {
           setNeedsOnboarding(false);
         } else {
+          // 2. Nếu chưa có cờ, kiểm tra xem DB đã có kênh chưa
           const { data: channels, error } = await supabase
             .from("creator_channels")
             .select("platform")
             .eq("user_id", session.user.id)
             .limit(1);
+
           if (error) throw error;
+
           if (!channels || channels.length === 0) {
-            setNeedsOnboarding(true);
+            setNeedsOnboarding(true); 
           } else {
             localStorage.setItem(`onboarded_${session.user.id}`, "true");
             setNeedsOnboarding(false);
@@ -50,9 +57,13 @@ function Protected({ children }) {
         setCheckingStatus(false);
       }
     };
+
     checkUserStatus();
   }, [session]);
 
+  // Nếu đang tải session hoặc đang kiểm tra lần đầu -> hiện vòng xoay
+  // NHƯNG: Khi đã vào App, quá trình này chỉ chạy 1 lần. 
+  // Nếu user đã onboarded, lần sau nó sẽ load cực nhanh (vì đọc từ localStorage).
   if (loading || checkingStatus) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f4fbf9]">
@@ -63,11 +74,14 @@ function Protected({ children }) {
 
   if (!session) return <Navigate to="/login" replace />;
   if (needsOnboarding) return <Navigate to="/onboarding" replace />;
+
   return children;
 }
 
+// Component bảo vệ cho Onboarding
 function OnboardingProtected({ children }) {
   const { session, loading } = useSession();
+  
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f4fbf9]">
@@ -75,11 +89,13 @@ function OnboardingProtected({ children }) {
       </div>
     );
   }
+  
   if (!session) return <Navigate to="/login" replace />;
+  
   return children;
 }
 
-// Bọc ngoài cùng để bắt sự kiện chuyển trang và thêm hiệu ứng mượt
+// Tách phần Routes ra để tránh bị render lại toàn bộ khi chuyển trang
 function AppRoutes() {
   const location = useLocation();
   
@@ -92,6 +108,7 @@ function AppRoutes() {
         
         <Route path="/onboarding" element={<OnboardingProtected><Onboarding /></OnboardingProtected>} />
 
+        {/* Bọc AppLayout trong Protected */}
         <Route path="/app" element={<Protected><AppLayout /></Protected>}>
           <Route index element={<Overview />} />
           <Route path="ranking" element={<Ranking />} />
