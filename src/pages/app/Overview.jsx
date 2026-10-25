@@ -25,25 +25,38 @@ function useMonthEnd() {
   return left;
 }
 
-// Component Avatar xử lý Skeleton (Chống nháy ảnh)
+// Component Avatar xử lý Skeleton (Chống nháy ảnh 100%)
 function AvatarWithSkeleton({ seed }) {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [imageSrc, setImageSrc] = useState("");
   const imgUrl = `https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${seed || 'Nxx315'}&radius=50`;
+
+  useEffect(() => {
+    // Kỹ thuật Preload: Tải ảnh vào bộ nhớ ngầm
+    const img = new Image();
+    img.src = imgUrl;
+    img.onload = () => {
+      setImageSrc(imgUrl);
+      // Đợi thêm 50ms cho mượt rồi mới tắt Skeleton
+      setTimeout(() => setIsLoaded(true), 50); 
+    };
+  }, [imgUrl]);
 
   return (
     <div className="relative h-full w-full">
-      {/* Skeleton hiện lên trước khi ảnh tải xong */}
+      {/* Skeleton hiện lên trước khi ảnh tải xong hoàn toàn */}
       {!isLoaded && (
         <div className="absolute inset-0 animate-pulse rounded-full bg-slate-200"></div>
       )}
       
-      {/* Ảnh Avatar, chỉ hiện ra khi đã tải xong */}
-      <img 
-        src={imgUrl} 
-        alt="Avatar" 
-        onLoad={() => setIsLoaded(true)}
-        className={`h-full w-full object-cover transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
-      />
+      {/* Ảnh chỉ được render ra khi đã tải xong xuôi */}
+      {imageSrc && (
+        <img 
+          src={imageSrc} 
+          alt="Avatar" 
+          className={`h-full w-full object-cover transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+        />
+      )}
     </div>
   );
 }
@@ -91,11 +104,10 @@ function OverviewSkeleton() {
 
 export default function Overview() {
   const navigate = useNavigate();
-  const { ov } = useOutletContext(); // Lấy ov từ AppLayout
+  const { ov } = useOutletContext(); 
   const { profile } = useSession();
   const left = useMonthEnd();
   
-  // State để kiểm tra xem đã có dữ liệu chưa
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -117,19 +129,17 @@ export default function Overview() {
     `Gắn hashtag ${hashtags} trong tiêu đề hoặc mô tả`,
   ];
 
-  // 1. NẾU ĐANG TẢI -> HIỆN SKELETON
   if (isLoading || !ov) {
     return <OverviewSkeleton />;
   }
 
-  // 2. NẾU ĐÃ CÓ DỮ LIỆU -> HIỆN GIAO DIỆN CHÍNH
   return (
     <div className="space-y-4">
       {/* Card Profile & Quick Actions */}
       <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/80 p-5 shadow-sm">
         <div className="flex items-center gap-4">
           
-          {/* KHỐI AVATAR CÓ SKELETON CHỐNG NHÁY */}
+          {/* KHỐI AVATAR CÓ PRELOAD CHỐNG NHÁY */}
           <div className="relative shrink-0">
             <div className="h-20 w-20 rounded-full border-[3px] border-slate-100 overflow-hidden bg-white shadow-sm flex items-center justify-center relative">
               <AvatarWithSkeleton seed={profile?.id || profile?.username} />
@@ -289,4 +299,4 @@ export default function Overview() {
       </div>
     </div>
   );
-        }
+      }
