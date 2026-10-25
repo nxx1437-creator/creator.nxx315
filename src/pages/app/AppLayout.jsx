@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard, Trophy, Film, Gift, Settings, Loader2, AlertTriangle,
+  LayoutDashboard, Trophy, Film, Gift, Settings, AlertTriangle,
   Download, Search, Bell, Globe, LogOut, User
 } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
@@ -31,10 +31,7 @@ function LinkBanner({ showButton, onGo }) {
         </p>
       </div>
       {showButton && (
-        <button
-          onClick={onGo}
-          className="shrink-0 rounded-xl bg-amber-500 px-3 py-2 text-xs font-bold text-white shadow-sm"
-        >
+        <button onClick={onGo} className="shrink-0 rounded-xl bg-amber-500 px-3 py-2 text-xs font-bold text-white shadow-sm">
           Liên kết ngay
         </button>
       )}
@@ -61,9 +58,8 @@ export default function AppLayout() {
   const [showLang, setShowLang] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showSearch, setShowSearch] = useState(false); 
+  const [showNotify, setShowNotify] = useState(false); 
   
-  // State quản lý thông báo
-  const [showNotify, setShowNotify] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [notifLoading, setNotifLoading] = useState(false);
 
@@ -80,7 +76,6 @@ export default function AppLayout() {
     reload();
   }, [reload]);
 
-  // --- CÁC HÀM XỬ LÝ THÔNG BÁO ---
   const fetchNotifications = async () => {
     setNotifLoading(true);
     const { data } = await supabase
@@ -100,7 +95,6 @@ export default function AppLayout() {
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
-  // Đóng menu khi click ra ngoài (Ngôn ngữ & Profile)
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (langRef.current && !langRef.current.contains(event.target)) setShowLang(false);
@@ -140,10 +134,7 @@ export default function AppLayout() {
           <Nxx315Logo />
 
           <div className="flex items-center gap-3 sm:gap-4 text-slate-600">
-            <button 
-              onClick={() => alert("Tính năng tải App đang được phát triển!")}
-              className="hidden sm:block hover:text-slate-900"
-            >
+            <button onClick={() => alert("Tính năng tải App đang được phát triển!")} className="hidden sm:block hover:text-slate-900">
               <Download size={20} />
             </button>
 
@@ -151,38 +142,23 @@ export default function AppLayout() {
               <Search size={20} />
             </button>
 
-            {/* Nút Thông báo - Đã thêm data-notif-toggle */}
             <button 
               data-notif-toggle
-              aria-label="Thông báo"
-              onClick={() => {
-                setShowNotify((o) => !o);
-                if (!showNotify) fetchNotifications();
-              }} 
+              onClick={() => { setShowNotify(!showNotify); if (!showNotify) fetchNotifications(); }} 
               className="hover:text-slate-900 flex items-center relative"
             >
               <Bell size={20} />
-              {unreadCount > 0 && (
-                <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-rose-500 border border-white"></span>
-              )}
+              {unreadCount > 0 && <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-rose-500 border border-white"></span>}
             </button>
             
-            {/* Dropdown Thông báo */}
             {showNotify && (
               <NotificationDropdown 
                 notifications={notifications}
                 loading={notifLoading}
                 onClose={() => setShowNotify(false)} 
-                onItemClick={(g) => {
-                  markRead(g.ids);
-                  setShowNotify(false);
-                  if (g.action_url) navigate(g.action_url);
-                }}
+                onItemClick={(g) => { markRead(g.ids); setShowNotify(false); if (g.action_url) navigate(g.action_url); }}
                 onMarkAllRead={() => markRead(notifications.filter((n) => !n.is_read).map((n) => n.id))}
-                onViewAll={() => {
-                  setShowNotify(false);
-                  navigate("/app/notifications"); // Đảm bảo anh/chị có route này
-                }}
+                onViewAll={() => { setShowNotify(false); navigate("/app/notifications"); }}
               />
             )}
             
@@ -199,7 +175,7 @@ export default function AppLayout() {
             </div>
 
             <div className="relative" ref={profileRef}>
-              <button onClick={() => setShowProfile(!showProfile)} className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-slate-200 shadow-sm">
+              <button onClick={() => setShowProfile(!showProfile)} className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-slate-200 shadow-sm bg-slate-100">
                 {session?.user?.user_metadata?.avatar_url ? (
                   <img src={session.user.user_metadata.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
                 ) : (
@@ -235,24 +211,31 @@ export default function AppLayout() {
 
       <main className="relative mx-auto max-w-md space-y-4 px-4 py-5 md:max-w-3xl">
         {loading ? (
-          <div className="flex justify-center py-20">
-            <Loader2 size={24} className="animate-spin text-cyan-600" />
+          // ĐÃ THAY VÒNG XOAY BẰNG SKELETON
+          <div className="space-y-4 animate-pulse">
+            <div className="rounded-[2rem] border border-white bg-white/80 p-5 shadow-sm h-64">
+              <div className="flex gap-4">
+                <div className="h-20 w-20 rounded-full bg-slate-200"></div>
+                <div className="flex-1 space-y-3 py-2">
+                  <div className="h-5 w-1/2 rounded bg-slate-200"></div>
+                  <div className="h-6 w-3/4 rounded bg-slate-200"></div>
+                </div>
+              </div>
+            </div>
+            <div className="rounded-[2rem] border border-white bg-white/80 p-5 shadow-sm h-48">
+              <div className="h-12 w-1/2 rounded bg-slate-200 mb-6"></div>
+            </div>
           </div>
         ) : !ov ? (
           <div className="py-16 text-center">
             <p className="text-sm text-slate-500">Không tải được dữ liệu.</p>
-            <button
-              onClick={() => { setLoading(true); reload(); }}
-              className="mt-3 rounded-full border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-700 shadow-sm"
-            >
+            <button onClick={() => { setLoading(true); reload(); }} className="mt-3 rounded-full border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-700 shadow-sm">
               Thử lại
             </button>
           </div>
         ) : (
           <>
-            {!linked && (
-              <LinkBanner showButton={true} onGo={() => navigate("/app/settings")} />
-            )}
+            {!linked && <LinkBanner showButton={true} onGo={() => navigate("/app/settings")} />}
             <Outlet context={{ ov, reload }} />
           </>
         )}
@@ -261,16 +244,7 @@ export default function AppLayout() {
       <nav className="fixed inset-x-3 bottom-3 z-40 mx-auto max-w-md rounded-[2rem] border border-white bg-white/95 px-2 py-2 shadow-[0_8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl md:max-w-xl">
         <div className="grid grid-cols-5">
           {TABS.map(({ to, end, label, Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              className={({ isActive }) =>
-                `flex flex-col items-center gap-1 rounded-2xl py-2.5 text-[9px] font-bold tracking-wide transition-colors ${
-                  isActive ? "text-emerald-600" : "text-slate-400 hover:text-slate-600"
-                }`
-              }
-            >
+            <NavLink key={to} to={to} end={end} className={({ isActive }) => `flex flex-col items-center gap-1 rounded-2xl py-2.5 text-[9px] font-bold tracking-wide transition-colors ${isActive ? "text-emerald-600" : "text-slate-400 hover:text-slate-600"}`}>
               <Icon size={20} strokeWidth={2.5} />
               {label}
             </NavLink>
@@ -279,4 +253,4 @@ export default function AppLayout() {
       </nav>
     </div>
   );
-}
+      }
