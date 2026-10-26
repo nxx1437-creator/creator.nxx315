@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom"; // Thêm useNavigate
 import {
   Plus, Send, Loader2, ExternalLink, Film, Eye, Heart, MessageCircle, RefreshCw,
 } from "lucide-react";
@@ -47,6 +47,9 @@ export default function Videos() {
   const { ov, reload: reloadOv } = useOutletContext();
   const { items, loading, reload } = useMyVideos(session?.user?.id);
   const hashtags = ov?.settings?.hashtags || "#Nxx315Studio";
+  
+  // KHAI BÁO NAVIGATE
+  const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
   const [url, setUrl] = useState("");
@@ -233,8 +236,8 @@ export default function Videos() {
       </div>
 
       {loading ? (
-  <div className="h-40"></div> // Khung trống
-) : shown.length === 0 ? (
+        <div className="h-40"></div>
+      ) : shown.length === 0 ? (
         <div className="rounded-[2rem] border border-dashed border-slate-300 bg-white/50 px-5 py-14 text-center">
           <Film size={36} className="mx-auto text-slate-400" />
           <p className="mt-3 text-lg font-bold text-slate-600">Chưa có video.</p>
@@ -243,10 +246,10 @@ export default function Videos() {
         <div className="space-y-3">
           {shown.map((it) => (
             <Card 
-  key={it.id} 
-  className="!p-4 cursor-pointer hover:bg-slate-50 transition"
-  onClick={() => navigate(`/app/videos/${it.id}`)}
->
+              key={it.id} 
+              className="!p-4 cursor-pointer hover:bg-slate-50 transition"
+              onClick={() => navigate(`/app/videos/${it.id}`)}
+            >
               <div className="flex gap-3">
                 {it.thumbnail_url ? (
                   <img
@@ -298,4 +301,4 @@ export default function Videos() {
       )}
     </div>
   );
-                }
+            }
