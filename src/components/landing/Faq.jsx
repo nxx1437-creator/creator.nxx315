@@ -9,7 +9,7 @@ const QA = [
   ],
   [
     "Video cần đáp ứng tiêu chuẩn nào?",
-    "Video đăng công khai, rõ mặt hoặc giọng nói (không dùng AI voice), giới thiệu chân thực về Nxx315 Studio, có gắn đầy đủ hashtag bắt buộc trong tiêu đề hoặc mô tả.",
+    "Video đăng công khai, giới thiệu chân thực về Nxx315 Studio, có gắn đầy đủ hashtag bắt buộc trong tiêu đề hoặc mô tả.",
   ],
   [
     "Làm sao để nhận được Gift Code?",
