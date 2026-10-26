@@ -1,215 +1,256 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { 
-  ArrowRight, Play, Trophy, Gift, ShieldCheck, Zap, 
-  Globe, LogIn, Link as LinkIcon, 
-  Rocket, MessageSquare, Flame, Clock, CheckCircle2
+import {
+  LogIn,
+  ArrowRight,
+  Sparkles,
+  Users,
+  Film,
+  Coins,
+  Eye,
+  Heart,
+  MessageCircle,
+  Gift,
+  Play,
+  ShieldCheck,
+  Trophy,
+  Hash,
+  Gamepad2,
+  Zap
 } from "lucide-react";
-import { MAIN_SITE } from "../lib/supabaseClient.js";
+import { supabase } from "../lib/supabaseClient.js";
+import { Logo, fmtNum } from "../components/landing/ui.jsx";
+import HowItWorks from "../components/landing/HowItWorks.jsx";
+import Features from "../components/landing/Features.jsx";
+import Ranking from "../components/landing/Ranking.jsx";
+import Faq from "../components/landing/Faq.jsx";
+import { FinalCta, Footer } from "../components/landing/Footer.jsx";
 
-export default function Landing() {
+function usePublicStats() {
+  const [stats, setStats] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    supabase.rpc("get_creator_public_stats").then(({ data }) => {
+      if (alive && data?.ok) setStats(data);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+  return stats;
+}
+
+function Header() {
+  const links = [
+    ["#cach-lam", "Cách làm"],
+    ["#quyen-loi", "Quyền lợi"],
+    ["#ranking", "Xếp hạng"],
+    ["#hoi-dap", "Hỏi đáp"],
+  ];
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#e6f7f2] via-[#f4fbf9] to-[#e6f7f2] font-sans text-slate-800 overflow-x-hidden">
-      
-      {/* HEADER */}
-      <header className="sticky top-0 z-50 border-b border-white/40 bg-[#e6f7f2]/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-3">
-          <div className="flex items-center gap-2 text-[20px] font-extrabold tracking-tight text-slate-900">
-            {/* Logo Nxx315 */}
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500">
-              <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
-            </svg>
-            Nxx315 <span className="text-emerald-500">Creator</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <a href={MAIN_SITE} className="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-emerald-600 transition">
-              <Globe size={18} /> Web chính
+    <header className="sticky top-0 z-40 border-b border-white/5 bg-[#0a1214]/90 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+        <Link to="/" className="transition-transform hover:scale-105">
+          <Logo />
+        </Link>
+        <nav className="hidden items-center gap-8 text-sm font-semibold text-slate-300 md:flex">
+          {links.map(([href, label]) => (
+            <a key={href} href={href} className="transition-colors hover:text-emerald-400">
+              {label}
             </a>
-            <Link 
-              to="/login" 
-              className="flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-500/20 transition hover:bg-emerald-600 active:scale-95"
-            >
-              <LogIn size={16} /> Đăng nhập
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* HERO SECTION */}
-      <section className="relative mx-auto max-w-4xl px-5 pt-12 pb-16">
-        <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-[#d1f0e5] px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-emerald-700 mb-6">
-          <Flame size={12} className="fill-emerald-500 text-emerald-500" /> Sân chơi sáng tạo nội dung
-        </div>
-        
-        <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-5xl md:text-6xl mb-6">
-          Sáng tạo. Kết nối.<br />
-          Nhận <span className="text-emerald-500">thu nhập.</span>
-        </h1>
-        
-        <p className="max-w-2xl text-[15px] leading-relaxed text-slate-600 mb-6">
-          Dành cho những Creator đam mê công nghệ. Làm video giới thiệu Nxx315 Studio, đăng tải lên TikTok/YouTube kèm hashtag:
-        </p>
-        
-        <div className="flex flex-wrap gap-2 mb-6">
-          <span className="rounded-full border border-emerald-300 bg-emerald-100/50 px-3 py-1 text-sm font-bold text-emerald-700">#Nxx315Studio</span>
-        </div>
-
-        <p className="max-w-2xl text-[15px] leading-relaxed text-slate-600 mb-10">
-          Nhận ngay <strong>code xu</strong> theo hiệu quả video và tranh tài trên <strong>bảng xếp hạng hàng tháng</strong> để nhận tiền mặt.
-        </p>
-
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Link 
-            to="/login" 
-            className="flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-8 py-4 text-base font-bold text-white shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-600 hover:-translate-y-0.5"
-          >
-            <Rocket size={20} /> Gia nhập ngay <ArrowRight size={18} />
-          </Link>
-          <Link 
-            to="/login"
-            className="flex items-center justify-center gap-2 rounded-full border-2 border-emerald-200 bg-white px-8 py-4 text-base font-bold text-emerald-700 shadow-sm transition hover:bg-emerald-50"
-          >
-            <Trophy size={18} className="text-amber-500" /> Xem Bảng Xếp Hạng
-          </Link>
-        </div>
-      </section>
-
-      {/* SỐ LIỆU CHIẾN DỊCH (Giữ nguyên bố cục nhưng đổi nội dung) */}
-      <section className="mx-auto max-w-4xl px-5 pb-16">
-        <div className="rounded-[2rem] border border-white bg-white/60 p-6 shadow-sm backdrop-blur-sm">
-          <div className="flex items-center justify-between mb-6">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-600">
-               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> CHIẾN DỊCH ĐANG DIỄN RA
-            </span>
-          </div>
-          
-          <div className="grid grid-cols-3 gap-2 mb-8 divide-x divide-slate-200">
-            <div className="text-center px-1">
-              <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Creator</p>
-              <p className="text-xl font-black text-slate-800">1.2K</p>
-            </div>
-            <div className="text-center px-1">
-              <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Video</p>
-              <p className="text-xl font-black text-slate-800">5.4K</p>
-            </div>
-            <div className="text-center px-1">
-              <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Giải thưởng</p>
-              <p className="text-xl font-black text-emerald-500 leading-none">35M xu<br/><span className="text-sm">+ Tiền mặt</span></p>
-            </div>
-          </div>
-
-          <div className="h-px w-full bg-slate-200 mb-6"></div>
-
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Chiến dịch đang diễn ra</p>
-          <h2 className="text-2xl font-black text-slate-900 mb-4">Tháng 10 2026</h2>
-          
-          <div className="grid grid-cols-2 gap-3">
-             <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-4">
-                <p className="text-[10px] font-bold text-emerald-600 uppercase mb-1 flex items-center gap-1"><Clock size={12}/> Kết thúc sau</p>
-                <p className="text-lg font-black text-slate-800">6 ngày</p>
-             </div>
-             <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-4">
-                <p className="text-[10px] font-bold text-amber-600 uppercase mb-1 flex items-center gap-1"><Gift size={12}/> Giải nhất</p>
-                <p className="text-lg font-black text-amber-600 leading-tight">Tiền mặt<br/>+ Giờ dùng</p>
-             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* VÌ SAO CHỌN (TÍNH NĂNG) */}
-      <section className="relative bg-white py-16">
-        <div className="mx-auto max-w-4xl px-5">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-500 mb-2">— VÌ SAO CHỌN NXX315 CREATOR?</p>
-          <h2 className="text-3xl font-extrabold text-slate-900 mb-8">Hệ sinh thái dành riêng cho Người sáng tạo</h2>
-
-          <div className="space-y-4">
-            {[
-              { icon: Zap, title: "Duyệt video tự động", desc: "Hệ thống bot tự động quét video mới, kiểm tra hashtag và kênh liên kết cực nhanh, tiết kiệm thời gian." },
-              { icon: Gift, title: "Thưởng theo hiệu quả", desc: "Video càng nhiều lượt xem, lượt thích, mức thưởng code xu bạn nhận được càng cao." },
-              { icon: ShieldCheck, title: "Minh bạch & An toàn", desc: "Mọi quy trình từ đăng ký, duyệt video đến trả thưởng đều được công khai rõ ràng." },
-              { icon: CheckCircle2, title: "Bảng xếp hạng công bằng", desc: "Hệ thống lọc view ảo, bot like bằng thuật toán cực gắt. Đảm bảo sân chơi công bằng cho các creator chân chính." },
-            ].map((item, idx) => (
-              <div key={idx} className="rounded-[2rem] border border-slate-100 bg-[#f4fbf9] p-6 flex flex-col sm:flex-row gap-4 items-start">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-md">
-                  <item.icon size={26} />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-1">{item.title}</h3>
-                  <p className="text-[14px] leading-relaxed text-slate-600">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* QUY TRÌNH 3 BƯỚC */}
-      <section className="relative mx-auto max-w-4xl px-5 py-16 text-center">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-500 mb-2">— HÀNH TRÌNH CREATOR</p>
-        <h2 className="text-3xl font-extrabold text-slate-900 mb-10">Ba bước để nhận thưởng</h2>
-
-        <div className="space-y-4 text-left">
-          {[
-            { step: "01", icon: LinkIcon, title: "Gắn kênh TikTok/YouTube", desc: "Kết nối nhanh kênh của bạn. Chỉ mất 30s để hệ thống AI nhận diện, không cần cấp quyền rườm rà." },
-            { step: "02", icon: Play, title: "Làm Video Review & Trải Nghiệm", desc: "Quay video giới thiệu Nxx315 Studio. Đăng kèm hashtag #Nxx315Studio để bot tự động track view." },
-            { step: "03", icon: Gift, title: "Chờ duyệt & Nhận xu", desc: "Admin duyệt nội dung video thủ công. Clip đạt chuẩn = cộng ngay code xu vào ví. Đua top nhận tiền mặt." },
-          ].map((item, idx) => (
-            <div key={idx} className="relative rounded-[2rem] border border-white bg-white p-6 shadow-sm">
-              <div className="flex flex-col sm:flex-row items-start gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-sm relative">
-                  <item.icon size={22} />
-                </div>
-                <div>
-                  <p className="font-mono text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-1">OP . {item.step}</p>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
-                  <p className="text-[14px] leading-relaxed text-slate-600">{item.desc}</p>
-                </div>
-              </div>
-            </div>
           ))}
-        </div>
-      </section>
+        </nav>
+        <Link
+          to="/login"
+          className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-xs sm:text-sm font-bold text-emerald-400 transition-all hover:bg-emerald-500 hover:text-white"
+        >
+          <LogIn size={15} /> Đăng nhập
+        </Link>
+      </div>
+    </header>
+  );
+}
 
-      {/* CTA BOTTOM */}
-      <section className="relative mx-auto max-w-4xl px-5 pb-20">
-        <div className="relative overflow-hidden rounded-[2.5rem] border border-emerald-200 bg-gradient-to-br from-[#d1f0e5] to-[#e6f7f2] p-8 sm:p-12 text-center shadow-xl shadow-emerald-900/5">
-          <div className="mx-auto mb-4 h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-md">
-             <Trophy className="text-amber-500" size={32} />
-          </div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-700 mb-2">🏆 CHINH PHỤC ĐỈNH CAO</p>
-          <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Sẵn sàng lên sóng?</h2>
-          <p className="text-slate-600 mb-8 max-w-md mx-auto text-[15px]">
-            Tham gia cộng đồng Creator của Nxx315 Studio. Đăng ký miễn phí. Không giới hạn số video. Khẳng định đẳng cấp ngay hôm nay.
-          </p>
-          <div className="flex flex-col items-center gap-3 w-full max-w-xs mx-auto">
-            <Link 
-              to="/login" 
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 py-4 text-base font-bold text-white shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-600 hover:-translate-y-0.5"
-            >
-              <Rocket size={20} /> Gia nhập ngay <ArrowRight size={18} />
-            </Link>
-            <Link 
-              to="/login"
-              className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-white bg-white/50 px-6 py-4 text-base font-bold text-emerald-800 shadow-sm transition hover:bg-white"
-            >
-              <LogIn size={20} /> Đăng nhập
-            </Link>
-          </div>
+function TicketMock() {
+  return (
+    <div className="relative mx-auto w-full max-w-sm group perspective-1000 mt-8 md:mt-0">
+      <div className="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-tr from-emerald-500/30 via-teal-500/10 to-transparent blur-2xl transition-all group-hover:bg-emerald-500/40" />
+      
+      <div className="relative rotate-1 rounded-3xl border border-white/10 bg-gradient-to-b from-[#0f1c1e] to-[#0a1214] p-5 sm:p-6 shadow-2xl transition-transform duration-300 group-hover:rotate-0">
+        <div className="flex items-center justify-between">
+          <span className="flex items-center gap-2 text-sm font-bold text-white">
+            <span className="flex h-6 w-6 items-center justify-center rounded bg-red-500/20 text-red-500">
+               <Play size={10} fill="currentColor" />
+            </span>
+            TikTok Video
+          </span>
+          <span className="flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] sm:text-[11px] font-bold text-emerald-400">
+            <ShieldCheck size={12} /> Đã duyệt
+          </span>
+        </div>
+        
+        <div className="mt-4 aspect-[4/3] sm:aspect-video rounded-xl bg-black/40 border border-white/5 flex items-center justify-center relative overflow-hidden">
+           <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+           <p className="relative z-10 px-4 text-center text-xs sm:text-sm font-medium text-slate-300 line-clamp-2">
+             "Trải nghiệm Nxx315 Studio cực mượt, anh em creator nên thử ngay! #Nxx315Creator"
+           </p>
+        </div>
+
+        <div className="mt-4 flex justify-between text-xs font-semibold text-slate-400 px-1">
+          <span className="flex items-center gap-1.5"><Eye size={14} className="text-emerald-400" /> 124.5K</span>
+          <span className="flex items-center gap-1.5"><Heart size={14} className="text-emerald-400" /> 8.6K</span>
+          <span className="flex items-center gap-1.5"><MessageCircle size={14} className="text-emerald-400" /> 420</span>
+        </div>
+
+        <div className="mt-5 rounded-2xl border border-dashed border-emerald-500/30 bg-emerald-500/[0.03] p-4 relative overflow-hidden">
+          <div className="absolute -left-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-[#0a1214]"></div>
+          <div className="absolute -right-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-[#0a1214]"></div>
           
-          <div className="mt-8 flex items-center justify-center gap-2 text-[11px] font-bold text-emerald-800/60 uppercase tracking-widest">
-            <MessageSquare size={14} /> THAM GIA DISCORD ĐỂ ĐƯỢC HỖ TRỢ
+          <div className="flex items-center justify-between text-xs mb-2">
+            <span className="flex items-center gap-1.5 font-bold text-emerald-400 uppercase tracking-wider">
+              <Gift size={14} /> Phần thưởng
+            </span>
+            <span className="rounded-full bg-amber-400/10 px-2 py-0.5 font-bold text-amber-400 border border-amber-400/20">+100 Xu</span>
           </div>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="border-t border-emerald-200/50 bg-[#e6f7f2] py-8">
-        <div className="mx-auto max-w-4xl px-5 text-center">
-          <p className="text-[12px] font-semibold text-slate-500">
-            © Nxx315 Studio · Chương trình Creator
+          <p className="rounded-xl bg-black/50 py-2.5 text-center font-mono text-xs sm:text-sm font-bold tracking-[0.2em] text-white border border-white/5">
+            NXX-7K2M9QXP
           </p>
         </div>
-      </footer>
+      </div>
     </div>
   );
-            }
+}
+
+function Hero({ hashtags }) {
+  const tags = String(hashtags || "").split(/[\s,]+/).filter(Boolean);
+  return (
+    <section className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pb-12 pt-10 md:grid-cols-2 md:pt-20 md:gap-16">
+      
+      {/* HỌA TIẾT NỀN MỜ (Giống ảnh mẫu) */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden z-0">
+        <Gamepad2 className="absolute -left-10 top-10 h-32 w-32 text-white/[0.03] rotate-12" />
+        <Zap className="absolute right-10 top-40 h-40 w-40 text-emerald-500/[0.03] -rotate-12" />
+      </div>
+
+      <div className="relative z-10 flex flex-col items-start">
+        {/* Badge có thêm icon nhỏ xíu giống ảnh 2 */}
+        <span className="relative inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-emerald-400">
+          <Sparkles size={13} /> 
+          Hệ sinh thái Gaming Creator
+          <span className="absolute -left-2 -top-2 text-emerald-500/50">
+            <Gamepad2 size={16} />
+          </span>
+        </span>
+        
+        <h1 className="mt-6 text-[2.6rem] sm:text-5xl lg:text-6xl font-black tracking-tight text-white relative flex flex-col gap-1">
+  <span className="leading-[1.1]">
+    Chơi game. Quay clip.
+  </span>
+  <span className="leading-[1.1] bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+    Biến view thành tiền.
+  </span>
+</h1>
+      
+        <p className="mt-5 max-w-xl text-sm leading-relaxed text-slate-400 sm:text-base">
+          Dành cho các Gamer và Creator đam mê sáng tạo. Làm video review/trải nghiệm trên Nxx315 Studio, đua top bảng xếp hạng để nhận <strong className="text-white">ngày dùng VIP</strong> và <strong className="text-white">tiền mặt cực khủng</strong> mỗi tháng.
+        </p>
+
+        {tags.length > 0 && (
+          <div className="mt-6 flex flex-wrap items-center gap-2">
+            {/* Thêm icon Hash nhỏ trước chữ GẮN HASHTAG */}
+            <span className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-slate-500 w-full sm:w-auto mb-1 sm:mb-0">
+              <Hash size={12} /> Gắn hashtag:
+            </span>
+            {tags.map((t) => (
+              <span
+                key={t}
+                className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1.5 font-mono text-xs font-bold text-emerald-300"
+              >
+                {t.startsWith("#") ? t : "#" + t}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:w-auto">
+          <Link
+            to="/login"
+            className="group flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 py-3.5 text-sm sm:text-base font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-400 hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] w-full sm:w-auto"
+          >
+            {/* Thêm icon Sparkles giống nút "Gia nhập Biệt Đội" ở ảnh 2 */}
+            <Sparkles size={18} className="text-white" />
+            Gia nhập ngay 
+            <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+          </Link>
+          <a
+            href="#ranking"
+            className="flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3.5 text-sm sm:text-base font-bold text-white transition-colors hover:bg-white/10 w-full sm:w-auto"
+          >
+            {/* Thêm icon Cúp Vàng giống nút "Xem Bảng Xếp Hạng" ở ảnh 2 */}
+            <Trophy size={18} className="text-amber-400" />
+            Xem Bảng Xếp Hạng
+          </a>
+        </div>
+        
+        <p className="mt-4 text-[11px] font-medium text-slate-500 flex flex-wrap items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+          Đăng ký miễn phí · Không giới hạn số video
+        </p>
+      </div>
+      
+      <div className="relative z-10 w-full">
+        <TicketMock />
+      </div>
+    </section>
+  );
+}
+
+function StatsStrip({ stats }) {
+  const items = [
+    [Users, "Người tham gia", stats?.creators],
+    [Film, "Video đã duyệt", stats?.videos],
+    [Coins, "Giải thưởng đã tặng", stats?.coins],
+  ];
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-8 relative z-10">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 rounded-[2rem] border border-white/5 bg-gradient-to-b from-[#0f1c1e] to-[#0a1214] p-4 md:p-8 shadow-xl">
+        {items.map(([Icon, label, value]) => (
+          <div key={label} className="flex flex-col items-center justify-center text-center">
+            <Icon size={20} className="text-emerald-500 mb-2 sm:mb-3 sm:w-6 sm:h-6" />
+            <p className="text-xl sm:text-3xl md:text-4xl font-black text-white">{stats ? fmtNum(value) : "—"}</p>
+            <p className="mt-1 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-widest text-slate-500 leading-tight">{label}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export default function Landing() {
+  const stats = usePublicStats();
+  return (
+    <div className="relative min-h-screen overflow-x-hidden bg-[#0a1214] text-slate-100 font-sans selection:bg-emerald-500/30">
+      
+      {/* Nền chuyển màu xanh thẫm (Gradient) giống ảnh mẫu 2, thay vì màu đen tuyền */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute top-0 inset-x-0 h-[600px] bg-gradient-to-b from-[#0d211d] to-[#0a1214] opacity-80" />
+        <div className="absolute top-[-10%] left-[-10%] h-[300px] w-[300px] sm:h-[500px] sm:w-[500px] rounded-full bg-emerald-500/10 blur-[100px] sm:blur-[120px]" />
+        <div className="absolute top-[20%] right-[-10%] h-[300px] w-[300px] sm:h-[400px] sm:w-[400px] rounded-full bg-teal-500/10 blur-[80px] sm:blur-[100px]" />
+      </div>
+      
+      <Header />
+      
+      <main className="relative z-10">
+        <Hero hashtags={stats?.settings?.hashtags || "#Nxx315Creator #Nxx315Studio"} />
+        <StatsStrip stats={stats} />
+        <HowItWorks />
+        <Features />
+        <Ranking stats={stats} />
+        <Faq />
+        <FinalCta />
+      </main>
+      
+      <Footer />
+    </div>
+  );
+}
