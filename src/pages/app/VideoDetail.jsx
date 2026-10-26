@@ -6,11 +6,11 @@ import { Card, StatusPill } from "../../components/creator/creatorUi.jsx";
 import {
   VideoPlayer, RewardCard, HistoryCard, OpenButton,
 } from "../../components/creator/VideoDetailParts.jsx";
-import { vn } from "../../lib/videoReward.js";
+import { vn, videoPoints } from "../../lib/videoReward.js";
 
 const dayFmt = new Intl.DateTimeFormat("vi-VN", { dateStyle: "short" });
 
-function StatBox({ label, value, Icon }) {
+function StatBox({ label, value, Icon, hint }) {
   return (
     <Card className="!p-4">
       <div className="mb-2 flex items-center justify-between text-slate-400">
@@ -18,6 +18,7 @@ function StatBox({ label, value, Icon }) {
         <Icon size={15} />
       </div>
       <p className="text-3xl font-black text-cyan-600">{value}</p>
+      {hint && <p className="mt-1 text-[10px] font-medium text-slate-400">{hint}</p>}
     </Card>
   );
 }
