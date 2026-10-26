@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { SectionTitle } from "./ui.jsx";
+import { SectionTitle, GLASS, INK } from "./ui.jsx";
 
 const QA = [
   [
@@ -31,26 +31,36 @@ export default function Faq() {
     <section id="hoi-dap" className="mx-auto max-w-3xl scroll-mt-20 px-4 py-16">
       <SectionTitle eyebrow="Hỗ trợ" title="Câu hỏi thường gặp" />
       <div className="mt-10 space-y-3">
-        {QA.map(([q, a], i) => (
-          <div key={q} className={`overflow-hidden rounded-2xl border transition-colors ${open === i ? "border-emerald-500/30 bg-emerald-500/5" : "border-white/5 bg-white/[0.02]"}`}>
-            <button
-              onClick={() => setOpen(open === i ? -1 : i)}
-              className="flex w-full items-center justify-between gap-3 px-5 py-5 text-left"
+        {QA.map(([q, a], i) => {
+          const isOpen = open === i;
+          return (
+            <div
+              key={q}
+              className={`overflow-hidden rounded-2xl transition-colors ${GLASS} ${isOpen ? "!border-emerald-400/60 !bg-white/90" : ""}`}
             >
-              <span className="text-sm font-bold text-white md:text-base">{q}</span>
-              <ChevronDown
-                size={18}
-                className={`shrink-0 text-emerald-400 transition-transform duration-300 ${open === i ? "rotate-180" : ""}`}
-              />
-            </button>
-            <div className={`grid transition-all duration-300 ease-in-out ${open === i ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
-              <div className="overflow-hidden">
-                <p className="px-5 pb-5 text-sm leading-relaxed text-slate-400">{a}</p>
+              <button
+                onClick={() => setOpen(isOpen ? -1 : i)}
+                aria-expanded={isOpen}
+                className="flex w-full items-center justify-between gap-3 px-5 py-5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+              >
+                <span className={`text-sm font-bold md:text-base ${INK}`}>{q}</span>
+                <span
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-all duration-300 ${
+                    isOpen ? "rotate-180 bg-emerald-500 text-white" : "bg-emerald-500/10 text-emerald-600"
+                  }`}
+                >
+                  <ChevronDown size={18} />
+                </span>
+              </button>
+              <div className={`grid transition-all duration-300 ease-in-out ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
+                <div className="overflow-hidden">
+                  <p className="px-5 pb-5 text-sm leading-relaxed text-slate-600">{a}</p>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
-      }
+}
