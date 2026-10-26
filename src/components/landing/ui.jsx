@@ -20,11 +20,11 @@ export const GRAD_TEXT =
 
 export function Logo() {
   return (
-    <span className="flex items-center gap-2.5">
-      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 text-white shadow-lg shadow-emerald-500/30">
+    <span className="flex shrink-0 items-center gap-2 whitespace-nowrap">
+      <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 text-white shadow-lg shadow-emerald-500/30">
         <Gamepad2 size={19} />
       </span>
-      <span className={`text-lg font-black tracking-tight ${INK}`}>
+      <span className={`text-base font-black tracking-tight sm:text-lg ${INK}`}>
         Nxx315 <span className="text-emerald-600">Creator</span>
       </span>
     </span>
@@ -53,4 +53,5 @@ export function SectionTitle({ eyebrow, title, sub, center = true }) {
 export function GlassCard({ children, className = "" }) {
   return <div className={`${GLASS} rounded-[1.75rem] ${className}`}>{children}</div>;
 }
+
 
