@@ -4,6 +4,7 @@ import useSession from "./hooks/useSession.js";
 import { supabase } from "./lib/supabaseClient.js";
 
 import VideoDetail from "./pages/app/VideoDetail.jsx";
+import CreatorProfile from "./pages/app/CreatorProfile.jsx";
 import Help from "./pages/app/Help.jsx";
 import Payout from "./pages/app/Payout.jsx";
 import Rules from "./pages/app/Rules.jsx";
@@ -70,10 +71,10 @@ function Protected({ children }) {
 
 function OnboardingProtected({ children }) {
   const { session, loading } = useSession();
-  
+
   if (loading) return <div className="min-h-screen bg-[#f4fbf9]"></div>;
   if (!session) return <Navigate to="/login" replace />;
-  
+
   return children;
 }
 
@@ -84,10 +85,24 @@ export default function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Navigate to="/login" replace />} />
-        
-        <Route path="/onboarding" element={<OnboardingProtected><Onboarding /></OnboardingProtected>} />
 
-        <Route path="/app" element={<Protected><AppLayout /></Protected>}>
+        <Route
+          path="/onboarding"
+          element={
+            <OnboardingProtected>
+              <Onboarding />
+            </OnboardingProtected>
+          }
+        />
+
+        <Route
+          path="/app"
+          element={
+            <Protected>
+              <AppLayout />
+            </Protected>
+          }
+        >
           <Route index element={<Overview />} />
           <Route path="ranking" element={<Ranking />} />
           <Route path="videos" element={<Videos />} />
@@ -96,11 +111,12 @@ export default function App() {
           <Route path="payout" element={<Payout />} />
           <Route path="help" element={<Help />} />
           <Route path="videos/:id" element={<VideoDetail />} />
+          <Route path="creator/:uid" element={<CreatorProfile />} />
           <Route path="rules" element={<Rules />} />
         </Route>
-        
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
-      }
+                        }
