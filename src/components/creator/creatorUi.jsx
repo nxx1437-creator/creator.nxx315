@@ -30,11 +30,11 @@ export const fmt = (n) => {
   return String(v);
 };
 
-// 1. CARD: Đổi sang nền trắng, viền xám nhạt, bóng đổ nhẹ
+// 1. CARD: nền trắng đặc, không blur -> nhẹ hơn nhiều trên điện thoại
 export function Card({ children, className = "" }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-[2rem] border border-white bg-white/80 p-5 shadow-sm backdrop-blur-sm ${className}`}
+      className={`relative overflow-hidden rounded-[2rem] border border-white bg-white p-5 shadow-sm ${className}`}
     >
       {children}
       {/* Đường kẻ màu xanh dưới đáy thẻ */}
@@ -70,6 +70,8 @@ export function Avatar({ src, name, size = 48 }) {
     <img
       src={src}
       alt=""
+      loading="lazy"
+      decoding="async"
       referrerPolicy="no-referrer"
       onError={() => setBad(true)}
       style={{ width: size, height: size }}
@@ -113,7 +115,7 @@ export function CodeBox({ code, coins }) {
         </code>
         <button
           onClick={copy}
-          className="flex shrink-0 items-center gap-1 rounded-xl bg-emerald-500 px-3 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-600"
+          className="flex shrink-0 items-center gap-1 rounded-xl bg-emerald-500 px-3 py-2.5 text-xs font-bold text-white shadow-sm"
         >
           {done ? <Check size={13} /> : <Copy size={13} />} {done ? "Đã chép" : "Chép"}
         </button>
@@ -125,7 +127,7 @@ export function CodeBox({ code, coins }) {
   );
 }
 
-// Hook lấy danh sách video (Giữ nguyên logic)
+// Hook lấy danh sách video
 export function useMyVideos(userId) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -232,12 +234,12 @@ export function ChannelLinkCard({ platform, channel, onChanged }) {
             autoComplete="off"
             spellCheck={false}
             maxLength={200}
-            className="mt-3 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white transition-colors"
+            className="mt-3 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none placeholder:text-slate-400 focus:border-cyan-500 focus:bg-white"
           />
           <button
             onClick={link}
             disabled={busy || !url.trim()}
-            className="mt-3 flex items-center gap-2 rounded-full bg-cyan-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-700 disabled:opacity-50"
+            className="mt-3 flex items-center gap-2 rounded-full bg-cyan-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm disabled:opacity-50"
           >
             {busy && <Loader2 size={15} className="animate-spin" />}
             {busy ? "Đang kiểm tra kênh..." : "Liên kết kênh"}
@@ -254,8 +256,9 @@ export function ChannelLinkCard({ platform, channel, onChanged }) {
   );
 }
 
-// 7. GUIDE VIDEO
+// 7. GUIDE VIDEO: hiện ảnh bìa trước, bấm mới nạp YouTube
 export function GuideVideo({ url }) {
+  const [play, setPlay] = useState(false);
   const u = (url || "").trim();
   const yt = u.match(
     /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([A-Za-z0-9_-]{11})/
@@ -267,15 +270,36 @@ export function GuideVideo({ url }) {
       </Eyebrow>
       <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
         {yt ? (
-          <iframe
-            title="Hướng dẫn liên kết kênh"
-            src={`https://www.youtube.com/embed/${yt}`}
-            className="aspect-video w-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
+          play ? (
+            <iframe
+              title="Hướng dẫn liên kết kênh"
+              src={`https://www.youtube.com/embed/${yt}?autoplay=1`}
+              className="aspect-video w-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <button
+              onClick={() => setPlay(true)}
+              className="relative block aspect-video w-full"
+              aria-label="Phát video hướng dẫn"
+            >
+              <img
+                src={`https://i.ytimg.com/vi/${yt}/hqdefault.jpg`}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-cover"
+              />
+              <span className="absolute inset-0 flex items-center justify-center">
+                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-black/60 text-white">
+                  <PlayCircle size={32} />
+                </span>
+              </span>
+            </button>
+          )
         ) : /\.(mp4|webm)(\?|$)/i.test(u) ? (
-          <video src={u} controls playsInline className="aspect-video w-full" />
+          <video src={u} controls playsInline preload="none" className="aspect-video w-full" />
         ) : (
           <div className="flex aspect-video flex-col items-center justify-center gap-2 text-center">
             <PlayCircle size={34} className="text-slate-300" />
@@ -286,4 +310,4 @@ export function GuideVideo({ url }) {
       </div>
     </Card>
   );
-    }
+  }
