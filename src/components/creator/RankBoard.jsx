@@ -99,7 +99,7 @@ const PodiumCol = memo(function PodiumCol({ it, prize, onOpen }) {
   );
 });
 
-export const PrevTop = memo(function PrevTop({ prev, prizes }) {
+export const PrevTop = memo(function PrevTop({ prev, prizes, title = "VINH DANH THÁNG NÀY" }) {
   const open = useOpenProfile();
   if (!prev || prev.length === 0) return null;
   const slots = [2, 1, 3].map((r) => prev.find((i) => i.rank === r));
@@ -118,7 +118,7 @@ export const PrevTop = memo(function PrevTop({ prev, prizes }) {
       <Sparkles size={12} className="absolute left-[30%] top-44 text-amber-300" />
 
       <p className="relative mb-5 text-center font-mono text-[11px] font-bold uppercase tracking-[0.3em] text-slate-500">
-        VINH DANH THÁNG TRƯỚC
+                {title}
       </p>
 
       <div className="grid grid-cols-3 items-end gap-1">
