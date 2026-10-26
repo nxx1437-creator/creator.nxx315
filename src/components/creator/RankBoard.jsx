@@ -99,7 +99,7 @@ const PodiumCol = memo(function PodiumCol({ it, prize, onOpen }) {
   );
 });
 
-export const PrevTop = memo(function PrevTop({ prev, prizes, title = "VINH DANH THÁNG NÀY" }) {
+export const PrevTop = memo(function PrevTop({ prev, prizes, title = "VINH DANH THÁNG TRƯỚC" }) {
   const open = useOpenProfile();
   if (!prev || prev.length === 0) return null;
   const slots = [2, 1, 3].map((r) => prev.find((i) => i.rank === r));
