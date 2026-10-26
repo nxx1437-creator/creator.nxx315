@@ -75,7 +75,7 @@ export function Avatar({ src, name, size = 48 }) {
       referrerPolicy="no-referrer"
       onError={() => setBad(true)}
       style={{ width: size, height: size }}
-      className="shrink-0 rounded-full border border-slate-200 object-cover shadow-sm"
+      className="max-w-none shrink-0 rounded-full border border-slate-200 object-cover shadow-sm"
     />
   ) : (
     <span
