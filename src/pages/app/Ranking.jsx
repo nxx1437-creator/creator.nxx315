@@ -39,6 +39,10 @@ export default function Ranking() {
   const name = data.me?.name || profile?.username || "Creator";
   const tier = getTier(ov?.approved || 0);
 
+  // Chưa có tháng trước thì vinh danh Top 3 tháng này
+  const hasPrev = data.prev?.length > 0;
+  const podium = hasPrev ? data.prev : (data.items || []).slice(0, 3);
+
   return (
     <div className="space-y-4 pb-10">
       <Hero total={data.total || 0} />
@@ -50,7 +54,11 @@ export default function Ranking() {
         tierName={tier.name}
       />
       <PrizeList prizes={prizes} />
-      <PrevTop prev={data.prev} prizes={prizes} />
+      <PrevTop
+        prev={podium}
+        prizes={prizes}
+        title={hasPrev ? "VINH DANH THÁNG TRƯỚC" : "VINH DANH THÁNG NÀY"}
+      />
       <RecentRewards stats={pub} />
       <LiveBoard
         items={data.items || []}
