@@ -1,256 +1,197 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import {
-  LogIn,
-  ArrowRight,
-  Sparkles,
-  Users,
-  Film,
-  Coins,
-  Eye,
-  Heart,
-  MessageCircle,
-  Gift,
-  Play,
-  ShieldCheck,
-  Trophy,
-  Hash,
-  Gamepad2,
-  Zap
+import { 
+  ArrowRight, Play, Trophy, Gift, ShieldCheck, Zap, 
+  Smartphone, Users, Star, CheckCircle2, ChevronRight 
 } from "lucide-react";
-import { supabase } from "../lib/supabaseClient.js";
-import { Logo, fmtNum } from "../components/landing/ui.jsx";
-import HowItWorks from "../components/landing/HowItWorks.jsx";
-import Features from "../components/landing/Features.jsx";
-import Ranking from "../components/landing/Ranking.jsx";
-import Faq from "../components/landing/Faq.jsx";
-import { FinalCta, Footer } from "../components/landing/Footer.jsx";
-
-function usePublicStats() {
-  const [stats, setStats] = useState(null);
-  useEffect(() => {
-    let alive = true;
-    supabase.rpc("get_creator_public_stats").then(({ data }) => {
-      if (alive && data?.ok) setStats(data);
-    });
-    return () => {
-      alive = false;
-    };
-  }, []);
-  return stats;
-}
-
-function Header() {
-  const links = [
-    ["#cach-lam", "Cách làm"],
-    ["#quyen-loi", "Quyền lợi"],
-    ["#ranking", "Xếp hạng"],
-    ["#hoi-dap", "Hỏi đáp"],
-  ];
-  return (
-    <header className="sticky top-0 z-40 border-b border-white/5 bg-[#0a1214]/90 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link to="/" className="transition-transform hover:scale-105">
-          <Logo />
-        </Link>
-        <nav className="hidden items-center gap-8 text-sm font-semibold text-slate-300 md:flex">
-          {links.map(([href, label]) => (
-            <a key={href} href={href} className="transition-colors hover:text-emerald-400">
-              {label}
-            </a>
-          ))}
-        </nav>
-        <Link
-          to="/login"
-          className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-xs sm:text-sm font-bold text-emerald-400 transition-all hover:bg-emerald-500 hover:text-white"
-        >
-          <LogIn size={15} /> Đăng nhập
-        </Link>
-      </div>
-    </header>
-  );
-}
-
-function TicketMock() {
-  return (
-    <div className="relative mx-auto w-full max-w-sm group perspective-1000 mt-8 md:mt-0">
-      <div className="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-tr from-emerald-500/30 via-teal-500/10 to-transparent blur-2xl transition-all group-hover:bg-emerald-500/40" />
-      
-      <div className="relative rotate-1 rounded-3xl border border-white/10 bg-gradient-to-b from-[#0f1c1e] to-[#0a1214] p-5 sm:p-6 shadow-2xl transition-transform duration-300 group-hover:rotate-0">
-        <div className="flex items-center justify-between">
-          <span className="flex items-center gap-2 text-sm font-bold text-white">
-            <span className="flex h-6 w-6 items-center justify-center rounded bg-red-500/20 text-red-500">
-               <Play size={10} fill="currentColor" />
-            </span>
-            TikTok Video
-          </span>
-          <span className="flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] sm:text-[11px] font-bold text-emerald-400">
-            <ShieldCheck size={12} /> Đã duyệt
-          </span>
-        </div>
-        
-        <div className="mt-4 aspect-[4/3] sm:aspect-video rounded-xl bg-black/40 border border-white/5 flex items-center justify-center relative overflow-hidden">
-           <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-           <p className="relative z-10 px-4 text-center text-xs sm:text-sm font-medium text-slate-300 line-clamp-2">
-             "Trải nghiệm Nxx315 Studio cực mượt, anh em creator nên thử ngay! #Nxx315Creator"
-           </p>
-        </div>
-
-        <div className="mt-4 flex justify-between text-xs font-semibold text-slate-400 px-1">
-          <span className="flex items-center gap-1.5"><Eye size={14} className="text-emerald-400" /> 124.5K</span>
-          <span className="flex items-center gap-1.5"><Heart size={14} className="text-emerald-400" /> 8.6K</span>
-          <span className="flex items-center gap-1.5"><MessageCircle size={14} className="text-emerald-400" /> 420</span>
-        </div>
-
-        <div className="mt-5 rounded-2xl border border-dashed border-emerald-500/30 bg-emerald-500/[0.03] p-4 relative overflow-hidden">
-          <div className="absolute -left-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-[#0a1214]"></div>
-          <div className="absolute -right-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-[#0a1214]"></div>
-          
-          <div className="flex items-center justify-between text-xs mb-2">
-            <span className="flex items-center gap-1.5 font-bold text-emerald-400 uppercase tracking-wider">
-              <Gift size={14} /> Phần thưởng
-            </span>
-            <span className="rounded-full bg-amber-400/10 px-2 py-0.5 font-bold text-amber-400 border border-amber-400/20">+100 Xu</span>
-          </div>
-          <p className="rounded-xl bg-black/50 py-2.5 text-center font-mono text-xs sm:text-sm font-bold tracking-[0.2em] text-white border border-white/5">
-            NXX-7K2M9QXP
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Hero({ hashtags }) {
-  const tags = String(hashtags || "").split(/[\s,]+/).filter(Boolean);
-  return (
-    <section className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pb-12 pt-10 md:grid-cols-2 md:pt-20 md:gap-16">
-      
-      {/* HỌA TIẾT NỀN MỜ (Giống ảnh mẫu) */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden z-0">
-        <Gamepad2 className="absolute -left-10 top-10 h-32 w-32 text-white/[0.03] rotate-12" />
-        <Zap className="absolute right-10 top-40 h-40 w-40 text-emerald-500/[0.03] -rotate-12" />
-      </div>
-
-      <div className="relative z-10 flex flex-col items-start">
-        {/* Badge có thêm icon nhỏ xíu giống ảnh 2 */}
-        <span className="relative inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-emerald-400">
-          <Sparkles size={13} /> 
-          Hệ sinh thái Gaming Creator
-          <span className="absolute -left-2 -top-2 text-emerald-500/50">
-            <Gamepad2 size={16} />
-          </span>
-        </span>
-        
-        <h1 className="mt-6 text-[2.6rem] sm:text-5xl lg:text-6xl font-black tracking-tight text-white relative flex flex-col gap-1">
-  <span className="leading-[1.1]">
-    Chơi game. Quay clip.
-  </span>
-  <span className="leading-[1.1] bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-    Biến view thành tiền.
-  </span>
-</h1>
-      
-        <p className="mt-5 max-w-xl text-sm leading-relaxed text-slate-400 sm:text-base">
-          Dành cho các Gamer và Creator đam mê sáng tạo. Làm video review/trải nghiệm trên Nxx315 Studio, đua top bảng xếp hạng để nhận <strong className="text-white">ngày dùng VIP</strong> và <strong className="text-white">tiền mặt cực khủng</strong> mỗi tháng.
-        </p>
-
-        {tags.length > 0 && (
-          <div className="mt-6 flex flex-wrap items-center gap-2">
-            {/* Thêm icon Hash nhỏ trước chữ GẮN HASHTAG */}
-            <span className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-slate-500 w-full sm:w-auto mb-1 sm:mb-0">
-              <Hash size={12} /> Gắn hashtag:
-            </span>
-            {tags.map((t) => (
-              <span
-                key={t}
-                className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1.5 font-mono text-xs font-bold text-emerald-300"
-              >
-                {t.startsWith("#") ? t : "#" + t}
-              </span>
-            ))}
-          </div>
-        )}
-
-        <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:w-auto">
-          <Link
-            to="/login"
-            className="group flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 py-3.5 text-sm sm:text-base font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-400 hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] w-full sm:w-auto"
-          >
-            {/* Thêm icon Sparkles giống nút "Gia nhập Biệt Đội" ở ảnh 2 */}
-            <Sparkles size={18} className="text-white" />
-            Gia nhập ngay 
-            <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-          </Link>
-          <a
-            href="#ranking"
-            className="flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3.5 text-sm sm:text-base font-bold text-white transition-colors hover:bg-white/10 w-full sm:w-auto"
-          >
-            {/* Thêm icon Cúp Vàng giống nút "Xem Bảng Xếp Hạng" ở ảnh 2 */}
-            <Trophy size={18} className="text-amber-400" />
-            Xem Bảng Xếp Hạng
-          </a>
-        </div>
-        
-        <p className="mt-4 text-[11px] font-medium text-slate-500 flex flex-wrap items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-          Đăng ký miễn phí · Không giới hạn số video
-        </p>
-      </div>
-      
-      <div className="relative z-10 w-full">
-        <TicketMock />
-      </div>
-    </section>
-  );
-}
-
-function StatsStrip({ stats }) {
-  const items = [
-    [Users, "Người tham gia", stats?.creators],
-    [Film, "Video đã duyệt", stats?.videos],
-    [Coins, "Giải thưởng đã tặng", stats?.coins],
-  ];
-  return (
-    <section className="mx-auto max-w-6xl px-4 py-8 relative z-10">
-      <div className="grid grid-cols-3 gap-2 sm:gap-4 rounded-[2rem] border border-white/5 bg-gradient-to-b from-[#0f1c1e] to-[#0a1214] p-4 md:p-8 shadow-xl">
-        {items.map(([Icon, label, value]) => (
-          <div key={label} className="flex flex-col items-center justify-center text-center">
-            <Icon size={20} className="text-emerald-500 mb-2 sm:mb-3 sm:w-6 sm:h-6" />
-            <p className="text-xl sm:text-3xl md:text-4xl font-black text-white">{stats ? fmtNum(value) : "—"}</p>
-            <p className="mt-1 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-widest text-slate-500 leading-tight">{label}</p>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
+import { MAIN_SITE } from "../lib/supabaseClient.js";
 
 export default function Landing() {
-  const stats = usePublicStats();
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#0a1214] text-slate-100 font-sans selection:bg-emerald-500/30">
+    <div className="min-h-screen bg-[#f4fbf9] font-sans text-slate-800 overflow-x-hidden">
       
-      {/* Nền chuyển màu xanh thẫm (Gradient) giống ảnh mẫu 2, thay vì màu đen tuyền */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 inset-x-0 h-[600px] bg-gradient-to-b from-[#0d211d] to-[#0a1214] opacity-80" />
-        <div className="absolute top-[-10%] left-[-10%] h-[300px] w-[300px] sm:h-[500px] sm:w-[500px] rounded-full bg-emerald-500/10 blur-[100px] sm:blur-[120px]" />
-        <div className="absolute top-[20%] right-[-10%] h-[300px] w-[300px] sm:h-[400px] sm:w-[400px] rounded-full bg-teal-500/10 blur-[80px] sm:blur-[100px]" />
-      </div>
-      
-      <Header />
-      
-      <main className="relative z-10">
-        <Hero hashtags={stats?.settings?.hashtags || "#Nxx315Creator #Nxx315Studio"} />
-        <StatsStrip stats={stats} />
-        <HowItWorks />
-        <Features />
-        <Ranking stats={stats} />
-        <Faq />
-        <FinalCta />
-      </main>
-      
-      <Footer />
+      {/* BACKGROUND GRID MỜ */}
+      <div className="pointer-events-none fixed inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(0,0,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
+
+      {/* HEADER */}
+      <header className="sticky top-0 z-50 border-b border-white/50 bg-[#f4fbf9]/90 backdrop-blur-md">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4">
+          <Link to="/" className="text-[20px] font-extrabold tracking-tight text-slate-900">
+            Nxx315 <span className="text-cyan-600">Creator</span>
+          </Link>
+          <div className="flex items-center gap-4">
+            <a href={MAIN_SITE} className="hidden sm:block text-sm font-semibold text-slate-600 hover:text-cyan-600 transition">
+              Web chính
+            </a>
+            <Link 
+              to="/login" 
+              className="rounded-full bg-cyan-600 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-cyan-600/20 transition hover:bg-cyan-700 active:scale-95"
+            >
+              Đăng nhập
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* HERO SECTION */}
+      <section className="relative mx-auto max-w-5xl px-5 pt-16 pb-20 text-center">
+        <div className="inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-cyan-50 px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-cyan-700 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <Star size={14} className="fill-cyan-500 text-cyan-500" /> Chương trình Creator chính thức
+        </div>
+        
+        <h1 className="mx-auto max-w-3xl text-4xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-5xl md:text-6xl animate-in fade-in slide-in-from-bottom-6 duration-700">
+          Sáng tạo nội dung.<br />
+          Nhận <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-blue-600">thưởng lớn.</span>
+        </h1>
+        
+        <p className="mx-auto mt-6 max-w-2xl text-[15px] leading-relaxed text-slate-600 sm:text-lg animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+          Tham gia chương trình Creator của Nxx315 Studio. Quay video giới thiệu, nhận code xu theo hiệu quả video và đua top bảng xếp hạng hàng tháng để nhận tiền mặt.
+        </p>
+
+        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
+          <Link 
+            to="/login" 
+            className="flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-cyan-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-cyan-600/30 transition hover:bg-cyan-700 hover:-translate-y-0.5"
+          >
+            Bắt đầu ngay <ArrowRight size={18} />
+          </Link>
+          <Link 
+            to="/login" // Hoặc link tới trang Thể lệ nếu có
+            className="flex w-full sm:w-auto items-center justify-center gap-2 rounded-full border-2 border-slate-200 bg-white px-8 py-4 text-base font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-slate-300"
+          >
+            <Play size={18} className="text-cyan-600" /> Xem thể lệ
+          </Link>
+        </div>
+
+        {/* SỐ LIỆU NỔI BẬT */}
+        <div className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">
+          {[
+            { label: "Creator tham gia", value: "1,200+", icon: Users },
+            { label: "Video đã duyệt", value: "15,000+", icon: Play },
+            { label: "Tổng giải thưởng", value: "50M+", icon: Gift },
+            { label: "Tỉ lệ duyệt", value: "98%", icon: CheckCircle2 },
+          ].map((item, i) => (
+            <div key={i} className="rounded-2xl border border-white bg-white/60 p-4 shadow-sm backdrop-blur-sm">
+              <item.icon size={20} className="mx-auto text-cyan-500 mb-2" />
+              <p className="text-2xl font-black text-slate-900">{item.value}</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">{item.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* TÍNH NĂNG */}
+      <section className="relative mx-auto max-w-5xl px-5 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-2xl font-extrabold text-slate-900 sm:text-3xl">Tại sao chọn Nxx315 Creator?</h2>
+          <p className="mt-2 text-slate-500 text-sm sm:text-base">Nền tảng minh bạch, quy trình rõ ràng, thưởng liền tay.</p>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { 
+              icon: Zap, 
+              title: "Duyệt video tự động", 
+              desc: "Hệ thống bot tự động quét video mới, kiểm tra hashtag và kênh liên kết cực nhanh." 
+            },
+            { 
+              icon: Gift, 
+              title: "Thưởng theo hiệu quả", 
+              desc: "Video càng nhiều lượt xem, lượt thích, mức thưởng code xu bạn nhận được càng cao." 
+            },
+            { 
+              icon: Trophy, 
+              title: "Đua top nhận tiền mặt", 
+              desc: "Bảng xếp hạng cập nhật liên tục. Lọt top tháng, nhận ngay phần thưởng tiền mặt giá trị." 
+            },
+            { 
+              icon: ShieldCheck, 
+              title: "Minh bạch & An toàn", 
+              desc: "Mọi quy trình từ đăng ký, duyệt video đến trả thưởng đều được công khai rõ ràng." 
+            },
+            { 
+              icon: Smartphone, 
+              title: "Quản lý mọi lúc mọi nơi", 
+              desc: "Giao diện tối ưu cho điện thoại, giúp bạn theo dõi tiến độ và nhận thông báo dễ dàng." 
+            },
+            { 
+              icon: Users, 
+              title: "Cộng đồng Creator", 
+              desc: "Tham gia Discord giao lưu, học hỏi kinh nghiệm làm video và nhận hỗ trợ trực tiếp từ team." 
+            },
+          ].map((feature, idx) => (
+            <div key={idx} className="group rounded-[2rem] border border-white bg-white p-6 shadow-sm transition hover:shadow-md hover:-translate-y-1 duration-300">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-50 text-cyan-600 group-hover:bg-cyan-600 group-hover:text-white transition-colors">
+                <feature.icon size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">{feature.title}</h3>
+              <p className="text-[13px] leading-relaxed text-slate-500">{feature.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* QUY TRÌNH */}
+      <section className="relative bg-white py-20">
+        <div className="mx-auto max-w-5xl px-5">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl font-extrabold text-slate-900 sm:text-3xl">Cách thức hoạt động</h2>
+            <p className="mt-2 text-slate-500 text-sm sm:text-base">Chỉ mất 3 bước để bắt đầu nhận thưởng.</p>
+          </div>
+
+          <div className="grid gap-8 sm:grid-cols-3">
+            {[
+              { step: "01", title: "Đăng nhập & Liên kết", desc: "Đăng nhập bằng Google, vào Cài đặt để liên kết kênh TikTok hoặc YouTube của bạn." },
+              { step: "02", title: "Gửi video giới thiệu", desc: "Sáng tạo video về Nxx315 Studio, nhớ gắn hashtag #Nxx315Studio và gửi link lên web." },
+              { step: "03", title: "Chờ duyệt & Nhận thưởng", desc: "Admin duyệt video, điểm tự động cộng vào bảng xếp hạng. Nhận code xu ngay khi duyệt xong." },
+            ].map((item, idx) => (
+              <div key={idx} className="relative text-center">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-cyan-50 text-2xl font-black text-cyan-600 border-4 border-white shadow-sm relative z-10">
+                  {item.step}
+                </div>
+                {idx !== 2 && (
+                  <div className="absolute top-8 left-1/2 hidden w-full border-t-2 border-dashed border-slate-200 sm:block" />
+                )}
+                <h3 className="text-base font-bold text-slate-900 mb-2">{item.title}</h3>
+                <p className="text-[13px] text-slate-500 px-4">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA BOTTOM */}
+      <section className="relative mx-auto max-w-4xl px-5 py-20 text-center">
+        <div className="rounded-[3rem] border border-cyan-100 bg-gradient-to-br from-cyan-50 to-blue-50 p-10 shadow-xl shadow-cyan-900/5">
+          <h2 className="text-2xl font-extrabold text-slate-900 sm:text-3xl mb-4">Sẵn sàng trở thành Creator?</h2>
+          <p className="text-slate-600 mb-8 max-w-lg mx-auto text-sm sm:text-base">
+            Đừng bỏ lỡ cơ hội kiếm thêm thu nhập từ niềm đam mê sáng tạo nội dung. Tham gia ngay hôm nay!
+          </p>
+          <Link 
+            to="/login" 
+            className="inline-flex items-center gap-2 rounded-full bg-cyan-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-cyan-600/30 transition hover:bg-cyan-700 hover:scale-105"
+          >
+            Đăng nhập bằng Google <ArrowRight size={18} />
+          </Link>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="border-t border-slate-200 bg-white py-8">
+        <div className="mx-auto max-w-5xl px-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+          <div>
+            <p className="text-[17px] font-extrabold text-slate-900">
+              Nxx315 <span className="text-cyan-600">Creator</span>
+            </p>
+            <p className="text-[12px] text-slate-500 mt-1">Nền tảng dành cho những nhà sáng tạo nội dung.</p>
+          </div>
+          <div className="flex items-center gap-6 text-sm font-semibold text-slate-600">
+            <a href={MAIN_SITE} className="hover:text-cyan-600 transition">Web chính</a>
+            <a href="https://discord.gg/your-invite-link" target="_blank" rel="noreferrer" className="hover:text-cyan-600 transition">Discord</a>
+            <Link to="/login" className="hover:text-cyan-600 transition">Đăng nhập</Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
-            }
+        }
