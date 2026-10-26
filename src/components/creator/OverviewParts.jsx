@@ -24,7 +24,7 @@ function calcLeft() {
 }
 
 // Chỉ component này render lại mỗi giây, phần còn lại của trang đứng yên
-const Countdown = memo(function Countdown() {
+export const Countdown = memo(function Countdown() {
   const [left, setLeft] = useState(calcLeft);
 
   useEffect(() => {
