@@ -51,3 +51,5 @@ export function estimateReward(platform, views, likes) {
   for (const t of LOW_TIERS) if (v >= t.min) low = t;
   return { xu: low.xu, label: `Bảng dưới 1.000 lượt xem · ${low.label}`, next: table[0] };
 }
+export const videoPoints = (v, l, c) =>
+  (Number(v) || 0) + (Number(l) || 0) + (Number(c) || 0);
