@@ -220,15 +220,30 @@ export default function Rules() {
                     {/* 9 */}
           <section>
             <h2 className="font-bold text-slate-900 mb-2 text-[15px]">9. BẢNG XẾP HẠNG CREATOR HÀNG THÁNG</h2>
-            <div className="mb-4">
+             <div className="mb-4">
               <h3 className="font-semibold text-[14px] text-slate-800 mb-1.5">9.1. Cách tính điểm</h3>
+              <div className="mb-3 rounded-lg border border-cyan-200 bg-cyan-50 p-3 text-[13px] font-semibold text-cyan-800">
+                Điểm của một video = lượt xem + lượt thích/tim + bình luận.
+              </div>
               <ul className="list-disc pl-5 space-y-1">
-                <li>Mỗi video được duyệt hợp lệ tương ứng 100 điểm.</li>
-                <li>Thứ hạng được xác định dựa trên số video được duyệt trong tháng.</li>
-                <li>Nếu có cùng số video được duyệt, người có video được duyệt sớm hơn sẽ được ưu tiên.</li>
+                <li>Điểm của tháng là tổng điểm của tất cả video được duyệt hợp lệ trong tháng đó.</li>
+                <li>Chỉ video đã được duyệt mới có điểm. Video đang chờ duyệt hoặc bị từ chối không được tính.</li>
+                <li>Video càng được nhiều lượt xem, lượt thích/tim và bình luận thì điểm càng cao.</li>
+                <li>Số liệu video được cập nhật định kỳ nên điểm và thứ hạng có thể thay đổi trong tháng.</li>
+                <li>Nếu bằng điểm, người có video được duyệt sớm hơn sẽ được xếp trên.</li>
+                <li>Điểm xếp hạng chỉ dùng để xếp top tháng, khác với xu thưởng từng video ở mục 7.</li>
+                <li>Điểm của video bị phát hiện gian lận hoặc vi phạm sẽ bị hủy và thứ hạng được tính lại.</li>
                 <li>Bảng xếp hạng sử dụng giờ Việt Nam (UTC+7).</li>
                 <li>Điểm của tháng mới được tính lại từ 00:00 ngày đầu tiên của tháng.</li>
               </ul>
+              <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-[13px]">
+                <p className="mb-1 font-semibold text-slate-800">Ví dụ:</p>
+                <ul className="list-disc space-y-1 pl-5 text-slate-600">
+                  <li>Video A: 1.200 xem + 80 thích + 10 bình luận = <strong>1.290 điểm</strong>.</li>
+                  <li>Video B: 800 xem + 35 thích + 5 bình luận = <strong>840 điểm</strong>.</li>
+                  <li>Tổng điểm tháng = 1.290 + 840 = <strong className="text-cyan-600">2.130 điểm</strong>.</li>
+                </ul>
+              </div>
             </div>
             <div className="mb-4">
               <h3 className="font-semibold text-[14px] text-slate-800 mb-1.5">9.2. Cơ cấu giải thưởng</h3>
