@@ -1,30 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  LogIn,
-  ArrowRight,
-  Sparkles,
-  Users,
-  Film,
-  Coins,
-  Eye,
-  Heart,
-  MessageCircle,
-  Gift,
-  Play,
-  ShieldCheck,
-  Trophy,
-  Hash,
-  Gamepad2,
-  Zap
+  LogIn, ArrowRight, Sparkles, Users, Film, Coins, Eye, Heart, MessageCircle,
+  Gift, Play, ShieldCheck, Trophy, Hash, Gamepad2, Zap, Crown,
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient.js";
-import { Logo, fmtNum } from "../components/landing/ui.jsx";
+import { Logo, fmtNum, INK, GLASS, GRAD_TEXT } from "../components/landing/ui.jsx";
 import HowItWorks from "../components/landing/HowItWorks.jsx";
 import Features from "../components/landing/Features.jsx";
 import Ranking from "../components/landing/Ranking.jsx";
 import Faq from "../components/landing/Faq.jsx";
 import { FinalCta, Footer } from "../components/landing/Footer.jsx";
+
+/* ---------- helpers ---------- */
+const CSS = `
+@keyframes nx-marquee { to { transform: translateX(-50%); } }
+@keyframes nx-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes nx-rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+.nx-marquee { animation: nx-marquee 28s linear infinite; }
+.nx-float { animation: nx-float 5s ease-in-out infinite; }
+.nx-float-2 { animation: nx-float 6.5s ease-in-out -2s infinite; }
+.nx-rise { animation: nx-rise .8s cubic-bezier(.2,.7,.2,1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .nx-marquee, .nx-float, .nx-float-2, .nx-rise { animation: none; }
+}
+`;
 
 function usePublicStats() {
   const [stats, setStats] = useState(null);
@@ -33,13 +33,12 @@ function usePublicStats() {
     supabase.rpc("get_creator_public_stats").then(({ data }) => {
       if (alive && data?.ok) setStats(data);
     });
-    return () => {
-      alive = false;
-    };
+    return () => { alive = false; };
   }, []);
   return stats;
 }
 
+/* ---------- header ---------- */
 function Header() {
   const links = [
     ["#cach-lam", "Cách làm"],
@@ -48,71 +47,76 @@ function Header() {
     ["#hoi-dap", "Hỏi đáp"],
   ];
   return (
-    <header className="sticky top-0 z-40 border-b border-white/5 bg-[#0a1214]/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-white/70 bg-white/60 backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link to="/" className="transition-transform hover:scale-105">
-          <Logo />
-        </Link>
-        <nav className="hidden items-center gap-8 text-sm font-semibold text-slate-300 md:flex">
+        <Link to="/"><Logo /></Link>
+        <nav className="hidden items-center gap-8 text-sm font-semibold text-slate-600 md:flex">
           {links.map(([href, label]) => (
-            <a key={href} href={href} className="transition-colors hover:text-emerald-400">
-              {label}
-            </a>
+            <a key={href} href={href} className="transition-colors hover:text-emerald-600">{label}</a>
           ))}
         </nav>
         <Link
           to="/login"
-          className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-xs sm:text-sm font-bold text-emerald-400 transition-all hover:bg-emerald-500 hover:text-white"
+          className="flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:shadow-emerald-500/50"
         >
-          <LogIn size={15} /> Đăng nhập
+          <LogIn size={16} /> Đăng nhập
         </Link>
       </div>
     </header>
   );
 }
 
+/* ---------- hero ---------- */
 function TicketMock() {
   return (
-    <div className="relative mx-auto w-full max-w-sm group perspective-1000 mt-8 md:mt-0">
-      <div className="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-tr from-emerald-500/30 via-teal-500/10 to-transparent blur-2xl transition-all group-hover:bg-emerald-500/40" />
-      
-      <div className="relative rotate-1 rounded-3xl border border-white/10 bg-gradient-to-b from-[#0f1c1e] to-[#0a1214] p-5 sm:p-6 shadow-2xl transition-transform duration-300 group-hover:rotate-0">
+    <div className="relative mx-auto w-full max-w-sm">
+      <div className="absolute -inset-6 rounded-[3rem] bg-gradient-to-tr from-emerald-300/50 via-teal-200/40 to-sky-300/40 blur-3xl" />
+
+      <div className="nx-float absolute -left-3 -top-5 z-20 flex items-center gap-2 rounded-2xl border border-white bg-white/90 px-3 py-2 shadow-xl sm:-left-8">
+        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-100 text-amber-600"><Crown size={15} /></span>
+        <span className="text-xs font-extrabold text-slate-800">Top 1 tháng</span>
+      </div>
+      <div className="nx-float-2 absolute -bottom-4 -right-2 z-20 flex items-center gap-2 rounded-2xl border border-white bg-white/90 px-3 py-2 shadow-xl sm:-right-6">
+        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600"><Zap size={15} /></span>
+        <span className="text-xs font-extrabold text-slate-800">Bot cập nhật 24/7</span>
+      </div>
+
+      <div className={`${GLASS} relative rotate-1 rounded-[2rem] p-5 transition-transform duration-300 hover:rotate-0 sm:p-6`}>
         <div className="flex items-center justify-between">
-          <span className="flex items-center gap-2 text-sm font-bold text-white">
-            <span className="flex h-6 w-6 items-center justify-center rounded bg-red-500/20 text-red-500">
-               <Play size={10} fill="currentColor" />
+          <span className={`flex items-center gap-2 text-sm font-extrabold ${INK}`}>
+            <span className="flex h-6 w-6 items-center justify-center rounded-md bg-red-100 text-red-500">
+              <Play size={10} fill="currentColor" />
             </span>
             TikTok Video
           </span>
-          <span className="flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] sm:text-[11px] font-bold text-emerald-400">
+          <span className="flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-bold text-emerald-700">
             <ShieldCheck size={12} /> Đã duyệt
           </span>
         </div>
-        
-        <div className="mt-4 aspect-[4/3] sm:aspect-video rounded-xl bg-black/40 border border-white/5 flex items-center justify-center relative overflow-hidden">
-           <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-           <p className="relative z-10 px-4 text-center text-xs sm:text-sm font-medium text-slate-300 line-clamp-2">
-             "Trải nghiệm Nxx315 Studio cực mượt, anh em creator nên thử ngay! #Nxx315Creator"
-           </p>
+
+        <div className="relative mt-4 flex aspect-video items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-[#0b2e27] to-[#0f4a40]">
+          <Gamepad2 className="absolute -right-4 -top-4 h-24 w-24 rotate-12 text-white/5" />
+          <p className="relative z-10 line-clamp-2 px-5 text-center text-xs font-medium text-emerald-50 sm:text-sm">
+            "Trải nghiệm Nxx315 Studio cực mượt, anh em creator nên thử ngay! #Nxx315Creator"
+          </p>
         </div>
 
-        <div className="mt-4 flex justify-between text-xs font-semibold text-slate-400 px-1">
-          <span className="flex items-center gap-1.5"><Eye size={14} className="text-emerald-400" /> 124.5K</span>
-          <span className="flex items-center gap-1.5"><Heart size={14} className="text-emerald-400" /> 8.6K</span>
-          <span className="flex items-center gap-1.5"><MessageCircle size={14} className="text-emerald-400" /> 420</span>
+        <div className="mt-4 flex justify-between px-1 text-xs font-bold text-slate-500">
+          <span className="flex items-center gap-1.5"><Eye size={14} className="text-emerald-500" /> 124.5K</span>
+          <span className="flex items-center gap-1.5"><Heart size={14} className="text-emerald-500" /> 8.6K</span>
+          <span className="flex items-center gap-1.5"><MessageCircle size={14} className="text-emerald-500" /> 420</span>
         </div>
 
-        <div className="mt-5 rounded-2xl border border-dashed border-emerald-500/30 bg-emerald-500/[0.03] p-4 relative overflow-hidden">
-          <div className="absolute -left-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-[#0a1214]"></div>
-          <div className="absolute -right-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-[#0a1214]"></div>
-          
-          <div className="flex items-center justify-between text-xs mb-2">
-            <span className="flex items-center gap-1.5 font-bold text-emerald-400 uppercase tracking-wider">
+        <div className="relative mt-5 rounded-2xl border border-dashed border-emerald-500/40 bg-emerald-50/80 p-4">
+          <span className="absolute -left-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-[#e6f6f0]" />
+          <span className="absolute -right-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-[#e6f6f0]" />
+          <div className="mb-2 flex items-center justify-between text-xs">
+            <span className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-emerald-700">
               <Gift size={14} /> Phần thưởng
             </span>
-            <span className="rounded-full bg-amber-400/10 px-2 py-0.5 font-bold text-amber-400 border border-amber-400/20">+100 Xu</span>
+            <span className="rounded-full border border-amber-300 bg-amber-100 px-2 py-0.5 font-extrabold text-amber-600">+100 Xu</span>
           </div>
-          <p className="rounded-xl bg-black/50 py-2.5 text-center font-mono text-xs sm:text-sm font-bold tracking-[0.2em] text-white border border-white/5">
+          <p className="rounded-xl bg-white py-2.5 text-center font-mono text-sm font-bold tracking-[0.2em] text-slate-800 shadow-inner">
             NXX-7K2M9QXP
           </p>
         </div>
@@ -124,84 +128,89 @@ function TicketMock() {
 function Hero({ hashtags }) {
   const tags = String(hashtags || "").split(/[\s,]+/).filter(Boolean);
   return (
-    <section className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pb-12 pt-10 md:grid-cols-2 md:pt-20 md:gap-16">
-      
-      {/* HỌA TIẾT NỀN MỜ (Giống ảnh mẫu) */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden z-0">
-        <Gamepad2 className="absolute -left-10 top-10 h-32 w-32 text-white/[0.03] rotate-12" />
-        <Zap className="absolute right-10 top-40 h-40 w-40 text-emerald-500/[0.03] -rotate-12" />
-      </div>
+    <section className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 pb-10 pt-10 md:grid-cols-2 md:gap-16 md:pt-20">
+      <Gamepad2 className="pointer-events-none absolute -left-6 top-6 h-32 w-32 rotate-12 text-emerald-700/[0.06]" />
+      <Zap className="pointer-events-none absolute right-4 top-48 h-40 w-40 -rotate-12 text-teal-600/[0.07]" />
 
-      <div className="relative z-10 flex flex-col items-start">
-        {/* Badge có thêm icon nhỏ xíu giống ảnh 2 */}
-        <span className="relative inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-emerald-400">
-          <Sparkles size={13} /> 
-          Hệ sinh thái Gaming Creator
-          <span className="absolute -left-2 -top-2 text-emerald-500/50">
-            <Gamepad2 size={16} />
+      <div className="nx-rise relative z-10 flex flex-col items-start">
+        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-600/25 bg-white/70 px-3.5 py-1.5 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-700 backdrop-blur">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
           </span>
+          Sân chơi dành riêng cho Gaming Creator
         </span>
-        
-        <h1 className="mt-6 text-[2.6rem] sm:text-5xl lg:text-6xl font-black tracking-tight text-white relative flex flex-col gap-1">
-  <span className="leading-[1.1]">
-    Chơi game. Quay clip.
-  </span>
-  <span className="leading-[1.1] bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-    Biến view thành tiền.
-  </span>
-</h1>
-      
-        <p className="mt-5 max-w-xl text-sm leading-relaxed text-slate-400 sm:text-base">
-          Dành cho các Gamer và Creator đam mê sáng tạo. Làm video review/trải nghiệm trên Nxx315 Studio, đua top bảng xếp hạng để nhận <strong className="text-white">ngày dùng VIP</strong> và <strong className="text-white">tiền mặt cực khủng</strong> mỗi tháng.
+
+        <h1 className={`mt-6 text-[2.7rem] font-black leading-[1.05] tracking-tight sm:text-6xl ${INK}`}>
+          Chơi game. Quay clip.
+          <span className={`mt-1 block ${GRAD_TEXT}`}>Biến view thành tiền.</span>
+        </h1>
+
+        <p className="mt-5 max-w-xl text-base leading-relaxed text-slate-600">
+          Làm video review, trải nghiệm game trên <strong className={INK}>Nxx315 Studio</strong>, gắn hashtag
+          rồi đua top bảng xếp hạng để nhận <strong className={INK}>ngày dùng VIP</strong> và{" "}
+          <strong className={INK}>tiền mặt</strong> mỗi tháng. Clip chất lượng + view căng = thưởng nặng.
         </p>
 
         {tags.length > 0 && (
           <div className="mt-6 flex flex-wrap items-center gap-2">
-            {/* Thêm icon Hash nhỏ trước chữ GẮN HASHTAG */}
-            <span className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-widest text-slate-500 w-full sm:w-auto mb-1 sm:mb-0">
-              <Hash size={12} /> Gắn hashtag:
+            <span className="flex w-full items-center gap-1 font-mono text-[11px] font-bold uppercase tracking-widest text-slate-500 sm:w-auto">
+              <Hash size={12} /> Gắn hashtag
             </span>
             {tags.map((t) => (
-              <span
-                key={t}
-                className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1.5 font-mono text-xs font-bold text-emerald-300"
-              >
+              <span key={t} className="rounded-xl border border-emerald-600/20 bg-emerald-500/10 px-3 py-1.5 font-mono text-xs font-bold text-emerald-800">
                 {t.startsWith("#") ? t : "#" + t}
               </span>
             ))}
           </div>
         )}
 
-        <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row sm:w-auto">
+        <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
           <Link
             to="/login"
-            className="group flex items-center justify-center gap-2 rounded-full bg-emerald-500 px-6 py-3.5 text-sm sm:text-base font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-400 hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] w-full sm:w-auto"
+            className="group flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-7 py-4 text-base font-extrabold text-white shadow-xl shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:shadow-emerald-500/50"
           >
-            {/* Thêm icon Sparkles giống nút "Gia nhập Biệt Đội" ở ảnh 2 */}
-            <Sparkles size={18} className="text-white" />
-            Gia nhập ngay 
+            <Sparkles size={18} /> Gia nhập ngay
             <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
           </Link>
           <a
             href="#ranking"
-            className="flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3.5 text-sm sm:text-base font-bold text-white transition-colors hover:bg-white/10 w-full sm:w-auto"
+            className={`${GLASS} flex items-center justify-center gap-2 rounded-2xl px-7 py-4 text-base font-bold ${INK} transition hover:-translate-y-0.5`}
           >
-            {/* Thêm icon Cúp Vàng giống nút "Xem Bảng Xếp Hạng" ở ảnh 2 */}
-            <Trophy size={18} className="text-amber-400" />
-            Xem Bảng Xếp Hạng
+            <Trophy size={18} className="text-amber-500" /> Xem bảng xếp hạng
           </a>
         </div>
-        
-        <p className="mt-4 text-[11px] font-medium text-slate-500 flex flex-wrap items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-          Đăng ký miễn phí · Không giới hạn số video
+
+        <p className="mt-5 flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          Miễn phí · Không giới hạn số video · Trả thưởng minh bạch
         </p>
       </div>
-      
+
       <div className="relative z-10 w-full">
         <TicketMock />
       </div>
     </section>
+  );
+}
+
+/* ---------- ticker + stats ---------- */
+function Ticker() {
+  const games = ["Roblox", "Free Fire", "Genshin Impact", "Liên Quân", "PUBG Mobile", "Minecraft", "Mobile Legends", "Honkai Star Rail"];
+  const row = [...games, ...games];
+  return (
+    <div className="relative my-6 overflow-hidden border-y border-emerald-900/10 bg-white/50 py-4 backdrop-blur">
+      <div className="nx-marquee flex w-max items-center gap-10 whitespace-nowrap">
+        {row.map((g, i) => (
+          <span key={i} className="flex items-center gap-10 text-xl font-black text-emerald-900/30 sm:text-2xl">
+            {g}
+            <Sparkles size={18} className="text-emerald-500/60" />
+          </span>
+        ))}
+      </div>
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#e6f6f0] to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#e6f6f0] to-transparent" />
+    </div>
   );
 }
 
@@ -212,13 +221,15 @@ function StatsStrip({ stats }) {
     [Coins, "Giải thưởng đã tặng", stats?.coins],
   ];
   return (
-    <section className="mx-auto max-w-6xl px-4 py-8 relative z-10">
-      <div className="grid grid-cols-3 gap-2 sm:gap-4 rounded-[2rem] border border-white/5 bg-gradient-to-b from-[#0f1c1e] to-[#0a1214] p-4 md:p-8 shadow-xl">
+    <section className="mx-auto max-w-6xl px-4 py-6">
+      <div className={`${GLASS} grid grid-cols-3 divide-x divide-emerald-900/10 rounded-[2rem] py-6 md:py-9`}>
         {items.map(([Icon, label, value]) => (
-          <div key={label} className="flex flex-col items-center justify-center text-center">
-            <Icon size={20} className="text-emerald-500 mb-2 sm:mb-3 sm:w-6 sm:h-6" />
-            <p className="text-xl sm:text-3xl md:text-4xl font-black text-white">{stats ? fmtNum(value) : "—"}</p>
-            <p className="mt-1 text-[9px] sm:text-[10px] md:text-xs font-bold uppercase tracking-widest text-slate-500 leading-tight">{label}</p>
+          <div key={label} className="flex flex-col items-center px-2 text-center">
+            <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-md shadow-emerald-500/30">
+              <Icon size={19} />
+            </span>
+            <p className={`text-2xl font-black sm:text-4xl ${INK}`}>{stats ? fmtNum(value) : "—"}</p>
+            <p className="mt-1 text-[11px] font-semibold leading-tight text-slate-500 sm:text-sm">{label}</p>
           </div>
         ))}
       </div>
@@ -226,22 +237,28 @@ function StatsStrip({ stats }) {
   );
 }
 
+/* ---------- page ---------- */
 export default function Landing() {
   const stats = usePublicStats();
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#0a1214] text-slate-100 font-sans selection:bg-emerald-500/30">
-      
-      {/* Nền chuyển màu xanh thẫm (Gradient) giống ảnh mẫu 2, thay vì màu đen tuyền */}
+    <div className="relative min-h-screen overflow-x-hidden bg-[#e6f6f0] font-sans text-slate-800 selection:bg-emerald-300/50">
+      <style>{CSS}</style>
+
+      {/* nền mint gradient + chấm lưới */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 inset-x-0 h-[600px] bg-gradient-to-b from-[#0d211d] to-[#0a1214] opacity-80" />
-        <div className="absolute top-[-10%] left-[-10%] h-[300px] w-[300px] sm:h-[500px] sm:w-[500px] rounded-full bg-emerald-500/10 blur-[100px] sm:blur-[120px]" />
-        <div className="absolute top-[20%] right-[-10%] h-[300px] w-[300px] sm:h-[400px] sm:w-[400px] rounded-full bg-teal-500/10 blur-[80px] sm:blur-[100px]" />
+        <div className="absolute inset-x-0 top-0 h-[900px] bg-gradient-to-b from-emerald-200/70 via-teal-100/50 to-transparent" />
+        <div className="absolute -left-24 top-10 h-[420px] w-[420px] rounded-full bg-emerald-300/40 blur-[110px]" />
+        <div className="absolute -right-24 top-[28rem] h-[420px] w-[420px] rounded-full bg-sky-300/40 blur-[110px]" />
+        <div
+          className="absolute inset-0 opacity-[0.35]"
+          style={{ backgroundImage: "radial-gradient(rgba(6,78,59,.18) 1px, transparent 1px)", backgroundSize: "26px 26px" }}
+        />
       </div>
-      
+
       <Header />
-      
       <main className="relative z-10">
         <Hero hashtags={stats?.settings?.hashtags || "#Nxx315Creator #Nxx315Studio"} />
+        <Ticker />
         <StatsStrip stats={stats} />
         <HowItWorks />
         <Features />
@@ -249,8 +266,8 @@ export default function Landing() {
         <Faq />
         <FinalCta />
       </main>
-      
       <Footer />
     </div>
   );
-}
+            }
+
