@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { LogIn, ArrowRight, Sparkles, Users, Film, Coins, Trophy, Hash } from "lucide-react";
 import { supabase } from "../lib/supabaseClient.js";
-import { Logo, fmtNum, INK, GLASS, GRAD_TEXT } from "../components/landing/ui.jsx";
+import { fmtNum } from "../components/landing/ui.jsx";
+import { Logo, INK, GLASS, GRAD_TEXT } from "../components/landing/theme.jsx";
 import HowItWorks from "../components/landing/HowItWorks.jsx";
 import Features from "../components/landing/Features.jsx";
 import Ranking from "../components/landing/Ranking.jsx";
@@ -200,5 +201,6 @@ export default function Landing() {
       <Footer />
     </div>
   );
-    }
+     }
+
 
