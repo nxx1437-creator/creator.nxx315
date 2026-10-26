@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  LogIn, ArrowRight, Sparkles, Users, Film, Coins, Eye, Heart, MessageCircle,
-  Gift, Play, ShieldCheck, Trophy, Hash, Gamepad2, Zap, Crown,
-} from "lucide-react";
+import { LogIn, ArrowRight, Sparkles, Users, Film, Coins, Trophy, Hash } from "lucide-react";
 import { supabase } from "../lib/supabaseClient.js";
 import { Logo, fmtNum, INK, GLASS, GRAD_TEXT } from "../components/landing/ui.jsx";
 import HowItWorks from "../components/landing/HowItWorks.jsx";
@@ -48,7 +45,7 @@ function Header() {
   ];
   return (
     <header className="sticky top-0 z-40 border-b border-white/70 bg-white/60 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Link to="/"><Logo /></Link>
         <nav className="hidden items-center gap-8 text-sm font-semibold text-slate-600 md:flex">
           {links.map(([href, label]) => (
@@ -57,7 +54,7 @@ function Header() {
         </nav>
         <Link
           to="/login"
-          className="flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:shadow-emerald-500/50"
+          className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2 text-sm font-bold sm:px-5 sm:py-2.5 text-white shadow-lg shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:shadow-emerald-500/50"
         >
           <LogIn size={16} /> Đăng nhập
         </Link>
@@ -70,33 +67,30 @@ function Header() {
 function Hero({ hashtags }) {
   const tags = String(hashtags || "").split(/[\s,]+/).filter(Boolean);
   return (
-    <section className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 pb-10 pt-10 md:grid-cols-2 md:gap-16 md:pt-20">
-      <Gamepad2 className="pointer-events-none absolute -left-6 top-6 h-32 w-32 rotate-12 text-emerald-700/[0.06]" />
-      <Zap className="pointer-events-none absolute right-4 top-48 h-40 w-40 -rotate-12 text-teal-600/[0.07]" />
-
-      <div className="nx-rise relative z-10 flex flex-col items-start">
-        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-600/25 bg-white/70 px-3.5 py-1.5 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-700 backdrop-blur">
+    <section className="relative mx-auto max-w-4xl px-4 pb-8 pt-10 md:pt-24 md:text-center">
+      <div className="nx-rise relative z-10 flex flex-col items-start md:items-center">
+        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-600/25 bg-white/70 px-3.5 py-1.5 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-emerald-700 backdrop-blur">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
           </span>
-          Sân chơi dành riêng cho Gaming Creator
+          Dành cho Gaming Creator
         </span>
 
-        <h1 className={`mt-6 text-[2.7rem] font-black leading-[1.05] tracking-tight sm:text-6xl ${INK}`}>
-          Chơi game. Quay clip.
-          <span className={`mt-1 block ${GRAD_TEXT}`}>Biến view thành tiền.</span>
+        <h1 className={`mt-6 text-[2.4rem] font-black leading-[1.08] tracking-tight sm:text-6xl md:text-7xl ${INK}`}>
+          <span className="block">Chơi game. Quay clip.</span>
+          <span className={`mt-1 block text-balance ${GRAD_TEXT}`}>Biến view thành tiền.</span>
         </h1>
 
-        <p className="mt-5 max-w-xl text-base leading-relaxed text-slate-600">
+        <p className="mt-6 max-w-xl text-base leading-relaxed text-slate-600 md:text-lg">
           Làm video review, trải nghiệm game trên <strong className={INK}>Nxx315 Studio</strong>, gắn hashtag
-          rồi đua top bảng xếp hạng để nhận <strong className={INK}>ngày dùng VIP</strong> và{" "}
-          <strong className={INK}>tiền mặt</strong> mỗi tháng. Clip chất lượng + view căng = thưởng nặng.
+          rồi đua top bảng xếp hạng để nhận <strong className={INK}>Gift Code VIP</strong> và{" "}
+          <strong className={INK}>tiền mặt</strong> mỗi tháng.
         </p>
 
         {tags.length > 0 && (
-          <div className="mt-6 flex flex-wrap items-center gap-2">
-            <span className="flex w-full items-center gap-1 font-mono text-[11px] font-bold uppercase tracking-widest text-slate-500 sm:w-auto">
+          <div className="mt-6 flex flex-wrap items-center gap-2 md:justify-center">
+            <span className="flex items-center gap-1 font-mono text-[11px] font-bold uppercase tracking-widest text-slate-500">
               <Hash size={12} /> Gắn hashtag
             </span>
             {tags.map((t) => (
@@ -110,27 +104,23 @@ function Hero({ hashtags }) {
         <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
           <Link
             to="/login"
-            className="group flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-7 py-4 text-base font-extrabold text-white shadow-xl shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:shadow-emerald-500/50"
+            className="group flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-4 text-base font-extrabold text-white shadow-xl shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:shadow-emerald-500/50"
           >
             <Sparkles size={18} /> Gia nhập ngay
             <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
           </Link>
           <a
             href="#ranking"
-            className={`${GLASS} flex items-center justify-center gap-2 rounded-2xl px-7 py-4 text-base font-bold ${INK} transition hover:-translate-y-0.5`}
+            className={`${GLASS} flex items-center justify-center gap-2 rounded-2xl px-8 py-4 text-base font-bold ${INK} transition hover:-translate-y-0.5`}
           >
             <Trophy size={18} className="text-amber-500" /> Xem bảng xếp hạng
           </a>
         </div>
 
-        <p className="mt-5 flex items-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-          Miễn phí · Không giới hạn số video · Trả thưởng minh bạch
+        <p className="mt-5 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+          Miễn phí · Không giới hạn số video
         </p>
       </div>
-      
-      {/* ĐÃ XÓA TICKETMOCK Ở ĐÂY */}
-      
     </section>
   );
 }
@@ -185,6 +175,7 @@ export default function Landing() {
     <div className="relative min-h-screen overflow-x-hidden bg-[#e6f6f0] font-sans text-slate-800 selection:bg-emerald-300/50">
       <style>{CSS}</style>
 
+      {/* nền mint gradient + chấm lưới */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute inset-x-0 top-0 h-[900px] bg-gradient-to-b from-emerald-200/70 via-teal-100/50 to-transparent" />
         <div className="absolute -left-24 top-10 h-[420px] w-[420px] rounded-full bg-emerald-300/40 blur-[110px]" />
@@ -209,4 +200,5 @@ export default function Landing() {
       <Footer />
     </div>
   );
-     }
+    }
+
