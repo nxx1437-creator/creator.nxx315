@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { 
   ArrowLeft, ExternalLink, Eye, Heart, MessageSquare, Share2, 
-  AlertCircle, Play, LineChart
+  AlertCircle, LineChart
 } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
 
@@ -31,9 +31,26 @@ export default function VideoDetail() {
   if (loading) return <div className="h-screen bg-[#f4fbf9]"></div>;
   if (!video) return <div className="p-5 text-center mt-10">Không tìm thấy video này.</div>;
 
-  const requiredTags = ["#XCLOUDPHONE", "#CLOUDPHONE", "#CLOUDGAMING"];
+  // CHỈ CÒN 1 HASHTAG DUY NHẤT
+  const requiredTags = ["#Nxx315Studio"];
   const videoContent = ((video.title || "") + " " + (video.url || "")).toLowerCase();
   
+  // Hàm lấy ID video để nhúng iframe
+  const getEmbedUrl = (url, platform) => {
+    if (!url) return null;
+    if (platform === 'youtube') {
+      const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([A-Za-z0-9_-]{11})/);
+      return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+    }
+    if (platform === 'tiktok') {
+      const match = url.match(/\/video\/(\d+)/);
+      return match ? `https://www.tiktok.com/embed/v2/${match[1]}` : null;
+    }
+    return null;
+  };
+
+  const embedUrl = getEmbedUrl(video.url, video.platform);
+
   const metrics = [
     { 
       time: new Date(video.created_at).toLocaleString("vi-VN"), 
@@ -66,26 +83,36 @@ export default function VideoDetail() {
         </div>
       </div>
 
-      <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black shadow-sm flex items-center justify-center">
-        {video.thumbnail_url && (
-          <img src={video.thumbnail_url} alt="" className="absolute inset-0 h-full w-full object-cover opacity-50" />
+      {/* KHUNG VIDEO TỰ ĐỘNG CO GIÃN THEO TỶ LỆ NỀN TẢNG */}
+      <div className="w-full flex justify-center bg-black rounded-2xl overflow-hidden shadow-sm">
+        {embedUrl ? (
+          <div className={`w-full ${video.platform === 'tiktok' ? 'aspect-[9/16] max-h-[600px]' : 'aspect-video'}`}>
+            <iframe 
+              src={embedUrl} 
+              className="w-full h-full" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowFullScreen
+              title="Video player"
+            ></iframe>
+          </div>
+        ) : (
+          <div className="aspect-video w-full flex flex-col items-center justify-center text-white/50 bg-slate-900 p-5 text-center">
+            <AlertCircle size={32} className="mb-2" />
+            <p className="text-sm">Không thể nhúng video này trực tiếp.</p>
+            <a href={video.url} target="_blank" rel="noreferrer" className="mt-3 text-cyan-400 font-bold hover:underline">Bấm vào đây để mở trên {video.platform}</a>
+          </div>
         )}
-        <Play size={48} className="text-white/80 z-10" fill="currentColor" />
-        <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-3 flex items-center justify-between text-white z-10">
-           <div className="flex items-center gap-2"><Play size={16}/> 00:00/00:23</div>
-           <ExternalLink size={16} />
-        </div>
       </div>
 
-      <div className="px-1 flex items-center justify-between text-xs text-slate-500 font-mono">
+      <div className="px-1 flex items-center justify-between text-xs text-slate-500 font-mono mt-2">
         <span>{new Date(video.created_at).toLocaleDateString("vi-VN")} · {video.platform?.toUpperCase()}</span>
-        <a href={video.url} target="_blank" rel="noreferrer" className="flex items-center gap-1 rounded-full bg-emerald-500 px-4 py-2 text-white font-bold text-xs shadow-sm">
+        <a href={video.url} target="_blank" rel="noreferrer" className="flex items-center gap-1 rounded-full bg-emerald-500 px-4 py-2 text-white font-bold text-xs shadow-sm hover:bg-emerald-600 transition">
           Mở trên {video.platform} <ExternalLink size={14} />
         </a>
       </div>
 
       {video.status === 'rejected' && (
-        <div className="rounded-2xl border border-rose-200 bg-rose-50 p-5">
+        <div className="rounded-2xl border border-rose-200 bg-rose-50 p-5 mt-4">
           <div className="flex items-center gap-2 text-rose-600 font-bold text-sm mb-2">
             <AlertCircle size={16} /> LÝ DO TỪ CHỐI
           </div>
@@ -99,9 +126,10 @@ export default function VideoDetail() {
         </div>
       )}
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      {/* HASHTAG ĐÃ ĐƯỢC SỬA THÀNH #NXX315STUDIO */}
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm mt-4">
         <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">▸ HASHTAG</p>
-        <p className="text-xs font-bold text-slate-600 mb-2">BẮT BUỘC (THIẾU)</p>
+        <p className="text-xs font-bold text-slate-600 mb-2">BẮT BUỘC</p>
         <div className="flex flex-wrap gap-2">
           {requiredTags.map(tag => {
             const isMissing = !videoContent.includes(tag.toLowerCase());
@@ -109,14 +137,14 @@ export default function VideoDetail() {
               <span key={tag} className={`rounded-full border px-3 py-1 text-xs font-bold ${
                 isMissing ? 'border-amber-200 bg-amber-50 text-amber-600' : 'border-emerald-200 bg-emerald-50 text-emerald-600'
               }`}>
-                {tag}
+                {tag} {isMissing ? "(Thiếu)" : "(Đã có)"}
               </span>
             );
           })}
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3 mt-4">
         <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-[10px] font-bold uppercase">LƯỢT XEM</span> <Eye size={14}/>
@@ -143,7 +171,7 @@ export default function VideoDetail() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm mt-4">
         <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">▸ LỊCH SỬ CHỈ SỐ</p>
         <p className="text-sm font-bold text-slate-800 mb-1">LƯỢT XEM ({metrics.length} MẪU)</p>
         <p className="text-[10px] text-slate-400 font-mono mb-4">LẦN CUỐI: {new Date(video.created_at).toLocaleString("vi-VN")}</p>
@@ -186,4 +214,4 @@ export default function VideoDetail() {
       </div>
     </div>
   );
-                }
+      }
