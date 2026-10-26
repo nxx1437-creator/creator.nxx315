@@ -121,7 +121,7 @@ export const PrevTop = memo(function PrevTop({ prev, prizes, title = "VINH DANH 
                 {title}
       </p>
 
-      <div className="grid grid-cols-3 items-end gap-1">
+            <div className="grid grid-cols-[1fr_1.25fr_1fr] items-end gap-1">
         {slots.map((it, i) =>
           it ? (
             <PodiumCol key={it.rank} it={it} prize={prizeFor(prizes, it.rank)} onOpen={open} />
