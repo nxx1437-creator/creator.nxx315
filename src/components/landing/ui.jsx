@@ -1,4 +1,5 @@
 import React from "react";
+import { Gamepad2 } from "lucide-react";
 
 export const fmtNum = (n) => Number(n || 0).toLocaleString("vi-VN");
 
@@ -10,30 +11,46 @@ export const timeAgo = (iso) => {
   return `${Math.floor(s / 86400)} ngày trước`;
 };
 
+/* Design tokens dùng chung */
+export const INK = "text-[#06251f]";
+export const GLASS =
+  "border border-white/80 bg-white/70 backdrop-blur-xl shadow-[0_12px_40px_-14px_rgba(6,78,59,0.25)]";
+export const GRAD_TEXT =
+  "bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 bg-clip-text text-transparent";
+
 export function Logo() {
   return (
-    <span className="text-xl font-black tracking-tight text-white">
-      Nxx315 <span className="text-emerald-400">Creator</span>
+    <span className="flex items-center gap-2.5">
+      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 text-white shadow-lg shadow-emerald-500/30">
+        <Gamepad2 size={19} />
+      </span>
+      <span className={`text-lg font-black tracking-tight ${INK}`}>
+        Nxx315 <span className="text-emerald-600">Creator</span>
+      </span>
+    </span>
+  );
+}
+
+export function Eyebrow({ children, className = "" }) {
+  return (
+    <span className={`inline-flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-emerald-700 ${className}`}>
+      <span className="h-px w-7 bg-emerald-600/50" />
+      {children}
     </span>
   );
 }
 
 export function SectionTitle({ eyebrow, title, sub, center = true }) {
   return (
-    <div className={center ? "text-center" : ""}>
-      <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-500">{eyebrow}</p>
-      <h2 className="mt-3 text-3xl font-black tracking-tight text-white md:text-4xl lg:text-5xl">{title}</h2>
-      {sub && <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-slate-400 md:text-base">{sub}</p>}
+    <div className={center ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}>
+      <Eyebrow>{eyebrow}</Eyebrow>
+      <h2 className={`mt-4 text-3xl font-black tracking-tight sm:text-5xl ${INK}`}>{title}</h2>
+      {sub && <p className="mt-4 text-sm leading-relaxed text-slate-600 md:text-base">{sub}</p>}
     </div>
   );
 }
 
 export function GlassCard({ children, className = "" }) {
-  return (
-    <div
-      className={`rounded-[2rem] border border-white/5 bg-gradient-to-b from-[#0f1c1e] to-[#0a1214] shadow-xl shadow-black/50 ${className}`}
-    >
-      {children}
-    </div>
-  );
+  return <div className={`${GLASS} rounded-[1.75rem] ${className}`}>{children}</div>;
 }
+
