@@ -1,10 +1,10 @@
-import React, { memo, useMemo, useState } from "react";
+import React, { memo, useMemo } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { Send, Trophy, Film, ArrowRight, Play, MessageSquare, ExternalLink } from "lucide-react";
 import useSession from "../../hooks/useSession.js";
 import { Card, PLATFORMS, getTier } from "../../components/creator/creatorUi.jsx";
 import {
-  CARD, NotifyBanner, EventCard, RequirementCard, StatsCard,
+  CARD, EventCard, RequirementCard, StatsCard,
 } from "../../components/creator/OverviewParts.jsx";
 
 const UserCard = memo(function UserCard({ username, tierName, greet, onVideos, onRanking }) {
@@ -134,7 +134,6 @@ export default function Overview() {
   const navigate = useNavigate();
   const { ov } = useOutletContext();
   const { profile } = useSession();
-  const [showBanner, setShowBanner] = useState(true);
 
   const { greet, monthLabel } = useMemo(() => {
     const hour = new Date().getHours();
@@ -155,7 +154,6 @@ export default function Overview() {
 
   return (
     <div className="space-y-4 pb-10">
-      {showBanner && <NotifyBanner onClose={() => setShowBanner(false)} />}
       <UserCard
         username={profile?.username}
         tierName={tier.name}
@@ -170,4 +168,4 @@ export default function Overview() {
       <RecentVideos recent={ov.recent} onAll={goVideos} />
     </div>
   );
-      }
+}
