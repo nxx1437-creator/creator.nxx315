@@ -242,7 +242,11 @@ export default function Videos() {
       ) : (
         <div className="space-y-3">
           {shown.map((it) => (
-            <Card key={it.id} className="!p-4">
+            <Card 
+  key={it.id} 
+  className="!p-4 cursor-pointer hover:bg-slate-50 transition"
+  onClick={() => navigate(`/app/videos/${it.id}`)}
+>
               <div className="flex gap-3">
                 {it.thumbnail_url ? (
                   <img
