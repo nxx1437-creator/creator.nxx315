@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { 
   ArrowLeft, ExternalLink, Eye, Heart, MessageSquare, Share2, 
-  AlertCircle, Play, LineChart, CheckCircle2 
+  AlertCircle, Play, LineChart
 } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
 
@@ -34,7 +34,6 @@ export default function VideoDetail() {
   const requiredTags = ["#XCLOUDPHONE", "#CLOUDPHONE", "#CLOUDGAMING"];
   const videoContent = ((video.title || "") + " " + (video.url || "")).toLowerCase();
   
-  // Lấy dữ liệu mẫu
   const metrics = [
     { 
       time: new Date(video.created_at).toLocaleString("vi-VN"), 
@@ -46,12 +45,10 @@ export default function VideoDetail() {
 
   return (
     <div className="space-y-4 pb-10">
-      {/* NÚT QUAY LẠI */}
       <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-600 font-semibold px-1 mb-2 mt-2">
         <ArrowLeft size={18} /> Quay lại danh sách
       </button>
 
-      {/* TIÊU ĐỀ */}
       <div className="px-1">
         <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
           ▸ CHI TIẾT VIDEO {video.platform?.toUpperCase()}
@@ -69,7 +66,6 @@ export default function VideoDetail() {
         </div>
       </div>
 
-      {/* KHUNG VIDEO (Giả lập) */}
       <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black shadow-sm flex items-center justify-center">
         {video.thumbnail_url && (
           <img src={video.thumbnail_url} alt="" className="absolute inset-0 h-full w-full object-cover opacity-50" />
@@ -81,7 +77,6 @@ export default function VideoDetail() {
         </div>
       </div>
 
-      {/* NÚT MỞ TRÊN NỀN TẢNG */}
       <div className="px-1 flex items-center justify-between text-xs text-slate-500 font-mono">
         <span>{new Date(video.created_at).toLocaleDateString("vi-VN")} · {video.platform?.toUpperCase()}</span>
         <a href={video.url} target="_blank" rel="noreferrer" className="flex items-center gap-1 rounded-full bg-emerald-500 px-4 py-2 text-white font-bold text-xs shadow-sm">
@@ -89,7 +84,6 @@ export default function VideoDetail() {
         </a>
       </div>
 
-      {/* LÝ DO TỪ CHỐI */}
       {video.status === 'rejected' && (
         <div className="rounded-2xl border border-rose-200 bg-rose-50 p-5">
           <div className="flex items-center gap-2 text-rose-600 font-bold text-sm mb-2">
@@ -105,7 +99,6 @@ export default function VideoDetail() {
         </div>
       )}
 
-      {/* HASHTAG BẮT BUỘC */}
       <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">▸ HASHTAG</p>
         <p className="text-xs font-bold text-slate-600 mb-2">BẮT BUỘC (THIẾU)</p>
@@ -123,7 +116,6 @@ export default function VideoDetail() {
         </div>
       </div>
 
-      {/* THỐNG KÊ TƯƠNG TÁC */}
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between text-slate-400 mb-2">
@@ -151,7 +143,6 @@ export default function VideoDetail() {
         </div>
       </div>
 
-      {/* BIỂU ĐỒ LỊCH SỬ */}
       <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">▸ LỊCH SỬ CHỈ SỐ</p>
         <p className="text-sm font-bold text-slate-800 mb-1">LƯỢT XEM ({metrics.length} MẪU)</p>
@@ -163,7 +154,7 @@ export default function VideoDetail() {
                 <LineChart size={20} />
              </div>
              <p className="text-[13px] font-bold tracking-widest text-slate-600 uppercase">ĐANG CHỜ THÊM MẪU</p>
-             <p className="text-[12px] text-slate-500 mt-1">Cần ít nhất 2 mẫu để vẽ biểu đồ xu hướng. Mẫu tiếp theo sẽ tạo khi cron refresh-metrics chạy lần kế.</p>
+             <p className="text-[12px] text-slate-500 mt-1">Cần ít nhất 2 mẫu để vẽ biểu đồ xu hướng.</p>
            </div>
         ) : (
            <div className="h-32 w-full bg-slate-50 rounded-xl mb-4"></div>
@@ -195,4 +186,4 @@ export default function VideoDetail() {
       </div>
     </div>
   );
-      }
+                }
