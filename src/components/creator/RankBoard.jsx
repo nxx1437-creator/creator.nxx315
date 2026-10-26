@@ -1,6 +1,6 @@
 import React, { memo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, Heart, MessageCircle, Crown, Gift } from "lucide-react";
+import { Eye, Heart, MessageCircle, Crown, Gift, Sparkles } from "lucide-react";
 import { Card, Avatar, fmt } from "./creatorUi.jsx";
 import { nf, prizeFor } from "./RankParts.jsx";
 
@@ -34,42 +34,64 @@ const useOpenProfile = () => {
 /* ---------- VINH DANH THÁNG TRƯỚC (BỤC) ---------- */
 const PODIUM = {
   1: {
-    ring: "border-amber-400", badge: "bg-amber-400 text-amber-900",
-    block: "from-amber-200 to-amber-50 text-amber-300", size: 88, h: "h-20", label: "text-amber-600",
+    ring: "from-amber-300 to-amber-500",
+    glow: "shadow-[0_0_28px_rgba(251,191,36,0.55)]",
+    badge: "from-amber-300 to-amber-500 text-amber-900",
+    block: "from-amber-100 to-white border-amber-400 text-amber-300",
+    size: 104, h: "h-24", label: "text-amber-500",
   },
   2: {
-    ring: "border-slate-300", badge: "bg-slate-300 text-slate-700",
-    block: "from-slate-200 to-slate-50 text-slate-300", size: 64, h: "h-14", label: "text-slate-500",
+    ring: "from-slate-200 to-slate-400",
+    glow: "",
+    badge: "from-slate-200 to-slate-400 text-slate-700",
+    block: "from-slate-100 to-white border-slate-300 text-slate-300",
+    size: 72, h: "h-16", label: "text-slate-500",
   },
   3: {
-    ring: "border-orange-400", badge: "bg-orange-400 text-orange-900",
-    block: "from-orange-200 to-orange-50 text-orange-300", size: 64, h: "h-10", label: "text-orange-600",
+    ring: "from-orange-300 to-orange-600",
+    glow: "shadow-[0_0_20px_rgba(234,88,12,0.35)]",
+    badge: "from-orange-300 to-orange-500 text-orange-900",
+    block: "from-orange-100 to-white border-orange-500 text-orange-300",
+    size: 72, h: "h-12", label: "text-orange-600",
   },
 };
 
 const PodiumCol = memo(function PodiumCol({ it, prize, onOpen }) {
   const s = PODIUM[it.rank];
+  const first = it.rank === 1;
   return (
-    <button onClick={() => onOpen(it.uid)} className="flex min-w-0 flex-1 flex-col items-center">
-      {it.rank === 1 && <Crown size={28} className="mb-1 text-amber-500" fill="currentColor" />}
+    <button onClick={() => onOpen(it.uid)} className="relative z-10 flex min-w-0 flex-col items-center">
+      {first && (
+        <Crown size={40} className="mb-1 text-amber-400 drop-shadow" fill="currentColor" />
+      )}
       <div className="relative">
-        <div className={`rounded-full border-[3px] p-0.5 ${s.ring}`}>
-          <Avatar src={it.avatar} name={it.name} size={s.size} />
+        <div className={`rounded-full bg-gradient-to-b p-1 ${s.ring} ${s.glow}`}>
+          <div className="rounded-full bg-white p-0.5">
+            <Avatar src={it.avatar} name={it.name} size={s.size} />
+          </div>
         </div>
-        <span className={`absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full text-sm font-black ${s.badge}`}>
+        <span
+          className={`absolute -bottom-1 -right-1 flex items-center justify-center rounded-full bg-gradient-to-br font-black shadow ${s.badge} ${
+            first ? "h-9 w-9 text-lg" : "h-7 w-7 text-sm"
+          }`}
+        >
           {it.rank}
         </span>
       </div>
-      <p className={`mt-3 font-mono text-[10px] font-bold tracking-widest ${s.label}`}>TOP {it.rank}</p>
+
+      <p className={`mt-3 font-mono text-[10px] font-bold tracking-[0.3em] ${s.label}`}>
+        TOP {it.rank}
+      </p>
       <p className="max-w-full truncate px-1 text-sm font-extrabold text-slate-800">{it.name}</p>
       {prize && (
-        <span className="mt-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 font-mono text-[10px] font-bold text-amber-600">
+        <span className="mt-1.5 rounded-2xl border border-amber-200 bg-amber-50 px-2.5 py-1 text-center font-mono text-[11px] font-bold text-amber-600">
           {prizeText(prize)}
         </span>
       )}
-      <p className="mt-1 text-[11px] text-slate-500">{nf.format(it.points)} điểm</p>
+      <p className="mt-1.5 font-mono text-[11px] text-slate-500">{nf.format(it.points)} điểm</p>
+
       <div
-        className={`mt-2 flex w-full items-start justify-center rounded-t-2xl bg-gradient-to-b pt-1 text-3xl font-black ${s.block} ${s.h}`}
+        className={`mt-3 flex w-full items-start justify-center rounded-t-[2rem] border-t-2 bg-gradient-to-b pt-2 text-4xl font-black ${s.block} ${s.h}`}
       >
         {it.rank}
       </div>
@@ -82,16 +104,29 @@ export const PrevTop = memo(function PrevTop({ prev, prizes }) {
   if (!prev || prev.length === 0) return null;
   const slots = [2, 1, 3].map((r) => prev.find((i) => i.rank === r));
   return (
-    <Card className="!px-3">
-      <p className="mb-4 text-center font-mono text-[11px] font-bold uppercase tracking-widest text-slate-500">
+    <Card className="!px-2 !pb-0">
+      {/* Quầng sáng vàng phía sau Top 1 */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-12 h-72 w-72 -translate-x-1/2"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(251,191,36,0.35) 0%, rgba(251,191,36,0) 70%)",
+        }}
+      />
+      <Sparkles size={18} className="absolute left-[26%] top-24 text-amber-400" />
+      <Sparkles size={14} className="absolute right-[28%] top-20 text-amber-300" />
+      <Sparkles size={12} className="absolute left-[30%] top-44 text-amber-300" />
+
+      <p className="relative mb-5 text-center font-mono text-[11px] font-bold uppercase tracking-[0.3em] text-slate-500">
         VINH DANH THÁNG TRƯỚC
       </p>
-      <div className="flex items-end gap-2">
+
+      <div className="grid grid-cols-3 items-end gap-1">
         {slots.map((it, i) =>
           it ? (
             <PodiumCol key={it.rank} it={it} prize={prizeFor(prizes, it.rank)} onOpen={open} />
           ) : (
-            <div key={i} className="flex-1" />
+            <div key={i} />
           )
         )}
       </div>
