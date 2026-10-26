@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+ import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, useOutletContext } from "react-router-dom";
 import { ArrowLeft, AlertCircle, Eye, Heart, MessageSquare, Share2, Calendar } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
@@ -165,7 +165,20 @@ export default function VideoDetail() {
         <StatBox label="LƯỢT XEM" value={vn(video.views || 0)} Icon={Eye} />
         <StatBox label="LƯỢT THÍCH" value={vn(video.likes || 0)} Icon={Heart} />
         <StatBox label="BÌNH LUẬN" value={vn(video.comments || 0)} Icon={MessageSquare} />
-        <StatBox label="ĐIỂM" value={video.status === "approved" ? 100 : 0} Icon={Share2} />
+        <StatBox
+  label="ĐIỂM"
+  value={
+    video.status === "approved"
+      ? vn(videoPoints(video.views, video.likes, video.comments))
+      : 0
+  }
+  Icon={Share2}
+  hint={
+    video.status === "approved"
+      ? "Cộng vào xếp hạng tháng"
+      : "Tính khi video được duyệt"
+  }
+/>
       </div>
 
       <HistoryCard samples={rows} />
