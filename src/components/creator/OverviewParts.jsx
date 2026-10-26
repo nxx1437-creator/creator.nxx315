@@ -106,7 +106,7 @@ export const EventCard = memo(function EventCard({ monthLabel }) {
         <div className="flex items-center gap-2 text-xs font-bold text-emerald-700">
           <Trophy size={16} /> TOP 1
         </div>
-        <span className="text-sm font-bold text-emerald-700"> 50.000k + 20.000 xu</span>
+        <span className="text-sm font-bold text-emerald-700"> 50.000Đ + 20.000 xu</span>
       </div>
 
       <div className="flex items-center justify-between border-t border-slate-200/60 pt-4">
