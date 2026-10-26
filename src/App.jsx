@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import useSession from "./hooks/useSession.js";
 import { supabase } from "./lib/supabaseClient.js";
 
+import VideoDetail from "./pages/app/VideoDetail.jsx";
 import Help from "./pages/app/Help.jsx";
 import Payout from "./pages/app/Payout.jsx";
 import Rules from "./pages/app/Rules.jsx";
@@ -94,6 +95,7 @@ export default function App() {
           <Route path="settings" element={<Settings />} />
           <Route path="payout" element={<Payout />} />
           <Route path="help" element={<Help />} />
+          <Route path="videos/:id" element={<VideoDetail />} />
           <Route path="rules" element={<Rules />} />
         </Route>
         
