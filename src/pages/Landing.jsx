@@ -12,6 +12,10 @@ import { FinalCta, Footer } from "../components/landing/Footer.jsx";
 
 /* ---------- helpers ---------- */
 const CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+.nx-root { font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; }
+.nx-root h1, .nx-root h2 { font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif; font-weight: 900; letter-spacing: -0.025em; }
+.nx-root h3 { font-family: 'Montserrat', 'Plus Jakarta Sans', sans-serif; }
 @keyframes nx-marquee { to { transform: translateX(-50%); } }
 @keyframes nx-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 @keyframes nx-rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
@@ -64,62 +68,101 @@ function Header() {
   );
 }
 
+/* ---------- game art (SVG tự vẽ) ---------- */
+function GameBlock({ className = "" }) {
+  return (
+    <svg viewBox="0 0 100 100" className={className} aria-hidden="true">
+      <defs>
+        <linearGradient id="nx-gb" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#fef08a" />
+          <stop offset="1" stopColor="#facc15" />
+        </linearGradient>
+      </defs>
+      <ellipse cx="50" cy="92" rx="34" ry="6" fill="#064e3b" opacity=".14" />
+      <polygon points="50,10 90,31 50,52 10,31" fill="url(#nx-gb)" />
+      <polygon points="10,31 50,52 50,90 10,69" fill="#f59e0b" />
+      <polygon points="90,31 50,52 50,90 90,69" fill="#d97706" />
+      <polygon points="50,10 90,31 50,52 10,31" fill="none" stroke="#fff" strokeOpacity=".5" strokeWidth="1.5" />
+      <circle cx="28" cy="58" r="3.4" fill="#78350f" />
+      <circle cx="40" cy="64" r="3.4" fill="#78350f" />
+      <path d="M26 70 Q35 78 44 73" stroke="#78350f" strokeWidth="3" fill="none" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function BoltDrop({ className = "" }) {
+  return (
+    <svg viewBox="0 0 100 120" className={className} aria-hidden="true">
+      <defs>
+        <linearGradient id="nx-bd-o" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#fdba74" />
+          <stop offset="1" stopColor="#ef4444" />
+        </linearGradient>
+        <linearGradient id="nx-bd-c" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#cffafe" />
+          <stop offset="1" stopColor="#22d3ee" />
+        </linearGradient>
+      </defs>
+      <path d="M50 6C50 6 90 46 90 76A40 40 0 0 1 10 76C10 46 50 6 50 6Z" fill="url(#nx-bd-o)" />
+      <path d="M50 24C50 24 78 52 78 76A28 28 0 0 1 22 76C22 52 50 24 50 24Z" fill="url(#nx-bd-c)" />
+      <path d="M55 42L35 78H49L44 104L67 66H52Z" fill="#fff" />
+    </svg>
+  );
+}
+
 /* ---------- hero ---------- */
 function Hero({ hashtags }) {
-  const tags = String(hashtags || "").split(/[\s,]+/).filter(Boolean);
+  const tags = String(hashtags || "").split(/[\s,]+/).filter(Boolean).map((t) => t.replace(/^#/, ""));
   return (
     <section className="relative mx-auto max-w-4xl px-4 pb-8 pt-10 md:pt-24 md:text-center">
       <div className="nx-rise relative z-10 flex flex-col items-start md:items-center">
-        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-600/25 bg-white/70 px-3.5 py-1.5 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-emerald-700 backdrop-blur">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-          </span>
-          Dành cho Gaming Creator
+        <span className="relative inline-flex w-full items-center gap-2 whitespace-nowrap rounded-full border border-emerald-700/25 bg-white/50 py-2.5 pl-4 pr-4 font-mono text-[10.5px] font-bold uppercase tracking-[0.1em] text-emerald-800 backdrop-blur sm:w-auto sm:text-[11px] sm:tracking-[0.16em]">
+          <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-600" />
+          Sân chơi dành riêng cho Gaming Creator
+          <GameBlock className="nx-float pointer-events-none absolute -left-4 -top-7 z-20 h-14 w-14 -rotate-6" />
         </span>
 
-        <h1 className={`mt-6 text-[2.4rem] font-black leading-[1.08] tracking-tight sm:text-6xl md:text-7xl ${INK}`}>
-          <span className="block">Chơi game. Quay clip.</span>
-          <span className={`mt-1 block text-balance ${GRAD_TEXT}`}>Biến view thành tiền.</span>
-        </h1>
+        <div className="relative mt-7 w-full md:w-auto">
+          <BoltDrop className="nx-float-2 pointer-events-none absolute -right-2 top-[46%] z-0 h-20 w-16 sm:h-28 sm:w-24 md:-right-28 md:top-1/2 md:-translate-y-1/2" />
+          <h1 className={`relative z-10 text-[2.3rem] leading-[1.14] sm:text-6xl md:text-7xl ${INK}`}>
+            Chơi game. Quay clip.
+            <span className={`block ${GRAD_TEXT}`}>Biến view thành tiền.</span>
+          </h1>
+        </div>
 
-        <p className="mt-6 max-w-xl text-base leading-relaxed text-slate-600 md:text-lg">
-          Làm video review, trải nghiệm game trên <strong className={INK}>Nxx315 Studio</strong>, gắn hashtag
-          rồi đua top bảng xếp hạng để nhận <strong className={INK}>Gift Code VIP</strong> và{" "}
-          <strong className={INK}>tiền mặt</strong> mỗi tháng.
-        </p>
-
-        {tags.length > 0 && (
-          <div className="mt-6 flex flex-wrap items-center gap-2 md:justify-center">
-            <span className="flex items-center gap-1 font-mono text-[11px] font-bold uppercase tracking-widest text-slate-500">
-              <Hash size={12} /> Gắn hashtag
+        <p className="mt-7 max-w-xl text-[1.05rem] leading-[1.95] text-slate-600 md:text-lg">
+          Dành cho các <b className={INK}>Gamer</b> và <b className={INK}>Creator</b>. Làm video review/trải nghiệm
+          game trên <b className={INK}>Nxx315 Studio</b> kèm hashtag{" "}
+          {tags.map((t) => (
+            <span
+              key={t}
+              className="mx-0.5 my-0.5 inline-flex items-center gap-0.5 rounded-xl border border-emerald-700/25 bg-white/50 px-3 py-1 align-middle font-mono text-sm font-bold text-emerald-800"
+            >
+              <Hash size={14} />{t}
             </span>
-            {tags.map((t) => (
-              <span key={t} className="rounded-xl border border-emerald-600/20 bg-emerald-500/10 px-3 py-1.5 font-mono text-xs font-bold text-emerald-800">
-                {t.startsWith("#") ? t : "#" + t}
-              </span>
-            ))}
-          </div>
-        )}
+          ))}{" "}
+          lên TikTok/YouTube để nhận <b className={INK}>Gift Code VIP</b> và <b className={INK}>tiền mặt</b> mỗi tháng.
+          Clip chất lượng + view căng = thưởng nặng!
+        </p>
 
         <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
           <Link
             to="/login"
-            className="group flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-4 text-base font-extrabold text-white shadow-xl shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:shadow-emerald-500/50"
+            className="group flex items-center justify-center gap-3 rounded-[1.25rem] bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-4 text-lg font-extrabold text-white shadow-xl shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:shadow-emerald-500/50"
           >
-            <Sparkles size={18} /> Gia nhập ngay
-            <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            <Sparkles size={20} /> Gia nhập ngay
+            <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
           </Link>
           <a
             href="#ranking"
-            className={`${GLASS} flex items-center justify-center gap-2 rounded-2xl px-8 py-4 text-base font-bold ${INK} transition hover:-translate-y-0.5`}
+            className={`${GLASS} flex items-center justify-center gap-2 rounded-[1.25rem] px-8 py-4 text-lg font-semibold ${INK} transition hover:-translate-y-0.5`}
           >
-            <Trophy size={18} className="text-amber-500" /> Xem bảng xếp hạng
+            <Trophy size={20} className="text-amber-500" /> Xem bảng xếp hạng
           </a>
         </div>
 
-        <p className="mt-5 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-          Miễn phí · Không giới hạn số video
+        <p className="mt-6 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+          ▸ Miễn phí · Không giới hạn số video · Trả thưởng minh bạch
         </p>
       </div>
     </section>
@@ -132,6 +175,7 @@ function Ticker() {
   const row = [...games, ...games];
   return (
     <div className="relative my-6 overflow-hidden border-y border-emerald-900/10 bg-white/50 py-4 backdrop-blur">
+      <div style={{ maskImage: "linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)", WebkitMaskImage: "linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)" }}>
       <div className="nx-marquee flex w-max items-center gap-10 whitespace-nowrap">
         {row.map((g, i) => (
           <span key={i} className="flex items-center gap-10 text-xl font-black text-emerald-900/30 sm:text-2xl">
@@ -140,8 +184,7 @@ function Ticker() {
           </span>
         ))}
       </div>
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#e6f6f0] to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#e6f6f0] to-transparent" />
+      </div>
     </div>
   );
 }
@@ -173,16 +216,16 @@ function StatsStrip({ stats }) {
 export default function Landing() {
   const stats = usePublicStats();
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#e6f6f0] font-sans text-slate-800 selection:bg-emerald-300/50">
+    <div className="relative min-h-screen overflow-x-hidden nx-root bg-[#eaf6f3] text-slate-800 selection:bg-emerald-300/50">
       <style>{CSS}</style>
 
-      {/* nền mint gradient + chấm lưới */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute inset-x-0 top-0 h-[900px] bg-gradient-to-b from-emerald-200/70 via-teal-100/50 to-transparent" />
-        <div className="absolute -left-24 top-10 h-[420px] w-[420px] rounded-full bg-emerald-300/40 blur-[110px]" />
-        <div className="absolute -right-24 top-[28rem] h-[420px] w-[420px] rounded-full bg-sky-300/40 blur-[110px]" />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg,#a7d2c2 0,#e3f3ee 900px,#eaf6f3 55%,#cdeaf0 100%)" }} />
+        <div className="absolute left-1/2 top-24 h-[380px] w-[380px] -translate-x-1/2 rounded-full bg-white/60 blur-[100px]" />
+        <div className="absolute -right-32 top-[30rem] h-[460px] w-[460px] rounded-full bg-[#9edbe6]/60 blur-[120px]" />
+        <div className="absolute -left-32 top-[70rem] h-[460px] w-[460px] rounded-full bg-[#a7d2c2]/60 blur-[120px]" />
         <div
-          className="absolute inset-0 opacity-[0.35]"
+          className="absolute inset-0 opacity-[0.3]"
           style={{ backgroundImage: "radial-gradient(rgba(6,78,59,.18) 1px, transparent 1px)", backgroundSize: "26px 26px" }}
         />
       </div>
@@ -201,6 +244,5 @@ export default function Landing() {
       <Footer />
     </div>
   );
-     }
-
-
+              }
+      
