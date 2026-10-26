@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  LogIn, ArrowRight, Sparkles, Users, Film, Coins, Eye, Heart, MessageCircle,
-  Gift, Play, ShieldCheck, Trophy, Hash, Gamepad2, Zap, Crown,
+  LogIn, ArrowRight, Sparkles, Users, Film, Coins,
+  Gift, Play, ShieldCheck, Trophy, Hash, Gamepad2, Zap,
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient.js";
 import { Logo, fmtNum, INK, GLASS, GRAD_TEXT } from "../components/landing/ui.jsx";
@@ -15,14 +15,11 @@ import { FinalCta, Footer } from "../components/landing/Footer.jsx";
 /* ---------- helpers ---------- */
 const CSS = `
 @keyframes nx-marquee { to { transform: translateX(-50%); } }
-@keyframes nx-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 @keyframes nx-rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
 .nx-marquee { animation: nx-marquee 28s linear infinite; }
-.nx-float { animation: nx-float 5s ease-in-out infinite; }
-.nx-float-2 { animation: nx-float 6.5s ease-in-out -2s infinite; }
 .nx-rise { animation: nx-rise .8s cubic-bezier(.2,.7,.2,1) both; }
 @media (prefers-reduced-motion: reduce) {
-  .nx-marquee, .nx-float, .nx-float-2, .nx-rise { animation: none; }
+  .nx-marquee, .nx-rise { animation: none; }
 }
 `;
 
@@ -38,45 +35,34 @@ function usePublicStats() {
   return stats;
 }
 
-/* ---------- header (GIỮ NGUYÊN) ---------- */
+/* ---------- HEADER (SỬA LẠI NÚT ĐĂNG NHẬP) ---------- */
 function Header() {
-  const links = [
-    ["#cach-lam", "Cách làm"],
-    ["#quyen-loi", "Quyền lợi"],
-    ["#ranking", "Xếp hạng"],
-    ["#hoi-dap", "Hỏi đáp"],
-  ];
   return (
     <header className="sticky top-0 z-40 border-b border-white/70 bg-white/60 backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <Link to="/"><Logo /></Link>
-        <nav className="hidden items-center gap-8 text-sm font-semibold text-slate-600 md:flex">
-          {links.map(([href, label]) => (
-            <a key={href} href={href} className="transition-colors hover:text-emerald-600">{label}</a>
-          ))}
-        </nav>
+        {/* Bỏ thanh menu, chỉ giữ nút đăng nhập nhỏ gọn */}
         <Link
           to="/login"
-          className="flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:shadow-emerald-500/50"
+          className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-emerald-500/30 transition hover:-translate-y-0.5"
         >
-          <LogIn size={16} /> Đăng nhập
+          <LogIn size={14} /> Đăng nhập
         </Link>
       </div>
     </header>
   );
 }
 
-/* ---------- hero (ĐÃ XÓA TICKETMOCK VÀ THU GỌN KHOẢNG CÁCH) ---------- */
+/* ---------- HERO (SỬA LẠI CHỮ KHÔNG BỊ VỠ) ---------- */
 function Hero({ hashtags }) {
   const tags = String(hashtags || "").split(/[\s,]+/).filter(Boolean);
   return (
-    // Giảm padding từ pt-10 md:pt-20 xuống pt-6 md:pt-12 để ngắn lại
-    <section className="relative mx-auto flex max-w-4xl flex-col items-center px-4 pb-8 pt-6 md:pt-12 text-center">
-      <Gamepad2 className="pointer-events-none absolute left-0 top-6 h-32 w-32 rotate-12 text-emerald-700/[0.06]" />
-      <Zap className="pointer-events-none absolute right-0 top-48 h-40 w-40 -rotate-12 text-teal-600/[0.07]" />
+    <section className="relative mx-auto flex max-w-4xl flex-col items-center px-5 pb-8 pt-8 sm:pt-12 text-center">
+      <Gamepad2 className="pointer-events-none absolute left-0 top-6 h-24 w-24 rotate-12 text-emerald-700/[0.06]" />
+      <Zap className="pointer-events-none absolute right-0 top-40 h-32 w-32 -rotate-12 text-teal-600/[0.07]" />
 
-      <div className="nx-rise relative z-10 flex w-full flex-col items-center">
-        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-600/25 bg-white/70 px-3.5 py-1.5 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-700 backdrop-blur">
+      <div className="nx-rise relative z-10 flex flex-col items-center w-full">
+        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-600/25 bg-white/70 px-3.5 py-1.5 font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.15em] text-emerald-700 backdrop-blur">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
@@ -84,12 +70,12 @@ function Hero({ hashtags }) {
           Sân chơi dành riêng cho Gaming Creator
         </span>
 
-        <h1 className={`mt-5 text-[2.6rem] font-black leading-[1.1] tracking-tight sm:text-5xl ${INK}`}>
+        <h1 className={`mt-6 text-[2.6rem] sm:text-6xl font-black leading-[1.15] tracking-tight ${INK}`}>
           Chơi game. Quay clip.
           <span className={`mt-1 block ${GRAD_TEXT}`}>Biến view thành tiền.</span>
         </h1>
 
-        <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-600">
+        <p className="mt-5 max-w-[90%] sm:max-w-xl text-[15px] sm:text-base leading-relaxed text-slate-600">
           Làm video review, trải nghiệm game trên <strong className={INK}>Nxx315 Studio</strong>, gắn hashtag
           rồi đua top bảng xếp hạng để nhận <strong className={INK}>ngày dùng VIP</strong> và{" "}
           <strong className={INK}>tiền mặt</strong> mỗi tháng. Clip chất lượng + view căng = thưởng nặng.
@@ -97,7 +83,7 @@ function Hero({ hashtags }) {
 
         {tags.length > 0 && (
           <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-            <span className="flex items-center gap-1 font-mono text-[11px] font-bold uppercase tracking-widest text-slate-500">
+            <span className="flex items-center gap-1 font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-slate-500">
               <Hash size={12} /> Gắn hashtag
             </span>
             {tags.map((t) => (
@@ -108,23 +94,23 @@ function Hero({ hashtags }) {
           </div>
         )}
 
-        <div className="mt-6 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
+        <div className="mt-8 flex w-full max-w-xs flex-col gap-3">
           <Link
             to="/login"
-            className="group flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-7 py-4 text-base font-extrabold text-white shadow-xl shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:shadow-emerald-500/50"
+            className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-4 text-base font-extrabold text-white shadow-xl shadow-emerald-500/30 transition hover:-translate-y-0.5"
           >
             <Sparkles size={18} /> Gia nhập ngay
             <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
           </Link>
           <a
             href="#ranking"
-            className={`${GLASS} flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl px-7 py-4 text-base font-bold ${INK} transition hover:-translate-y-0.5`}
+            className={`${GLASS} flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-bold ${INK} transition hover:-translate-y-0.5`}
           >
             <Trophy size={18} className="text-amber-500" /> Xem bảng xếp hạng
           </a>
         </div>
 
-        <p className="mt-5 flex items-center justify-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+        <p className="mt-5 flex flex-wrap items-center justify-center gap-2 font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-slate-500">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
           Miễn phí · Không giới hạn số video · Trả thưởng minh bạch
         </p>
@@ -133,17 +119,17 @@ function Hero({ hashtags }) {
   );
 }
 
-/* ---------- ticker + stats (GIỮ NGUYÊN) ---------- */
+/* ---------- TICKER & STATS (GIỮ NGUYÊN) ---------- */
 function Ticker() {
   const games = ["Roblox", "Free Fire", "Genshin Impact", "Liên Quân", "PUBG Mobile", "Minecraft", "Mobile Legends", "Honkai Star Rail"];
   const row = [...games, ...games];
   return (
-    <div className="relative my-6 overflow-hidden border-y border-emerald-900/10 bg-white/50 py-4 backdrop-blur">
-      <div className="nx-marquee flex w-max items-center gap-10 whitespace-nowrap">
+    <div className="relative my-4 overflow-hidden border-y border-emerald-900/10 bg-white/50 py-3 backdrop-blur">
+      <div className="nx-marquee flex w-max items-center gap-8 whitespace-nowrap">
         {row.map((g, i) => (
-          <span key={i} className="flex items-center gap-10 text-xl font-black text-emerald-900/30 sm:text-2xl">
+          <span key={i} className="flex items-center gap-8 text-lg font-black text-emerald-900/30 sm:text-2xl">
             {g}
-            <Sparkles size={18} className="text-emerald-500/60" />
+            <Sparkles size={16} className="text-emerald-500/60" />
           </span>
         ))}
       </div>
@@ -160,15 +146,15 @@ function StatsStrip({ stats }) {
     [Coins, "Giải thưởng đã tặng", stats?.coins],
   ];
   return (
-    <section className="mx-auto max-w-6xl px-4 py-6">
-      <div className={`${GLASS} grid grid-cols-3 divide-x divide-emerald-900/10 rounded-[2rem] py-6 md:py-9`}>
+    <section className="mx-auto max-w-6xl px-4 py-4">
+      <div className={`${GLASS} grid grid-cols-3 divide-x divide-emerald-900/10 rounded-[2rem] py-5 md:py-8`}>
         {items.map(([Icon, label, value]) => (
           <div key={label} className="flex flex-col items-center px-2 text-center">
-            <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-md shadow-emerald-500/30">
-              <Icon size={19} />
+            <span className="mb-2 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-md shadow-emerald-500/30">
+              <Icon size={16} />
             </span>
-            <p className={`text-2xl font-black sm:text-4xl ${INK}`}>{stats ? fmtNum(value) : "—"}</p>
-            <p className="mt-1 text-[11px] font-semibold leading-tight text-slate-500 sm:text-sm">{label}</p>
+            <p className={`text-xl sm:text-3xl font-black ${INK}`}>{stats ? fmtNum(value) : "—"}</p>
+            <p className="mt-1 text-[10px] sm:text-xs font-semibold leading-tight text-slate-500">{label}</p>
           </div>
         ))}
       </div>
@@ -176,7 +162,7 @@ function StatsStrip({ stats }) {
   );
 }
 
-/* ---------- page ---------- */
+/* ---------- PAGE ---------- */
 export default function Landing() {
   const stats = usePublicStats();
   return (
@@ -184,12 +170,12 @@ export default function Landing() {
       <style>{CSS}</style>
 
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute inset-x-0 top-0 h-[900px] bg-gradient-to-b from-emerald-200/70 via-teal-100/50 to-transparent" />
-        <div className="absolute -left-24 top-10 h-[420px] w-[420px] rounded-full bg-emerald-300/40 blur-[110px]" />
-        <div className="absolute -right-24 top-[28rem] h-[420px] w-[420px] rounded-full bg-sky-300/40 blur-[110px]" />
+        <div className="absolute inset-x-0 top-0 h-[600px] bg-gradient-to-b from-emerald-200/70 via-teal-100/50 to-transparent" />
+        <div className="absolute -left-24 top-10 h-[300px] w-[300px] rounded-full bg-emerald-300/40 blur-[80px]" />
+        <div className="absolute -right-24 top-[20rem] h-[300px] w-[300px] rounded-full bg-sky-300/40 blur-[80px]" />
         <div
-          className="absolute inset-0 opacity-[0.35]"
-          style={{ backgroundImage: "radial-gradient(rgba(6,78,59,.18) 1px, transparent 1px)", backgroundSize: "26px 26px" }}
+          className="absolute inset-0 opacity-[0.3]"
+          style={{ backgroundImage: "radial-gradient(rgba(6,78,59,.15) 1px, transparent 1px)", backgroundSize: "26px 26px" }}
         />
       </div>
 
