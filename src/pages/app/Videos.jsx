@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useOutletContext, useNavigate } from "react-router-dom"; // Thêm useNavigate
+import { useOutletContext, useNavigate } from "react-router-dom";
 import {
   Plus, Send, Loader2, ExternalLink, Film, Eye, Heart, MessageCircle, RefreshCw,
 } from "lucide-react";
@@ -47,8 +47,6 @@ export default function Videos() {
   const { ov, reload: reloadOv } = useOutletContext();
   const { items, loading, reload } = useMyVideos(session?.user?.id);
   const hashtags = ov?.settings?.hashtags || "#Nxx315Studio";
-  
-  // KHAI BÁO NAVIGATE
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
@@ -245,60 +243,64 @@ export default function Videos() {
       ) : (
         <div className="space-y-3">
           {shown.map((it) => (
-            <Card 
+            // BỌC THẺ CARD TRONG MỘT THẺ DIV CÓ ONCLICK ĐỂ ĐẢM BẢO CLICK ĐƯỢC
+            <div 
               key={it.id} 
-              className="!p-4 cursor-pointer hover:bg-slate-50 transition"
               onClick={() => navigate(`/app/videos/${it.id}`)}
+              className="cursor-pointer transition-transform active:scale-[0.98]"
             >
-              <div className="flex gap-3">
-                {it.thumbnail_url ? (
-                  <img
-                    src={it.thumbnail_url}
-                    alt=""
-                    referrerPolicy="no-referrer"
-                    onError={(e) => (e.currentTarget.style.display = "none")}
-                    className="h-20 w-14 shrink-0 rounded-xl border border-slate-200 object-cover shadow-sm"
-                  />
-                ) : null}
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="flex items-center gap-2 text-sm font-bold text-slate-800">
-                      <span className={`h-2.5 w-2.5 rounded-full ${PLATFORMS[it.platform]?.dot}`} />
-                      {PLATFORMS[it.platform]?.name}
-                    </span>
-                    <StatusPill status={it.status} />
+              <Card className="!p-4 hover:bg-slate-50 transition">
+                <div className="flex gap-3">
+                  {it.thumbnail_url ? (
+                    <img
+                      src={it.thumbnail_url}
+                      alt=""
+                      referrerPolicy="no-referrer"
+                      onError={(e) => (e.currentTarget.style.display = "none")}
+                      className="h-20 w-14 shrink-0 rounded-xl border border-slate-200 object-cover shadow-sm"
+                    />
+                  ) : null}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="flex items-center gap-2 text-sm font-bold text-slate-800">
+                        <span className={`h-2.5 w-2.5 rounded-full ${PLATFORMS[it.platform]?.dot}`} />
+                        {PLATFORMS[it.platform]?.name}
+                      </span>
+                      <StatusPill status={it.status} />
+                    </div>
+                    {it.title && (
+                      <p className="mt-1.5 line-clamp-2 text-sm font-medium text-slate-600">{it.title}</p>
+                    )}
+                    <Stats it={it} />
+                    <a
+                      href={it.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()} // Ngăn chặn sự kiện click lan ra thẻ div
+                      className="mt-2 flex items-center gap-1.5 text-xs font-medium text-cyan-600 hover:underline"
+                    >
+                      <ExternalLink size={12} className="shrink-0" />
+                      <span className="truncate">{it.url}</span>
+                    </a>
+                    <p className="mt-1 text-[11px] text-slate-400">
+                      {new Date(it.created_at).toLocaleString("vi-VN")}
+                    </p>
                   </div>
-                  {it.title && (
-                    <p className="mt-1.5 line-clamp-2 text-sm font-medium text-slate-600">{it.title}</p>
-                  )}
-                  <Stats it={it} />
-                  <a
-                    href={it.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 flex items-center gap-1.5 text-xs font-medium text-cyan-600"
-                  >
-                    <ExternalLink size={12} className="shrink-0" />
-                    <span className="truncate">{it.url}</span>
-                  </a>
-                  <p className="mt-1 text-[11px] text-slate-400">
-                    {new Date(it.created_at).toLocaleString("vi-VN")}
-                  </p>
                 </div>
-              </div>
 
-              {it.status === "approved" && it.gift_code && (
-                <CodeBox code={it.gift_code} coins={it.coins} />
-              )}
-              {it.status === "rejected" && it.admin_note && (
-                <p className="mt-3 rounded-xl bg-rose-50 border border-rose-100 px-3 py-2 text-xs font-medium text-rose-600">
-                  Lý do: {it.admin_note}
-                </p>
-              )}
-            </Card>
+                {it.status === "approved" && it.gift_code && (
+                  <CodeBox code={it.gift_code} coins={it.coins} />
+                )}
+                {it.status === "rejected" && it.admin_note && (
+                  <p className="mt-3 rounded-xl bg-rose-50 border border-rose-100 px-3 py-2 text-xs font-medium text-rose-600">
+                    Lý do: {it.admin_note}
+                  </p>
+                )}
+              </Card>
+            </div>
           ))}
         </div>
       )}
     </div>
   );
-            }
+      }
