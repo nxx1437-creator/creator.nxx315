@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, useOutletContext } from "react-router-dom";
-import { ArrowLeft, AlertCircle, Eye, Heart, MessageSquare, Share2, Calendar, ListChecks, RefreshCw } from "lucide-react";
+import { ArrowLeft, AlertCircle, Eye, Heart, MessageSquare, Share2, Calendar, ListChecks, RefreshCw, CheckCircle2, XCircle, Clock } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
 import { Card, StatusPill } from "../../components/creator/creatorUi.jsx";
 import {
@@ -16,8 +16,7 @@ const fmtDay = (d) => {
   return t && !Number.isNaN(t.getTime()) ? dayFmt.format(t) : "—";
 };
 
-/* ====== YÊU CẦU VIDEO (lấy từ Thể lệ chương trình) ======
-   Muốn thêm/sửa thì chỉnh thẳng trong danh sách dưới, mỗi dòng một yêu cầu. */
+/* ====== YÊU CẦU VIDEO (lấy từ Thể lệ chương trình) ====== */
 const REQUIREMENTS = [
   "Đăng công khai trên kênh TikTok/YouTube đã liên kết với tài khoản Creator của bạn.",
   "Nội dung giới thiệu NXX315 Studio, rõ ràng, dễ hiểu và trung thực.",
@@ -85,7 +84,7 @@ export default function VideoDetail() {
             .limit(200),
         ]);
         if (off) return;
-        if (v.error) throw v.error; // lỗi mạng/quyền -> báo lỗi, không báo "không tìm thấy"
+        if (v.error) throw v.error; 
         setVideo(v.data || null);
         setSamples(s.data || []);
       } catch (e) {
@@ -99,7 +98,6 @@ export default function VideoDetail() {
     };
   }, [id, attempt]);
 
-  // Nếu chưa có mẫu nào nhưng video đã có số liệu -> dùng số liệu hiện tại làm 1 mẫu
   const rows = useMemo(() => {
     if (samples.length || !video || video.views == null) return samples;
     return [
@@ -141,6 +139,40 @@ export default function VideoDetail() {
   const content = ((video.title || "") + " " + (video.url || "")).toLowerCase();
   const pf = video.platform?.toUpperCase();
 
+  // Hàm kiểm tra trạng thái từng yêu cầu
+  const getRequirementStatus = (reqText, index) => {
+    // 1. Nếu video bị từ chối, hiển thị X cho tất cả (trừ khi có thể đoán lý do)
+    if (video.status === 'rejected') {
+      // Nếu lý do từ chối có nhắc đến hashtag -> Yêu cầu số 3 (index 2) bị X
+      if (video.admin_note?.toLowerCase().includes('hashtag') && index === 2) {
+        return <XCircle size={16} className="text-rose-500 shrink-0 mt-0.5" />;
+      }
+      // Mặc định là X cho các yêu cầu khác
+      return <XCircle size={16} className="text-rose-500 shrink-0 mt-0.5" />;
+    }
+
+    // 2. Nếu đã duyệt -> Hiển thị ✓ cho tất cả
+    if (video.status === 'approved') {
+      return <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />;
+    }
+
+    // 3. Nếu đang chờ duyệt -> Kiểm tra những gì có thể tự động
+    if (video.status === 'pending') {
+      // Yêu cầu số 3 (index 2): Hashtag (tự động kiểm tra)
+      if (index === 2) {
+        // Kiểm tra xem có đủ các tag không
+        const hasAllTags = tags.every(tag => content.includes(tag.toLowerCase()));
+        return hasAllTags 
+          ? <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />
+          : <XCircle size={16} className="text-rose-500 shrink-0 mt-0.5" />;
+      }
+      // Các yêu cầu khác -> Đang chờ admin duyệt
+      return <Clock size={16} className="text-amber-500 shrink-0 mt-0.5" />;
+    }
+
+    return <Clock size={16} className="text-slate-400 shrink-0 mt-0.5" />;
+  };
+
   return (
     <div className="space-y-4 pb-10">
       <button
@@ -165,7 +197,6 @@ export default function VideoDetail() {
         </div>
       </div>
 
-      {/* key: đổi video thì khung phát được dựng lại từ đầu */}
       <VideoPlayer key={video.id} video={video} />
 
       <Card className="!p-4">
@@ -221,6 +252,7 @@ export default function VideoDetail() {
         </div>
       </Card>
 
+      {/* PHẦN YÊU CẦU VIDEO ĐÃ ĐƯỢC THÊM TRẠNG THÁI */}
       <Card>
         <p className="mb-3 flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500">
           <ListChecks size={14} /> ▸ YÊU CẦU VIDEO
@@ -228,10 +260,10 @@ export default function VideoDetail() {
         {REQUIREMENTS.length === 0 ? (
           <p className="text-sm text-slate-500">Các yêu cầu sẽ được cập nhật sau.</p>
         ) : (
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             {REQUIREMENTS.map((r, i) => (
-              <li key={i} className="flex gap-2 text-sm text-slate-700">
-                <span className="mt-0.5 font-mono text-xs font-bold text-cyan-600">{String(i + 1).padStart(2, "0")}</span>
+              <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700">
+                {getRequirementStatus(r, i)}
                 <span className="min-w-0 break-words">{r}</span>
               </li>
             ))}
@@ -265,5 +297,4 @@ export default function VideoDetail() {
       <HistoryCard samples={rows} />
     </div>
   );
-                                    }
-          
+        }        
