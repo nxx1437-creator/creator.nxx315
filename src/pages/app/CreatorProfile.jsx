@@ -1,7 +1,7 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  ArrowLeft, Calendar, Film, Eye, Heart, Gift, MessageCircle, ExternalLink, Flame, Trophy,
+  ArrowLeft, Calendar, Film, Eye, Heart, Gift, MessageCircle, ChevronRight, Flame, Trophy,
 } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
 import { Card, Avatar, PLATFORMS, fmt } from "../../components/creator/creatorUi.jsx";
@@ -32,13 +32,12 @@ const StatBox = memo(function StatBox({ label, value, Icon }) {
   );
 });
 
-const VideoRow = memo(function VideoRow({ v, hot }) {
+const VideoRow = memo(function VideoRow({ v, hot, onOpen }) {
   return (
-    <a
-      href={v.url}
-      target="_blank"
-      rel="noreferrer"
-      className="flex gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm"
+    <div
+      role="button"
+      onClick={() => onOpen(v.id)}
+      className="flex cursor-pointer gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm active:scale-[0.99]"
     >
       {v.thumbnail_url ? (
         <img
@@ -70,8 +69,8 @@ const VideoRow = memo(function VideoRow({ v, hot }) {
           <span className="flex items-center gap-1"><MessageCircle size={12} className="text-cyan-500" /> {fmt(v.comments)}</span>
         </div>
       </div>
-      <ExternalLink size={14} className="mt-1 shrink-0 text-slate-300" />
-    </a>
+      <ChevronRight size={18} className="mt-1 shrink-0 self-center text-slate-300" />
+    </div>
   );
 });
 
@@ -104,6 +103,11 @@ export default function CreatorProfile() {
       off = true;
     };
   }, [uid]);
+
+  const openVideo = useCallback(
+    (id) => navigate(`/app/creator/${uid}/video/${id}`),
+    [navigate, uid]
+  );
 
   const back = (
     <button
@@ -169,10 +173,7 @@ export default function CreatorProfile() {
           <SectionTitle icon={Trophy}>VINH DANH</SectionTitle>
           <div className="space-y-2.5">
             {p.honors.map((h) => (
-              <div
-                key={h.month}
-                className={`rounded-2xl border px-4 py-3 ${HONOR_STYLE[h.rank]}`}
-              >
+              <div key={h.month} className={`rounded-2xl border px-4 py-3 ${HONOR_STYLE[h.rank]}`}>
                 <p className="text-xl font-black">Top {h.rank}</p>
                 <p className="font-mono text-[11px] font-semibold opacity-80">
                   {monthText(h.month)} · {nf.format(h.points)} điểm
@@ -188,7 +189,7 @@ export default function CreatorProfile() {
           <SectionTitle icon={Flame} color="text-orange-600">VIDEO XU HƯỚNG</SectionTitle>
           <div className="space-y-2.5">
             {p.trending.map((v) => (
-              <VideoRow key={v.id} v={v} hot />
+              <VideoRow key={v.id} v={v} hot onOpen={openVideo} />
             ))}
           </div>
         </div>
@@ -201,7 +202,7 @@ export default function CreatorProfile() {
         ) : (
           <div className="space-y-2.5">
             {p.videos.slice(0, limit).map((v) => (
-              <VideoRow key={v.id} v={v} />
+              <VideoRow key={v.id} v={v} onOpen={openVideo} />
             ))}
             {p.videos.length > limit && (
               <button
@@ -216,4 +217,4 @@ export default function CreatorProfile() {
       </div>
     </div>
   );
-}
+                                                }
