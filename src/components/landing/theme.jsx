@@ -4,7 +4,7 @@ import { Gamepad2 } from "lucide-react";
 /* Design tokens dùng chung */
 export const INK = "text-[#06251f]";
 export const GLASS =
-  "border border-white/80 bg-white/70 backdrop-blur-xl shadow-[0_12px_40px_-14px_rgba(6,78,59,0.25)]";
+  "border border-white/80 bg-white/80 shadow-[0_12px_40px_-14px_rgba(6,78,59,0.25)] md:bg-white/70 md:backdrop-blur-xl";
 export const GRAD_TEXT =
   "bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 bg-clip-text text-transparent";
 
@@ -43,3 +43,5 @@ export function SectionTitle({ eyebrow, title, sub, center = true }) {
 export function GlassCard({ children, className = "" }) {
   return <div className={`${GLASS} rounded-[1.75rem] ${className}`}>{children}</div>;
 }
+
+
