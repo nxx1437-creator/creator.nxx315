@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useState } from "react";
 import {
-  Play, ExternalLink, AlertCircle, LineChart, Clock, Gift, Loader2,
+  Play, ExternalLink, AlertCircle, LineChart, Clock, Gift,
 } from "lucide-react";
 import { Card, CodeBox } from "./creatorUi.jsx";
 import {
@@ -20,6 +20,35 @@ const fmtTime = (d) => {
   const t = toDate(d);
   return t ? timeFmt.format(t) : "—";
 };
+
+/* ---------- logo nền tạm khi chưa có ảnh bìa ---------- */
+function PlatformLogo({ platform, className = "" }) {
+  if (platform === "youtube") {
+    return (
+      <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
+        <path fillRule="evenodd" d="M6 5h12a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V9a4 4 0 0 1 4-4zm4 4v6l5.2-3z" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
+      <circle cx="9.5" cy="16.5" r="4.6" />
+      <rect x="12.4" y="3" width="3.2" height="13.5" />
+      <path d="M15.6 3c.2 2.4 1.9 4.3 4.4 4.5v3.2c-1.7 0-3.2-.5-4.4-1.4z" />
+    </svg>
+  );
+}
+
+// Nền xám nhấp nháy + logo nền tảng (hiện khi ảnh bìa hỏng / đang tải)
+function Placeholder({ platform, children }) {
+  return (
+    <span className="absolute inset-0 flex flex-col items-center justify-center">
+      <span className="absolute inset-0 animate-pulse bg-slate-300" />
+      <PlatformLogo platform={platform} className="relative h-16 w-16 text-slate-500/80" />
+      {children}
+    </span>
+  );
+}
 
 /* ---------- PLAYER: hiện ảnh bìa, bấm mới nạp iframe ---------- */
 export const VideoPlayer = memo(function VideoPlayer({ video }) {
@@ -73,7 +102,7 @@ export const VideoPlayer = memo(function VideoPlayer({ video }) {
 
   return (
     <div>
-      <div className={`relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-100 via-teal-100 to-cyan-100 shadow-sm ${box}`}>
+      <div className={`relative overflow-hidden rounded-3xl bg-slate-200 shadow-sm ${box}`}>
         {play ? (
           <>
             <iframe
@@ -86,10 +115,11 @@ export const VideoPlayer = memo(function VideoPlayer({ video }) {
               onLoad={() => setLoaded(true)}
             />
             {!loaded && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-500">
-                <Loader2 size={30} className="animate-spin text-emerald-600" />
-                <p className="text-xs font-semibold">{slow ? "Tải hơi lâu, bạn chờ chút nhé…" : "Đang tải video…"}</p>
-              </div>
+              <Placeholder platform={platform}>
+                <span className="relative mt-3 text-xs font-semibold text-slate-500">
+                  {slow ? "Tải hơi lâu, bạn chờ chút nhé…" : "Đang tải video…"}
+                </span>
+              </Placeholder>
             )}
           </>
         ) : (
@@ -98,6 +128,7 @@ export const VideoPlayer = memo(function VideoPlayer({ video }) {
             className="relative block h-full w-full"
             aria-label="Phát video"
           >
+            <Placeholder platform={platform} />
             {poster && (
               <img
                 key={poster}
@@ -106,14 +137,14 @@ export const VideoPlayer = memo(function VideoPlayer({ video }) {
                 decoding="async"
                 referrerPolicy="no-referrer"
                 onError={() => setImgStage((s) => s + 1)}
-                className="h-full w-full object-cover"
+                className="relative h-full w-full object-cover"
               />
             )}
-            <span className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-              <span className={`flex h-16 w-16 items-center justify-center rounded-full text-white shadow-lg ${poster ? "bg-black/60" : "bg-emerald-600"}`}>
+            <span className={`absolute inset-0 flex flex-col items-center gap-2 ${poster ? "justify-center" : "justify-end pb-10"}`}>
+              <span className={`flex h-16 w-16 items-center justify-center rounded-full text-white shadow-lg ${poster ? "bg-black/60" : "bg-slate-700/80"}`}>
                 <Play size={30} fill="currentColor" />
               </span>
-              {!poster && <span className="text-xs font-bold text-emerald-800">Bấm để xem video</span>}
+              {!poster && <span className="text-xs font-bold text-slate-600">Bấm để xem video</span>}
             </span>
           </button>
         )}
