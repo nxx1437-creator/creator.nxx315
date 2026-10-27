@@ -119,18 +119,18 @@ function Hero({ hashtags }) {
         <span className="relative inline-flex w-full items-center gap-2 whitespace-nowrap rounded-full border border-emerald-700/25 bg-white/50 py-2.5 pl-4 pr-4 font-mono text-[10.5px] font-bold uppercase tracking-[0.1em] text-emerald-800 backdrop-blur sm:w-auto sm:text-[11px] sm:tracking-[0.16em]">
           <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-600" />
           Sân chơi dành riêng cho Gaming Creator
-          <GameBlock className="nx-float pointer-events-none absolute -left-4 -top-7 z-20 h-14 w-14 -rotate-6" />
+          <GameBlock className="nx-float pointer-events-none absolute -left-6 -top-9 z-20 h-12 w-12 -rotate-6" />
         </span>
 
         <div className="relative mt-7 w-full md:w-auto">
-          <BoltDrop className="nx-float-2 pointer-events-none absolute -right-2 top-[46%] z-0 h-20 w-16 sm:h-28 sm:w-24 md:-right-28 md:top-1/2 md:-translate-y-1/2" />
+          <BoltDrop className="nx-float-2 pointer-events-none absolute right-0 top-[32%] z-0 h-20 w-16 sm:h-28 sm:w-24 md:-right-28 md:top-1/2 md:-translate-y-1/2" />
           <h1 className={`relative z-10 text-[2.3rem] leading-[1.14] sm:text-6xl md:text-7xl ${INK}`}>
             Chơi game. Quay clip.
-            <span className={`block ${GRAD_TEXT}`}>Biến view thành tiền.</span>
+            <span className={`block ${GRAD_TEXT}`} style={{ textWrap: "balance" }}>Biến view thành tiền.</span>
           </h1>
         </div>
 
-        <p className="mt-7 max-w-xl text-[1.05rem] leading-[1.95] text-slate-600 md:text-lg">
+        <p className="mt-7 max-w-xl text-[1.05rem] leading-[1.8] text-slate-600 md:text-lg">
           Dành cho các <b className={INK}>Gamer</b> và <b className={INK}>Creator</b>. Làm video review/trải nghiệm
           game trên <b className={INK}>Nxx315 Studio</b> kèm hashtag{" "}
           {tags.map((t) => (
@@ -244,5 +244,6 @@ export default function Landing() {
       <Footer />
     </div>
   );
-    }
+                 }
+                   
               
