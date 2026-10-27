@@ -1,6 +1,6 @@
 import React from "react";
 import { Gift, ShieldCheck, RefreshCw, Trophy } from "lucide-react";
-import { SectionTitle, GlassCard, INK } from "./ui.jsx";
+import { SectionTitle, GlassCard, INK } from "./theme.jsx";
 
 const ITEMS = [
   {
@@ -66,4 +66,5 @@ export default function Features() {
     </section>
   );
 }
+
 
