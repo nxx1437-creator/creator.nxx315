@@ -1,6 +1,6 @@
-import React, { memo, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import {
-  Play, ExternalLink, AlertCircle, LineChart, Clock, Gift,
+  Play, ExternalLink, AlertCircle, LineChart, Clock, Gift, Loader2,
 } from "lucide-react";
 import { Card, CodeBox } from "./creatorUi.jsx";
 import {
@@ -11,70 +11,121 @@ const YT_RE = /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([A-Z
 const timeFmt = new Intl.DateTimeFormat("vi-VN", { dateStyle: "short", timeStyle: "medium" });
 const dayFmt = new Intl.DateTimeFormat("vi-VN", { dateStyle: "medium" });
 
+// Ngày null/sai định dạng không được làm sập cả trang
+const toDate = (d) => {
+  const t = d ? new Date(d) : null;
+  return t && !Number.isNaN(t.getTime()) ? t : null;
+};
+const fmtTime = (d) => {
+  const t = toDate(d);
+  return t ? timeFmt.format(t) : "—";
+};
+
 /* ---------- PLAYER: hiện ảnh bìa, bấm mới nạp iframe ---------- */
 export const VideoPlayer = memo(function VideoPlayer({ video }) {
   const [play, setPlay] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [slow, setSlow] = useState(false);
+  const [imgStage, setImgStage] = useState(0); // 0: ảnh lưu sẵn, 1: ảnh dự phòng, 2: không ảnh
   const { platform, url, thumbnail_url: thumb, external_id: ext } = video;
 
   let embed = null;
-  let poster = thumb;
+  let ytPoster = null;
   if (platform === "youtube") {
     const id = url?.match(YT_RE)?.[1] || (ext && ext.length === 11 ? ext : null);
     if (id) {
-      embed = `https://www.youtube.com/embed/${id}?autoplay=1`;
-      poster = poster || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+      embed = `https://www.youtube.com/embed/${id}?autoplay=1&playsinline=1&rel=0`;
+      ytPoster = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
     }
   } else if (platform === "tiktok") {
     const id = url?.match(/\/video\/(\d+)/)?.[1] || (/^\d+$/.test(ext || "") ? ext : null);
     if (id) embed = `https://www.tiktok.com/embed/v2/${id}`;
   }
 
+  // Ảnh bìa TikTok hay hết hạn -> thử ảnh dự phòng, hết cách thì dùng nền màu (không để mảng đen)
+  const candidates = [thumb, ytPoster].filter((v, i, a) => v && a.indexOf(v) === i);
+  const poster = candidates[imgStage] || null;
+
+  // Báo "tải hơi lâu" nếu iframe 8 giây chưa xong
+  useEffect(() => {
+    if (!play || loaded) return undefined;
+    const t = setTimeout(() => setSlow(true), 8000);
+    return () => clearTimeout(t);
+  }, [play, loaded]);
+
   const tall = platform === "tiktok";
-  const box = tall
-    ? "mx-auto w-full max-w-[315px] aspect-[9/16]"
-    : "w-full aspect-video";
+  const box = tall ? "mx-auto w-full max-w-[315px] aspect-[9/16]" : "w-full aspect-video";
+  const pfName = platform === "youtube" ? "YouTube" : "TikTok";
 
   if (!embed) {
     return (
-      <div className={`${box} flex flex-col items-center justify-center rounded-3xl bg-slate-900 p-5 text-center text-white/60`}>
+      <div className={`${box} flex flex-col items-center justify-center rounded-3xl bg-slate-100 p-5 text-center text-slate-500`}>
         <AlertCircle size={32} className="mb-2" />
         <p className="text-sm">Không thể nhúng video này trực tiếp.</p>
+        {url && (
+          <a href={url} target="_blank" rel="noreferrer" className="mt-3 text-sm font-bold text-cyan-600 underline">
+            Mở video
+          </a>
+        )}
       </div>
     );
   }
 
   return (
-    <div className={`relative overflow-hidden rounded-3xl bg-black shadow-sm ${box}`}>
-      {play ? (
-        <iframe
-          src={embed}
-          title="Video player"
-          className="h-full w-full"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
-      ) : (
-        <button
-          onClick={() => setPlay(true)}
-          className="relative block h-full w-full"
-          aria-label="Phát video"
-        >
-          {poster && (
-            <img
-              src={poster}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              referrerPolicy="no-referrer"
-              className="h-full w-full object-cover"
+    <div>
+      <div className={`relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-100 via-teal-100 to-cyan-100 shadow-sm ${box}`}>
+        {play ? (
+          <>
+            <iframe
+              src={embed}
+              title="Video player"
+              className={`h-full w-full transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+              allowFullScreen
+              referrerPolicy="strict-origin-when-cross-origin"
+              onLoad={() => setLoaded(true)}
             />
-          )}
-          <span className="absolute inset-0 flex items-center justify-center">
-            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-black/60 text-white">
-              <Play size={30} fill="currentColor" />
+            {!loaded && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-500">
+                <Loader2 size={30} className="animate-spin text-emerald-600" />
+                <p className="text-xs font-semibold">{slow ? "Tải hơi lâu, bạn chờ chút nhé…" : "Đang tải video…"}</p>
+              </div>
+            )}
+          </>
+        ) : (
+          <button
+            onClick={() => setPlay(true)}
+            className="relative block h-full w-full"
+            aria-label="Phát video"
+          >
+            {poster && (
+              <img
+                key={poster}
+                src={poster}
+                alt=""
+                decoding="async"
+                referrerPolicy="no-referrer"
+                onError={() => setImgStage((s) => s + 1)}
+                className="h-full w-full object-cover"
+              />
+            )}
+            <span className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+              <span className={`flex h-16 w-16 items-center justify-center rounded-full text-white shadow-lg ${poster ? "bg-black/60" : "bg-emerald-600"}`}>
+                <Play size={30} fill="currentColor" />
+              </span>
+              {!poster && <span className="text-xs font-bold text-emerald-800">Bấm để xem video</span>}
             </span>
-          </span>
-        </button>
+          </button>
+        )}
+      </div>
+
+      {play && (
+        <p className="mt-2 text-center text-[11px] text-slate-500">
+          Video không hiện?{" "}
+          <a href={url} target="_blank" rel="noreferrer" className="font-bold text-cyan-600 underline">
+            Mở trực tiếp trên {pfName}
+          </a>
+        </p>
       )}
     </div>
   );
@@ -108,9 +159,9 @@ export const RewardCard = memo(function RewardCard({ video }) {
   const lw = likeWord(video.platform);
   const table = TIERS[video.platform] || TIERS.tiktok;
 
-  const pub = new Date(video.video_published_at || video.published_at || video.created_at);
-  const due = new Date(pub.getTime() + 7 * 86400e3);
-  const daysLeft = Math.ceil((due.getTime() - Date.now()) / 86400e3);
+  const pub = toDate(video.video_published_at || video.published_at || video.created_at);
+  const due = pub ? new Date(pub.getTime() + 7 * 86400e3) : null;
+  const daysLeft = due ? Math.ceil((due.getTime() - Date.now()) / 86400e3) : null;
 
   if (video.status === "rejected") {
     return (
@@ -141,12 +192,14 @@ export const RewardCard = memo(function RewardCard({ video }) {
       </div>
       <p className="mt-1 text-xs font-medium text-slate-500">{est.label}</p>
 
-      <div className="mt-3 flex items-center gap-1.5 text-[11px] font-semibold text-slate-500">
-        <Clock size={13} className="text-cyan-600" />
-        {daysLeft > 0
-          ? `Chốt thưởng sau ${daysLeft} ngày nữa (${dayFmt.format(due)})`
-          : `Đã đủ 7 ngày (${dayFmt.format(due)}), chờ admin chốt thưởng`}
-      </div>
+      {due && (
+        <div className="mt-3 flex items-center gap-1.5 text-[11px] font-semibold text-slate-500">
+          <Clock size={13} className="text-cyan-600" />
+          {daysLeft > 0
+            ? `Chốt thưởng sau ${daysLeft} ngày nữa (${dayFmt.format(due)})`
+            : `Đã đủ 7 ngày (${dayFmt.format(due)}), chờ admin chốt thưởng`}
+        </div>
+      )}
 
       {est.next ? (
         <div className="mt-4 space-y-3 rounded-2xl border border-slate-100 bg-slate-50 p-3">
@@ -253,7 +306,7 @@ export const HistoryCard = memo(function HistoryCard({ samples }) {
       </p>
       {last && (
         <p className="mb-3 font-mono text-[10px] text-slate-400">
-          LẦN CUỐI: {timeFmt.format(new Date(last.sampled_at))}
+          LẦN CUỐI: {fmtTime(last.sampled_at)}
         </p>
       )}
 
@@ -293,7 +346,7 @@ export const HistoryCard = memo(function HistoryCard({ samples }) {
               {recent.map((m, i) => (
                 <tr key={i} className="border-b border-slate-50 last:border-0">
                   <td className="py-2.5 font-mono text-[10px] text-slate-500">
-                    {timeFmt.format(new Date(m.sampled_at))}
+                    {fmtTime(m.sampled_at)}
                   </td>
                   <td className="py-2.5 text-center font-bold text-slate-700">{vn(m.views || 0)}</td>
                   <td className="py-2.5 text-center font-bold text-slate-700">{vn(m.likes || 0)}</td>
@@ -320,3 +373,4 @@ export const OpenButton = memo(function OpenButton({ url, platform }) {
     </a>
   );
 });
+    
