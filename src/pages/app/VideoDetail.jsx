@@ -16,11 +16,19 @@ const fmtDay = (d) => {
   return t && !Number.isNaN(t.getTime()) ? dayFmt.format(t) : "—";
 };
 
-/* ====== YÊU CẦU VIDEO ======
-   Thêm yêu cầu vào đây sau, mỗi dòng một yêu cầu. Ví dụ:
-   "Video công khai, không để chế độ riêng tư",
-   Để trống thì trang hiện dòng "sẽ cập nhật sau". */
-const REQUIREMENTS = [];
+/* ====== YÊU CẦU VIDEO (lấy từ Thể lệ chương trình) ======
+   Muốn thêm/sửa thì chỉnh thẳng trong danh sách dưới, mỗi dòng một yêu cầu. */
+const REQUIREMENTS = [
+  "Đăng công khai trên kênh TikTok/YouTube đã liên kết với tài khoản Creator của bạn.",
+  "Nội dung giới thiệu NXX315 Studio, rõ ràng, dễ hiểu và trung thực.",
+  "Gắn đủ hashtag bắt buộc (xem phần Hashtag ở trên) trong tiêu đề hoặc mô tả.",
+  "Có tiêu đề và mô tả phù hợp với nội dung video.",
+  "Do bạn tự làm hoặc có quyền sử dụng hợp pháp, không sao chép hay đăng lại nội dung của người khác.",
+  "Chưa từng được gửi nhận thưởng trước đó, mỗi video chỉ được xét thưởng một lần.",
+  "Không mua lượt xem, lượt thích, bình luận và không dùng bot hay tương tác giả.",
+  "Tuân thủ quy định của nền tảng đăng tải và pháp luật hiện hành.",
+  "Số liệu được chốt sau 7 ngày kể từ lúc đăng công khai, cần đạt đồng thời lượt xem và lượt thích/tim của mốc thưởng.",
+];
 
 function StatBox({ label, value, Icon, hint }) {
   return (
@@ -229,6 +237,9 @@ export default function VideoDetail() {
             ))}
           </ul>
         )}
+        {REQUIREMENTS.length > 0 && (
+          <p className="mt-3 text-[11px] text-slate-400">Chi tiết đầy đủ xem ở mục Thể lệ chương trình.</p>
+        )}
       </Card>
 
       <div className="grid grid-cols-2 gap-3">
@@ -254,5 +265,5 @@ export default function VideoDetail() {
       <HistoryCard samples={rows} />
     </div>
   );
-          }
-            
+                                    }
+          
