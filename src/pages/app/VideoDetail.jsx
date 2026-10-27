@@ -11,6 +11,7 @@ export default function VideoDetail() {
   const navigate = useNavigate();
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isIframeLoaded, setIsIframeLoaded] = useState(false); // State kiểm tra iframe đã tải xong chưa
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -34,7 +35,6 @@ export default function VideoDetail() {
   // Hàm lấy ID video TikTok chuẩn
   const getTikTokEmbedUrl = (url) => {
     if (!url) return null;
-    // Tìm ID video trong link (dãy số dài)
     const match = url.match(/\/video\/(\d+)/);
     if (match && match[1]) {
       return `https://www.tiktok.com/embed/v2/${match[1]}`;
@@ -76,21 +76,31 @@ export default function VideoDetail() {
         </div>
       </div>
 
-      {/* KHUNG PHÁT VIDEO */}
-      <div className="w-full flex justify-center bg-black rounded-2xl overflow-hidden shadow-sm">
+      {/* KHUNG PHÁT VIDEO - ĐÃ THU GỌN CHIỀU CAO VÀ CÓ SKELETON XÁM */}
+      <div className="w-full flex justify-center rounded-2xl overflow-hidden shadow-sm bg-slate-100 relative min-h-[300px] max-h-[450px]">
+        
+        {/* 1. Skeleton nháy xám khi video CHƯA tải xong */}
+        {!isIframeLoaded && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-100 animate-pulse z-10">
+            <div className="h-12 w-12 rounded-full bg-slate-200 mb-3"></div>
+            <p className="text-xs font-bold text-slate-400">Đang tải video...</p>
+          </div>
+        )}
+
+        {/* 2. Khung iframe thật (ẩn đi khi chưa tải xong để tránh nền đen) */}
         {video.platform === 'tiktok' && tiktokEmbedUrl ? (
-          // Nhúng TikTok Player chuẩn (giống ảnh mẫu)
-          <div className="w-full aspect-[9/16] max-h-[600px] bg-[#000]">
+          <div className="w-full h-[400px] sm:h-[500px] bg-transparent">
             <iframe 
               src={tiktokEmbedUrl} 
               className="w-full h-full border-0" 
               allow="encrypted-media;" 
               allowFullScreen
+              onLoad={() => setIsIframeLoaded(true)} // Khi iframe tải xong thì tắt Skeleton
               title="TikTok video player"
             ></iframe>
           </div>
         ) : (
-          // Dành cho YouTube hoặc link lỗi
+          // Dành cho YouTube hoặc link lỗi (hiện ảnh bìa)
           <div className="w-full flex flex-col items-center justify-center p-5 text-center bg-slate-900 min-h-[250px] relative">
             {video.thumbnail_url && (
                <img src={video.thumbnail_url} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30" />
@@ -212,4 +222,4 @@ export default function VideoDetail() {
       </div>
     </div>
   );
-  }
+            }
