@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { LogIn, ArrowRight, Sparkles, Users, Film, Coins, Trophy, Hash } from "lucide-react";
 import { supabase } from "../lib/supabaseClient.js";
@@ -27,9 +27,20 @@ const CSS = `
 .nx-twinkle-2 { animation: nx-twinkle 4.1s ease-in-out -1.5s infinite; }
 .nx-h1 { font-size: clamp(2rem, 10vw, 3.8rem); line-height: 1.12; }
 @media (min-width: 768px) { .nx-h1 { font-size: clamp(2.4rem, 5.6vw, 3.6rem); line-height: 1.18; white-space: nowrap; } }
+@keyframes nx-pop { from { opacity: 0; transform: translateY(26px) scale(.55) rotate(-12deg); } to { opacity: .6; transform: translateY(0) scale(1) rotate(0deg); } }
+@keyframes nx-bob-a { 0%,100% { transform: translateY(0) scale(1) rotate(-6deg); } 50% { transform: translateY(-14px) scale(1.16) rotate(4deg); } }
+@keyframes nx-bob-b { 0%,100% { transform: translateY(0) scale(1) rotate(8deg); } 50% { transform: translateY(-16px) scale(1.18) rotate(-4deg); } }
+.nx-icon-a { animation: nx-pop 1.1s cubic-bezier(.2,.8,.2,1) .2s both, nx-bob-a 4.6s ease-in-out 1.3s infinite; }
+.nx-icon-b { animation: nx-pop 1.1s cubic-bezier(.2,.8,.2,1) .45s both, nx-bob-b 5.4s ease-in-out 1.55s infinite; }
+@keyframes nx-shimmer { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+.nx-shimmer { background-size: 220% 100%; animation: nx-shimmer 4.5s ease-in-out infinite alternate; }
+@keyframes nx-shine { from { transform: translateX(-130%) skewX(-20deg); } to { transform: translateX(560%) skewX(-20deg); } }
+.nx-shine { animation: nx-shine 3.6s ease-in-out 1.5s infinite; }
 .nx-rise { animation: nx-rise .8s cubic-bezier(.2,.7,.2,1) both; }
+.nx-d1 { animation-delay: .05s; } .nx-d2 { animation-delay: .18s; } .nx-d3 { animation-delay: .32s; } .nx-d4 { animation-delay: .46s; } .nx-d5 { animation-delay: .6s; }
 @media (prefers-reduced-motion: reduce) {
-  .nx-marquee, .nx-float, .nx-float-2, .nx-rise, .nx-twinkle, .nx-twinkle-2 { animation: none; }
+  .nx-marquee, .nx-float, .nx-float-2, .nx-rise, .nx-twinkle, .nx-twinkle-2, .nx-icon-a, .nx-icon-b, .nx-shimmer, .nx-shine { animation: none; }
+  .nx-icon-a, .nx-icon-b { opacity: .6; }
 }
 `;
 
@@ -43,6 +54,47 @@ function usePublicStats() {
     return () => { alive = false; };
   }, []);
   return stats;
+}
+
+/* ---------- hiệu ứng ---------- */
+function Reveal({ children }) {
+  const ref = useRef(null);
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!el || reduce || !("IntersectionObserver" in window)) { setOn(true); return; }
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setOn(true); io.disconnect(); } },
+      { threshold: 0.08, rootMargin: "0px 0px -6% 0px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className={`transition-all duration-700 ease-out ${on ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
+      {children}
+    </div>
+  );
+}
+
+function CountUp({ value }) {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    const to = Number(value) || 0;
+    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!to || reduce) { setN(to); return; }
+    let raf, t0 = null;
+    const step = (t) => {
+      if (t0 === null) t0 = t;
+      const p = Math.min(1, (t - t0) / 1300);
+      setN(Math.round(to * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+  return <>{fmtNum(n)}</>;
 }
 
 /* ---------- header ---------- */
@@ -139,23 +191,23 @@ function Hero({ hashtags }) {
       <Spark className="nx-twinkle-2 right-16 top-[17rem] h-4 w-4" color="#fff" />
       <Spark className="nx-twinkle left-3 top-[27rem] h-3.5 w-3.5" color="#22d3ee" />
       <Spark className="nx-twinkle-2 hidden md:block md:left-24 md:top-40 md:h-6 md:w-6" color="#fff" />
-      <div className="nx-rise relative z-10 flex flex-col items-start md:items-center">
-        <span className="relative inline-flex w-full items-center gap-2 whitespace-nowrap rounded-full border border-emerald-700/25 bg-white/50 py-2.5 pl-4 pr-4 font-mono text-[10.5px] font-bold uppercase tracking-[0.1em] text-emerald-800 backdrop-blur sm:w-auto sm:text-[11px] sm:tracking-[0.16em]">
+      <div className="relative z-10 flex flex-col items-start md:items-center">
+        <span className="nx-rise nx-d1 relative inline-flex w-full items-center gap-2 whitespace-nowrap rounded-full border border-emerald-700/25 bg-white/50 py-2.5 pl-4 pr-4 font-mono text-[10.5px] font-bold uppercase tracking-[0.1em] text-emerald-800 backdrop-blur sm:w-auto sm:text-[11px] sm:tracking-[0.16em]">
           <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-600" />
           Chương trình Creator · Nxx315
-          <GamePad className="nx-float pointer-events-none absolute -left-3 top-4 -z-10 h-14 w-14 -rotate-6" />
+          <GamePad className="nx-icon-a pointer-events-none absolute -left-3 top-4 -z-10 h-14 w-14" />
         </span>
 
-        <div className="relative mt-6 w-full md:w-auto">
-          <GoldCoin className="nx-float-2 pointer-events-none absolute right-0 top-[40%] z-0 h-14 w-14 sm:h-20 sm:w-20 md:-right-16 md:top-[8%] md:h-24 md:w-24" />
+        <div className="nx-rise nx-d2 relative mt-6 w-full md:w-auto">
+          <GoldCoin className="nx-icon-b pointer-events-none absolute right-0 top-[40%] z-0 h-14 w-14 sm:h-20 sm:w-20 md:-right-16 md:top-[8%] md:h-24 md:w-24" />
           <h1 className={`nx-h1 relative z-10 ${INK}`}>
             Quay clip.<br className="md:hidden" /> Leo top.
             <br />
-            <span className="whitespace-nowrap bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 bg-clip-text text-transparent">Ẵm thưởng lớn!.</span>
+            <span className="nx-shimmer whitespace-nowrap bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 bg-clip-text text-transparent">Ẵm thưởng thật.</span>
           </h1>
         </div>
 
-        <p className="mt-7 max-w-xl text-[1.05rem] leading-[1.8] text-slate-600 md:text-lg">
+        <p className="nx-rise nx-d3 mt-7 max-w-xl text-[1.05rem] leading-[1.8] text-slate-600 md:text-lg">
           Quay video review, trải nghiệm <b className={INK}>Nxx315 Studio</b> rồi đăng lên TikTok hoặc YouTube kèm hashtag{" "}
           {tags.map((t) => (
             <span
@@ -168,11 +220,12 @@ function Hero({ hashtags }) {
           . Video được duyệt nhận <b className={INK}>Gift Code VIP</b>, top bảng xếp hạng cuối tháng nhận <b className={INK}>tiền mặt</b>.
         </p>
 
-        <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+        <div className="nx-rise nx-d4 mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
           <Link
             to="/login"
-            className="group flex items-center justify-center gap-3 rounded-[1.25rem] bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-4 text-lg font-extrabold text-white shadow-xl shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:shadow-emerald-500/50"
+            className="group relative flex items-center justify-center gap-3 overflow-hidden rounded-[1.25rem] bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-4 text-lg font-extrabold text-white shadow-xl shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:shadow-emerald-500/50"
           >
+            <span aria-hidden="true" className="nx-shine pointer-events-none absolute inset-y-0 left-0 w-1/5 bg-white/35" />
             <Sparkles size={20} /> Gia nhập ngay
             <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
           </Link>
@@ -184,7 +237,7 @@ function Hero({ hashtags }) {
           </a>
         </div>
 
-        <p className="mt-6 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+        <p className="nx-rise nx-d5 mt-6 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
           ▸ Đăng ký miễn phí · Không giới hạn số video · Chốt thưởng cuối tháng
         </p>
       </div>
@@ -226,7 +279,7 @@ function StatsStrip({ stats }) {
             <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-md shadow-emerald-500/30">
               <Icon size={19} />
             </span>
-            <p className={`text-2xl font-black sm:text-4xl ${INK}`}>{stats ? fmtNum(value) : "—"}</p>
+            <p className={`text-2xl font-black sm:text-4xl ${INK}`}>{stats ? <CountUp value={value} /> : "—"}</p>
             <p className="mt-1 text-[11px] font-semibold leading-tight text-slate-500 sm:text-sm">{label}</p>
           </div>
         ))}
@@ -257,15 +310,15 @@ export default function Landing() {
       <main className="relative z-10">
         <Hero hashtags={stats?.settings?.hashtags || "#Nxx315Studio"} />
         <Ticker />
-        <StatsStrip stats={stats} />
-        <HowItWorks />
-        <Features />
-        <Ranking stats={stats} />
-        <Faq />
-        <FinalCta />
+        <Reveal><StatsStrip stats={stats} /></Reveal>
+        <Reveal><HowItWorks /></Reveal>
+        <Reveal><Features /></Reveal>
+        <Reveal><Ranking stats={stats} /></Reveal>
+        <Reveal><Faq /></Reveal>
+        <Reveal><FinalCta /></Reveal>
       </main>
       <Footer />
     </div>
   );
-    }
-                 
+          }
+          
