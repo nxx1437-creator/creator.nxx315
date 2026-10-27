@@ -267,9 +267,13 @@ export default function AppLayout() {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-cyan-600 text-xs font-bold uppercase text-white">
-                    {user?.email?.charAt(0) || "U"}
-                  </div>
+                                    user ? (
+                    <div className="flex h-full w-full items-center justify-center bg-cyan-600 text-xs font-bold uppercase text-white">
+                      {user.email?.charAt(0) || "U"}
+                    </div>
+                  ) : (
+                    <div className="h-full w-full bg-slate-200" />
+                  )
                 )}
               </button>
 
