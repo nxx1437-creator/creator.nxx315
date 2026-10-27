@@ -1,6 +1,6 @@
- import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, useOutletContext } from "react-router-dom";
-import { ArrowLeft, AlertCircle, Eye, Heart, MessageSquare, Share2, Calendar } from "lucide-react";
+import { ArrowLeft, AlertCircle, Eye, Heart, MessageSquare, Share2, Calendar, ListChecks, RefreshCw } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
 import { Card, StatusPill } from "../../components/creator/creatorUi.jsx";
 import {
@@ -9,6 +9,18 @@ import {
 import { vn, videoPoints } from "../../lib/videoReward.js";
 
 const dayFmt = new Intl.DateTimeFormat("vi-VN", { dateStyle: "short" });
+
+// Ngày lỗi/null thì không làm sập cả trang
+const fmtDay = (d) => {
+  const t = d ? new Date(d) : null;
+  return t && !Number.isNaN(t.getTime()) ? dayFmt.format(t) : "—";
+};
+
+/* ====== YÊU CẦU VIDEO ======
+   Thêm yêu cầu vào đây sau, mỗi dòng một yêu cầu. Ví dụ:
+   "Video công khai, không để chế độ riêng tư",
+   Để trống thì trang hiện dòng "sẽ cập nhật sau". */
+const REQUIREMENTS = [];
 
 function StatBox({ label, value, Icon, hint }) {
   return (
@@ -23,6 +35,20 @@ function StatBox({ label, value, Icon, hint }) {
   );
 }
 
+function Skeleton() {
+  return (
+    <div className="space-y-4 pb-10" aria-busy="true">
+      <div className="mt-2 h-5 w-40 animate-pulse rounded-full bg-slate-200/70" />
+      <div className="space-y-2 px-1">
+        <div className="h-3 w-32 animate-pulse rounded-full bg-slate-200/70" />
+        <div className="h-7 w-4/5 animate-pulse rounded-xl bg-slate-200/70" />
+      </div>
+      <div className="aspect-[9/16] max-h-[60vh] w-full animate-pulse rounded-3xl bg-slate-200/70" />
+      <div className="h-28 animate-pulse rounded-3xl bg-slate-200/70" />
+    </div>
+  );
+}
+
 export default function VideoDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -32,28 +58,38 @@ export default function VideoDetail() {
   const [video, setVideo] = useState(null);
   const [samples, setSamples] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let off = false;
+    setLoading(true);
+    setFailed(false);
     (async () => {
-      const [v, s] = await Promise.all([
-        supabase.from("intro_video_submissions").select("*").eq("id", id).maybeSingle(),
-        supabase
-          .from("video_metric_samples")
-          .select("sampled_at, views, likes, comments, shares")
-          .eq("video_id", id)
-          .order("sampled_at", { ascending: true })
-          .limit(200),
-      ]);
-      if (off) return;
-      setVideo(v.data || null);
-      setSamples(s.data || []);
-      setLoading(false);
+      try {
+        const [v, s] = await Promise.all([
+          supabase.from("intro_video_submissions").select("*").eq("id", id).maybeSingle(),
+          supabase
+            .from("video_metric_samples")
+            .select("sampled_at, views, likes, comments, shares")
+            .eq("video_id", id)
+            .order("sampled_at", { ascending: true })
+            .limit(200),
+        ]);
+        if (off) return;
+        if (v.error) throw v.error; // lỗi mạng/quyền -> báo lỗi, không báo "không tìm thấy"
+        setVideo(v.data || null);
+        setSamples(s.data || []);
+      } catch (e) {
+        if (!off) setFailed(true);
+      } finally {
+        if (!off) setLoading(false);
+      }
     })();
     return () => {
       off = true;
     };
-  }, [id]);
+  }, [id, attempt]);
 
   // Nếu chưa có mẫu nào nhưng video đã có số liệu -> dùng số liệu hiện tại làm 1 mẫu
   const rows = useMemo(() => {
@@ -74,7 +110,22 @@ export default function VideoDetail() {
     [hashtagsRaw]
   );
 
-  if (loading) return <div className="h-screen" />;
+  if (loading) return <Skeleton />;
+
+  if (failed) {
+    return (
+      <div className="mt-10 space-y-4 p-5 text-center">
+        <p className="text-slate-600">Không tải được video. Kiểm tra mạng rồi thử lại nhé.</p>
+        <button
+          onClick={() => setAttempt((n) => n + 1)}
+          className="inline-flex items-center gap-2 rounded-full bg-cyan-600 px-5 py-2.5 text-sm font-bold text-white"
+        >
+          <RefreshCw size={16} /> Thử lại
+        </button>
+      </div>
+    );
+  }
+
   if (!video) {
     return <div className="mt-10 p-5 text-center text-slate-500">Không tìm thấy video này.</div>;
   }
@@ -99,19 +150,20 @@ export default function VideoDetail() {
           {video.title || "Video không có tiêu đề"}
         </h1>
         <p className="mt-1 text-[13px] text-slate-500">
-          Theo dõi từ {dayFmt.format(new Date(video.created_at))}.
+          Theo dõi từ {fmtDay(video.created_at)}.
         </p>
         <div className="mt-3">
           <StatusPill status={video.status} />
         </div>
       </div>
 
-      <VideoPlayer video={video} />
+      {/* key: đổi video thì khung phát được dựng lại từ đầu */}
+      <VideoPlayer key={video.id} video={video} />
 
       <Card className="!p-4">
         <div className="flex items-center gap-2 font-mono text-[11px] text-slate-500">
           <Calendar size={14} />
-          {dayFmt.format(new Date(video.video_published_at || video.published_at || video.created_at))}
+          {fmtDay(video.video_published_at || video.published_at || video.created_at)}
           <span>·</span>
           {pf}
         </div>
@@ -161,27 +213,45 @@ export default function VideoDetail() {
         </div>
       </Card>
 
+      <Card>
+        <p className="mb-3 flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500">
+          <ListChecks size={14} /> ▸ YÊU CẦU VIDEO
+        </p>
+        {REQUIREMENTS.length === 0 ? (
+          <p className="text-sm text-slate-500">Các yêu cầu sẽ được cập nhật sau.</p>
+        ) : (
+          <ul className="space-y-2">
+            {REQUIREMENTS.map((r, i) => (
+              <li key={i} className="flex gap-2 text-sm text-slate-700">
+                <span className="mt-0.5 font-mono text-xs font-bold text-cyan-600">{String(i + 1).padStart(2, "0")}</span>
+                <span className="min-w-0 break-words">{r}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+
       <div className="grid grid-cols-2 gap-3">
         <StatBox label="LƯỢT XEM" value={vn(video.views || 0)} Icon={Eye} />
         <StatBox label="LƯỢT THÍCH" value={vn(video.likes || 0)} Icon={Heart} />
         <StatBox label="BÌNH LUẬN" value={vn(video.comments || 0)} Icon={MessageSquare} />
         <StatBox
-  label="ĐIỂM"
-  value={
-    video.status === "approved"
-      ? vn(videoPoints(video.views, video.likes, video.comments))
-      : 0
-  }
-  Icon={Share2}
-  hint={
-    video.status === "approved"
-      ? "Cộng vào xếp hạng tháng"
-      : "Tính khi video được duyệt"
-  }
-/>
+          label="ĐIỂM"
+          value={
+            video.status === "approved"
+              ? vn(videoPoints(video.views, video.likes, video.comments))
+              : 0
+          }
+          Icon={Share2}
+          hint={
+            video.status === "approved"
+              ? "Cộng vào xếp hạng tháng"
+              : "Tính khi video được duyệt"
+          }
+        />
       </div>
 
       <HistoryCard samples={rows} />
     </div>
   );
-    }
+}
