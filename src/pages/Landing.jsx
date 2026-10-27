@@ -35,8 +35,6 @@ const CSS = `
 .nx-icon-b { animation: nx-pop 1.1s cubic-bezier(.2,.8,.2,1) .45s both, nx-bob-b 5.4s ease-in-out 1.55s infinite; }
 @keyframes nx-shimmer { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
 .nx-shimmer { background-size: 220% 100%; animation: nx-shimmer 4.5s ease-in-out infinite alternate; }
-@keyframes nx-shine { from { transform: translateX(-130%) skewX(-20deg); } to { transform: translateX(560%) skewX(-20deg); } }
-.nx-shine { animation: nx-shine 3.6s ease-in-out 1.5s infinite; }
 .nx-rise { animation: nx-rise .8s cubic-bezier(.2,.7,.2,1) both; }
 .nx-d1 { animation-delay: .05s; } .nx-d2 { animation-delay: .18s; } .nx-d3 { animation-delay: .32s; } .nx-d4 { animation-delay: .46s; } .nx-d5 { animation-delay: .6s; }
 `;
@@ -220,9 +218,8 @@ function Hero({ hashtags }) {
         <div className="nx-rise nx-d4 mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
           <Link
             to="/login"
-            className="group relative flex items-center justify-center gap-3 overflow-hidden rounded-[1.25rem] bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-4 text-lg font-extrabold text-white shadow-xl shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:shadow-emerald-500/50"
+            className="group flex items-center justify-center gap-3 rounded-[1.25rem] bg-gradient-to-r from-emerald-500 to-teal-500 px-8 py-4 text-lg font-extrabold text-white shadow-xl shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:shadow-emerald-500/50"
           >
-            <span aria-hidden="true" className="nx-shine pointer-events-none absolute inset-y-0 left-0 w-1/5 bg-white/35" />
             <Sparkles size={20} /> Gia nhập ngay
             <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
           </Link>
@@ -319,5 +316,6 @@ export default function Landing() {
       <Footer />
     </div>
   );
-            }
+      }
+            
         
