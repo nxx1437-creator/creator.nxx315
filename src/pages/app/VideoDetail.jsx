@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { 
   ArrowLeft, ExternalLink, Eye, Heart, MessageSquare, Share2, 
-  AlertCircle, LineChart, Play
+  AlertCircle, LineChart
 } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
 
@@ -31,23 +31,27 @@ export default function VideoDetail() {
   if (loading) return <div className="h-screen bg-[#f4fbf9]"></div>;
   if (!video) return <div className="p-5 text-center mt-10">Không tìm thấy video này.</div>;
 
-  // Hàm tạo link nhúng tự động phát
-  const getEmbedUrl = (url, platform) => {
+  // Hàm lấy ID video TikTok chuẩn
+  const getTikTokEmbedUrl = (url) => {
     if (!url) return null;
-    if (platform === 'youtube') {
-      const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([A-Za-z0-9_-]{11})/);
-      // Thêm autoplay=1 và mute=1 (để trình duyệt cho phép tự động phát)
-      return match ? `https://www.youtube.com/embed/${match[1]}?autoplay=1&mute=1` : null;
-    }
-    if (platform === 'tiktok') {
-      const match = url.match(/\/video\/(\d+)/);
-      // TikTok không hỗ trợ autoplay qua iframe, nhưng vẫn nhúng được
-      return match ? `https://www.tiktok.com/embed/v2/${match[1]}` : null;
+    // Tìm ID video trong link (dãy số dài)
+    const match = url.match(/\/video\/(\d+)/);
+    if (match && match[1]) {
+      return `https://www.tiktok.com/embed/v2/${match[1]}`;
     }
     return null;
   };
 
-  const embedUrl = getEmbedUrl(video.url, video.platform);
+  const tiktokEmbedUrl = video.platform === 'tiktok' ? getTikTokEmbedUrl(video.url) : null;
+
+  const metrics = [
+    { 
+      time: new Date(video.created_at).toLocaleString("vi-VN"), 
+      views: video.views || 0, 
+      likes: video.likes || 0, 
+      comments: video.comments || 0 
+    }
+  ];
 
   return (
     <div className="space-y-4 pb-10">
@@ -72,27 +76,28 @@ export default function VideoDetail() {
         </div>
       </div>
 
-      {/* KHUNG PHÁT VIDEO TỰ ĐỘNG */}
+      {/* KHUNG PHÁT VIDEO */}
       <div className="w-full flex justify-center bg-black rounded-2xl overflow-hidden shadow-sm">
-        {embedUrl ? (
-          <div className={`w-full ${video.platform === 'tiktok' ? 'aspect-[9/16] max-h-[600px]' : 'aspect-video'}`}>
+        {video.platform === 'tiktok' && tiktokEmbedUrl ? (
+          // Nhúng TikTok Player chuẩn (giống ảnh mẫu)
+          <div className="w-full aspect-[9/16] max-h-[600px] bg-[#000]">
             <iframe 
-              src={embedUrl} 
-              className="w-full h-full" 
-              allow="autoplay; encrypted-media; picture-in-picture" 
+              src={tiktokEmbedUrl} 
+              className="w-full h-full border-0" 
+              allow="encrypted-media;" 
               allowFullScreen
-              title="Video player"
+              title="TikTok video player"
             ></iframe>
           </div>
         ) : (
-          // Nếu không nhúng được, hiện ảnh bìa và nút mở tab mới
-          <div className="w-full flex flex-col items-center justify-center p-5 text-center bg-slate-900 min-h-[250px]">
-            {video.thumbnail_url ? (
+          // Dành cho YouTube hoặc link lỗi
+          <div className="w-full flex flex-col items-center justify-center p-5 text-center bg-slate-900 min-h-[250px] relative">
+            {video.thumbnail_url && (
                <img src={video.thumbnail_url} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30" />
-            ) : null}
+            )}
             <div className="relative z-10 flex flex-col items-center">
               <AlertCircle size={32} className="text-white/50 mb-2" />
-              <p className="text-sm font-semibold text-white/80">Không thể nhúng video trực tiếp</p>
+              <p className="text-sm font-semibold text-white/80">Video này không hỗ trợ xem trực tiếp trên web</p>
               <a href={video.url} target="_blank" rel="noreferrer" className="mt-4 flex items-center gap-2 rounded-full bg-cyan-600 px-6 py-2.5 text-sm font-bold text-white shadow-md hover:bg-cyan-700 transition">
                 Mở trên {video.platform} <ExternalLink size={16} />
               </a>
@@ -108,6 +113,7 @@ export default function VideoDetail() {
         </a>
       </div>
 
+      {/* LÝ DO TỪ CHỐI */}
       {video.status === 'rejected' && (
         <div className="rounded-2xl border border-rose-200 bg-rose-50 p-5 mt-4">
           <div className="flex items-center gap-2 text-rose-600 font-bold text-sm mb-2">
@@ -123,6 +129,7 @@ export default function VideoDetail() {
         </div>
       )}
 
+      {/* HASHTAG */}
       <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm mt-4">
         <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">▸ HASHTAG</p>
         <p className="text-xs font-bold text-slate-600 mb-2">BẮT BUỘC</p>
@@ -133,6 +140,7 @@ export default function VideoDetail() {
         </div>
       </div>
 
+      {/* THỐNG KÊ */}
       <div className="grid grid-cols-2 gap-3 mt-4">
         <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between text-slate-400 mb-2">
@@ -160,19 +168,48 @@ export default function VideoDetail() {
         </div>
       </div>
 
+      {/* LỊCH SỬ CHỈ SỐ */}
       <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm mt-4">
         <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">▸ LỊCH SỬ CHỈ SỐ</p>
-        <p className="text-sm font-bold text-slate-800 mb-1">LƯỢT XEM (1 MẪU)</p>
+        <p className="text-sm font-bold text-slate-800 mb-1">LƯỢT XEM ({metrics.length} MẪU)</p>
         <p className="text-[10px] text-slate-400 font-mono mb-4">LẦN CUỐI: {new Date(video.created_at).toLocaleString("vi-VN")}</p>
         
-        <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-8 text-center flex flex-col items-center justify-center mb-4">
-          <div className="h-10 w-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 mb-3">
-            <LineChart size={20} />
-          </div>
-          <p className="text-[13px] font-bold tracking-widest text-slate-600 uppercase">ĐANG CHỜ THÊM MẪU</p>
-          <p className="text-[12px] text-slate-500 mt-1">Cần ít nhất 2 mẫu để vẽ biểu đồ xu hướng.</p>
+        {metrics.length < 2 ? (
+           <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-8 text-center flex flex-col items-center justify-center mb-4">
+             <div className="h-10 w-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 mb-3">
+                <LineChart size={20} />
+             </div>
+             <p className="text-[13px] font-bold tracking-widest text-slate-600 uppercase">ĐANG CHỜ THÊM MẪU</p>
+             <p className="text-[12px] text-slate-500 mt-1">Cần ít nhất 2 mẫu để vẽ biểu đồ xu hướng.</p>
+           </div>
+        ) : (
+           <div className="h-32 w-full bg-slate-50 rounded-xl mb-4"></div>
+        )}
+
+        <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2 mt-6">▸ MẪU GẦN ĐÂY</p>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-[11px]">
+            <thead className="text-slate-400 border-b border-slate-100">
+              <tr>
+                <th className="pb-2 font-bold uppercase">Thời điểm</th>
+                <th className="pb-2 font-bold uppercase text-center">Lượt xem</th>
+                <th className="pb-2 font-bold uppercase text-center">Lượt thích</th>
+                <th className="pb-2 font-bold uppercase text-center">Bình luận</th>
+              </tr>
+            </thead>
+            <tbody>
+              {metrics.map((m, i) => (
+                <tr key={i} className="border-b border-slate-50 last:border-0">
+                  <td className="py-3 font-mono text-[10px] text-slate-500">{m.time}</td>
+                  <td className="py-3 text-center font-bold text-slate-700">{m.views}</td>
+                  <td className="py-3 text-center font-bold text-slate-700">{m.likes}</td>
+                  <td className="py-3 text-center font-bold text-slate-700">{m.comments}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   );
-        }
+  }
