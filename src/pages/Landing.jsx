@@ -126,7 +126,7 @@ function Hero({ hashtags }) {
           <BoltDrop className="nx-float-2 pointer-events-none absolute right-0 top-[32%] z-0 h-20 w-16 sm:h-28 sm:w-24 md:-right-28 md:top-1/2 md:-translate-y-1/2" />
           <h1 className={`relative z-10 text-[2.3rem] leading-[1.14] sm:text-6xl md:text-7xl ${INK}`}>
             Chơi game. Quay clip.
-            <span className={`block ${GRAD_TEXT}`} style={{ textWrap: "balance" }}>Biến view thành tiền.</span>
+            <span className={`block [text-wrap:balance] ${GRAD_TEXT}`}>Biến view thành tiền.</span>
           </h1>
         </div>
 
@@ -244,6 +244,5 @@ export default function Landing() {
       <Footer />
     </div>
   );
-                 }
-                   
-              
+     }
+               
