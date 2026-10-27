@@ -25,6 +25,7 @@ const CSS = `
 @keyframes nx-twinkle { 0%,100% { opacity: .3; transform: scale(.75) rotate(0deg); } 50% { opacity: 1; transform: scale(1.1) rotate(25deg); } }
 .nx-twinkle { animation: nx-twinkle 3.2s ease-in-out infinite; }
 .nx-twinkle-2 { animation: nx-twinkle 4.1s ease-in-out -1.5s infinite; }
+.nx-h1 { font-size: clamp(1.4rem, 7.1vw, 4.25rem); line-height: 1.18; }
 .nx-rise { animation: nx-rise .8s cubic-bezier(.2,.7,.2,1) both; }
 @media (prefers-reduced-motion: reduce) {
   .nx-marquee, .nx-float, .nx-float-2, .nx-rise, .nx-twinkle, .nx-twinkle-2 { animation: none; }
@@ -149,14 +150,16 @@ function Hero({ hashtags }) {
         <span className="relative inline-flex w-full items-center gap-2 whitespace-nowrap rounded-full border border-emerald-700/25 bg-white/50 py-2.5 pl-4 pr-4 font-mono text-[10.5px] font-bold uppercase tracking-[0.1em] text-emerald-800 backdrop-blur sm:w-auto sm:text-[11px] sm:tracking-[0.16em]">
           <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-600" />
           Sân chơi dành riêng cho Gaming Creator
-          <GameBlock className="nx-float pointer-events-none absolute -left-2 -top-9 z-20 h-12 w-12 -rotate-6" />
+          <GameBlock className="nx-float pointer-events-none absolute -left-2 -top-9 -z-10 h-12 w-12 -rotate-6" />
         </span>
 
         <div className="relative mt-7 w-full md:w-auto">
-          <BoltDrop className="nx-float-2 pointer-events-none absolute right-0 top-[32%] z-0 h-20 w-16 sm:h-28 sm:w-24 md:-right-28 md:top-1/2 md:-translate-y-1/2" />
-          <h1 className={`relative z-10 text-[2.3rem] leading-[1.14] sm:text-6xl md:text-7xl ${INK}`}>
-            Chơi game. Quay clip.
-            <span className="block [text-wrap:balance]"><span className="bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 bg-clip-text text-transparent [-webkit-box-decoration-break:clone] [box-decoration-break:clone]">Biến view thành tiền.</span></span>
+          <BoltDrop className="nx-float-2 pointer-events-none absolute -right-2 -top-12 z-0 h-20 w-16 sm:-right-6 sm:-top-16 sm:h-28 sm:w-24 md:-right-14" />
+          <h1 className={`nx-h1 relative z-10 whitespace-nowrap ${INK}`}>
+            <span className="block">Chơi game. Quay clip.</span>
+            <span className="block">
+              <span className="bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 bg-clip-text text-transparent">Biến view thành tiền.</span>
+            </span>
           </h1>
         </div>
 
@@ -274,6 +277,4 @@ export default function Landing() {
       <Footer />
     </div>
   );
-      }
-            
-               
+        }
