@@ -1,6 +1,6 @@
 import React from "react";
 import { Link2, Video, ShieldCheck } from "lucide-react";
-import { SectionTitle, GlassCard, INK } from "./ui.jsx";
+import { SectionTitle, GlassCard, INK } from "./theme.jsx";
 
 const STEPS = [
   {
@@ -50,3 +50,4 @@ export default function HowItWorks() {
     </section>
   );
 }
+
