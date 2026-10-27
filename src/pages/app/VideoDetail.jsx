@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { 
   ArrowLeft, ExternalLink, Eye, Heart, MessageSquare, Share2, 
-  AlertCircle, LineChart
+  AlertCircle, LineChart, Play
 } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
 
@@ -11,7 +11,6 @@ export default function VideoDetail() {
   const navigate = useNavigate();
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isIframeLoaded, setIsIframeLoaded] = useState(false); // State kiểm tra iframe đã tải xong chưa
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -32,18 +31,6 @@ export default function VideoDetail() {
   if (loading) return <div className="h-screen bg-[#f4fbf9]"></div>;
   if (!video) return <div className="p-5 text-center mt-10">Không tìm thấy video này.</div>;
 
-  // Hàm lấy ID video TikTok chuẩn
-  const getTikTokEmbedUrl = (url) => {
-    if (!url) return null;
-    const match = url.match(/\/video\/(\d+)/);
-    if (match && match[1]) {
-      return `https://www.tiktok.com/embed/v2/${match[1]}`;
-    }
-    return null;
-  };
-
-  const tiktokEmbedUrl = video.platform === 'tiktok' ? getTikTokEmbedUrl(video.url) : null;
-
   const metrics = [
     { 
       time: new Date(video.created_at).toLocaleString("vi-VN"), 
@@ -52,6 +39,15 @@ export default function VideoDetail() {
       comments: video.comments || 0 
     }
   ];
+
+  // Chỉ nhúng iframe nếu là YouTube
+  const getYoutubeEmbed = (url) => {
+    if (!url) return null;
+    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([A-Za-z0-9_-]{11})/);
+    return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+  };
+
+  const youtubeEmbedUrl = video.platform === 'youtube' ? getYoutubeEmbed(video.url) : null;
 
   return (
     <div className="space-y-4 pb-10">
@@ -76,43 +72,52 @@ export default function VideoDetail() {
         </div>
       </div>
 
-      {/* KHUNG PHÁT VIDEO - ĐÃ THU GỌN CHIỀU CAO VÀ CÓ SKELETON XÁM */}
-      <div className="w-full flex justify-center rounded-2xl overflow-hidden shadow-sm bg-slate-100 relative min-h-[300px] max-h-[450px]">
+      {/* KHUNG HIỂN THỊ VIDEO */}
+      <div className="w-full rounded-2xl overflow-hidden shadow-sm bg-slate-100 relative min-h-[300px] max-h-[450px] flex justify-center">
         
-        {/* 1. Skeleton nháy xám khi video CHƯA tải xong */}
-        {!isIframeLoaded && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-100 animate-pulse z-10">
-            <div className="h-12 w-12 rounded-full bg-slate-200 mb-3"></div>
-            <p className="text-xs font-bold text-slate-400">Đang tải video...</p>
-          </div>
-        )}
-
-        {/* 2. Khung iframe thật (ẩn đi khi chưa tải xong để tránh nền đen) */}
-        {video.platform === 'tiktok' && tiktokEmbedUrl ? (
-          <div className="w-full h-[400px] sm:h-[500px] bg-transparent">
+        {/* Nếu là YouTube -> Nhúng iframe */}
+        {youtubeEmbedUrl ? (
+          <div className="w-full h-[300px] sm:h-[400px]">
             <iframe 
-              src={tiktokEmbedUrl} 
+              src={youtubeEmbedUrl} 
               className="w-full h-full border-0" 
-              allow="encrypted-media;" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
               allowFullScreen
-              onLoad={() => setIsIframeLoaded(true)} // Khi iframe tải xong thì tắt Skeleton
-              title="TikTok video player"
+              title="YouTube video player"
             ></iframe>
           </div>
         ) : (
-          // Dành cho YouTube hoặc link lỗi (hiện ảnh bìa)
-          <div className="w-full flex flex-col items-center justify-center p-5 text-center bg-slate-900 min-h-[250px] relative">
-            {video.thumbnail_url && (
-               <img src={video.thumbnail_url} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30" />
+          // Nếu là TikTok hoặc link lỗi -> Hiện ảnh bìa
+          <a 
+            href={video.url} 
+            target="_blank" 
+            rel="noreferrer"
+            className="relative block w-full h-[300px] sm:h-[400px] group"
+          >
+            {video.thumbnail_url ? (
+              <img 
+                src={video.thumbnail_url} 
+                alt={video.title} 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-slate-400 bg-slate-200">
+                Không có ảnh bìa
+              </div>
             )}
-            <div className="relative z-10 flex flex-col items-center">
-              <AlertCircle size={32} className="text-white/50 mb-2" />
-              <p className="text-sm font-semibold text-white/80">Video này không hỗ trợ xem trực tiếp trên web</p>
-              <a href={video.url} target="_blank" rel="noreferrer" className="mt-4 flex items-center gap-2 rounded-full bg-cyan-600 px-6 py-2.5 text-sm font-bold text-white shadow-md hover:bg-cyan-700 transition">
-                Mở trên {video.platform} <ExternalLink size={16} />
-              </a>
+            
+            <div className="absolute inset-0 bg-black/20 flex items-center justify-center transition group-hover:bg-black/40">
+               <div className="h-14 w-14 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center text-white border border-white/50 group-hover:scale-110 transition">
+                 <Play size={28} fill="currentColor" className="ml-1" />
+               </div>
             </div>
-          </div>
+
+            <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-3 flex items-center justify-between text-white">
+               <div className="flex items-center gap-2 text-xs font-semibold">
+                  <ExternalLink size={14} /> Bấm để xem trên {video.platform}
+               </div>
+            </div>
+          </a>
         )}
       </div>
 
@@ -222,4 +227,4 @@ export default function VideoDetail() {
       </div>
     </div>
   );
-            }
+      }
