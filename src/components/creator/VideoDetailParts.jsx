@@ -3,6 +3,7 @@ import {
   Play, ExternalLink, AlertCircle, LineChart, Clock, Gift,
 } from "lucide-react";
 import { Card, CodeBox } from "./creatorUi.jsx";
+import { TIKTOK_LOGO, YOUTUBE_LOGO } from "./platformLogos.js";
 import {
   LOW_TIERS, TIERS, estimateReward, likeWord, vn,
 } from "../../lib/videoReward.js";
@@ -23,19 +24,13 @@ const fmtTime = (d) => {
 
 /* ---------- logo nền tạm khi chưa có ảnh bìa ---------- */
 function PlatformLogo({ platform, className = "" }) {
-  if (platform === "youtube") {
-    return (
-      <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
-        <path fillRule="evenodd" d="M6 5h12a4 4 0 0 1 4 4v6a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V9a4 4 0 0 1 4-4zm4 4v6l5.2-3z" />
-      </svg>
-    );
-  }
   return (
-    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
-      <circle cx="9.5" cy="16.5" r="4.6" />
-      <rect x="12.4" y="3" width="3.2" height="13.5" />
-      <path d="M15.6 3c.2 2.4 1.9 4.3 4.4 4.5v3.2c-1.7 0-3.2-.5-4.4-1.4z" />
-    </svg>
+    <img
+      src={platform === "youtube" ? YOUTUBE_LOGO : TIKTOK_LOGO}
+      alt=""
+      draggable={false}
+      className={className}
+    />
   );
 }
 
@@ -44,7 +39,7 @@ function Placeholder({ platform, children }) {
   return (
     <span className="absolute inset-0 flex flex-col items-center justify-center">
       <span className="absolute inset-0 animate-pulse bg-slate-300" />
-      <PlatformLogo platform={platform} className="relative h-16 w-16 text-slate-500/80" />
+      <PlatformLogo platform={platform} className="relative h-16 w-16 opacity-90" />
       {children}
     </span>
   );
@@ -404,4 +399,4 @@ export const OpenButton = memo(function OpenButton({ url, platform }) {
     </a>
   );
 });
-    
+        
