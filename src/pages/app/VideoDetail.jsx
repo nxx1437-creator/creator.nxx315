@@ -67,6 +67,9 @@ export default function VideoDetail() {
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  
+  // KHAI BÁO STATE CHO PHẦN THU GỌN YÊU CẦU
+  const [showRequirements, setShowRequirements] = useState(false);
 
   useEffect(() => {
     let off = false;
@@ -141,32 +144,24 @@ export default function VideoDetail() {
 
   // Hàm kiểm tra trạng thái từng yêu cầu
   const getRequirementStatus = (reqText, index) => {
-    // 1. Nếu video bị từ chối, hiển thị X cho tất cả (trừ khi có thể đoán lý do)
     if (video.status === 'rejected') {
-      // Nếu lý do từ chối có nhắc đến hashtag -> Yêu cầu số 3 (index 2) bị X
       if (video.admin_note?.toLowerCase().includes('hashtag') && index === 2) {
         return <XCircle size={16} className="text-rose-500 shrink-0 mt-0.5" />;
       }
-      // Mặc định là X cho các yêu cầu khác
       return <XCircle size={16} className="text-rose-500 shrink-0 mt-0.5" />;
     }
 
-    // 2. Nếu đã duyệt -> Hiển thị ✓ cho tất cả
     if (video.status === 'approved') {
       return <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />;
     }
 
-    // 3. Nếu đang chờ duyệt -> Kiểm tra những gì có thể tự động
     if (video.status === 'pending') {
-      // Yêu cầu số 3 (index 2): Hashtag (tự động kiểm tra)
       if (index === 2) {
-        // Kiểm tra xem có đủ các tag không
         const hasAllTags = tags.every(tag => content.includes(tag.toLowerCase()));
         return hasAllTags 
           ? <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />
           : <XCircle size={16} className="text-rose-500 shrink-0 mt-0.5" />;
       }
-      // Các yêu cầu khác -> Đang chờ admin duyệt
       return <Clock size={16} className="text-amber-500 shrink-0 mt-0.5" />;
     }
 
@@ -253,35 +248,35 @@ export default function VideoDetail() {
       </Card>
 
       {/* PHẦN YÊU CẦU VIDEO (DẠNG THU GỌN) */}
-<Card>
-  <button 
-    onClick={() => setShowRequirements(!showRequirements)}
-    className="flex w-full items-center justify-between font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500"
-  >
-    <span className="flex items-center gap-2">
-      <ListChecks size={14} /> ▸ YÊU CẦU VIDEO
-    </span>
-    <ChevronDown size={16} className={`transition-transform ${showRequirements ? 'rotate-180' : ''}`} />
-  </button>
+      <Card>
+        <button 
+          onClick={() => setShowRequirements(!showRequirements)}
+          className="flex w-full items-center justify-between font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500"
+        >
+          <span className="flex items-center gap-2">
+            <ListChecks size={14} /> ▸ YÊU CẦU VIDEO
+          </span>
+          <ChevronDown size={16} className={`transition-transform ${showRequirements ? 'rotate-180' : ''}`} />
+        </button>
 
-  {showRequirements && (
-    <div className="mt-4 pt-4 border-t border-slate-100 animate-in fade-in slide-in-from-top-2">
-      {REQUIREMENTS.length === 0 ? (
-        <p className="text-sm text-slate-500">Các yêu cầu sẽ được cập nhật sau.</p>
-      ) : (
-        <ul className="space-y-3">
-          {REQUIREMENTS.map((r, i) => (
-            <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700">
-              {getRequirementStatus(r, i)}
-              <span className="min-w-0 break-words">{r}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-      <p className="mt-3 text-[11px] text-slate-400">Chi tiết đầy đủ xem ở mục Thể lệ chương trình.</p>
-    </div>
-  )}
-</Card>
+        {showRequirements && (
+          <div className="mt-4 pt-4 border-t border-slate-100 animate-in fade-in slide-in-from-top-2">
+            {REQUIREMENTS.length === 0 ? (
+              <p className="text-sm text-slate-500">Các yêu cầu sẽ được cập nhật sau.</p>
+            ) : (
+              <ul className="space-y-3">
+                {REQUIREMENTS.map((r, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700">
+                    {getRequirementStatus(r, i)}
+                    <span className="min-w-0 break-words">{r}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <p className="mt-3 text-[11px] text-slate-400">Chi tiết đầy đủ xem ở mục Thể lệ chương trình.</p>
+          </div>
+        )}
+      </Card>
 
       <div className="grid grid-cols-2 gap-3">
         <StatBox label="LƯỢT XEM" value={vn(video.views || 0)} Icon={Eye} />
@@ -306,4 +301,4 @@ export default function VideoDetail() {
       <HistoryCard samples={rows} />
     </div>
   );
-        }        
+                                                }
