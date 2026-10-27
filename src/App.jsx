@@ -5,6 +5,7 @@ import { supabase } from "./lib/supabaseClient.js";
 
 import VideoDetail from "./pages/app/VideoDetail.jsx";
 import CreatorProfile from "./pages/app/CreatorProfile.jsx";
+import PublicVideo from "./pages/app/PublicVideo.jsx";
 import Help from "./pages/app/Help.jsx";
 import Payout from "./pages/app/Payout.jsx";
 import Rules from "./pages/app/Rules.jsx";
@@ -112,6 +113,7 @@ export default function App() {
           <Route path="help" element={<Help />} />
           <Route path="videos/:id" element={<VideoDetail />} />
           <Route path="creator/:uid" element={<CreatorProfile />} />
+          <Route path="creator/:uid/video/:id" element={<PublicVideo />} />
           <Route path="rules" element={<Rules />} />
         </Route>
 
