@@ -181,6 +181,8 @@ export default function AppLayout() {
   const outletCtx = useMemo(() => ({ ov, reload }), [ov, reload]);
 
   const user = session?.user;
+  // Ảnh lấy từ phiên đăng nhập, chưa có thì dùng ảnh server đã trả sẵn
+  const avatarUrl = user?.user_metadata?.avatar_url || ov?.avatar;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#f4fbf9] to-[#e6f7fa] pb-28 font-sans text-slate-800">
@@ -256,9 +258,9 @@ export default function AppLayout() {
                 onClick={() => setShowProfile(!showProfile)}
                 className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100 shadow-sm"
               >
-                {user?.user_metadata?.avatar_url ? (
+                {avatarUrl ? (
                   <img
-                    src={user.user_metadata.avatar_url}
+                    src={avatarUrl}
                     alt="Avatar"
                     width={32}
                     height={32}
@@ -266,14 +268,12 @@ export default function AppLayout() {
                     referrerPolicy="no-referrer"
                     className="h-full w-full object-cover"
                   />
+                ) : user ? (
+                  <div className="flex h-full w-full items-center justify-center bg-cyan-600 text-xs font-bold uppercase text-white">
+                    {user.email?.charAt(0) || "U"}
+                  </div>
                 ) : (
-                                    user ? (
-                    <div className="flex h-full w-full items-center justify-center bg-cyan-600 text-xs font-bold uppercase text-white">
-                      {user.email?.charAt(0) || "U"}
-                    </div>
-                  ) : (
-                    <div className="h-full w-full bg-slate-200" />
-                  )
+                  <div className="h-full w-full bg-slate-200" />
                 )}
               </button>
 
@@ -281,7 +281,7 @@ export default function AppLayout() {
                 <div className="absolute right-0 mt-3 w-56 rounded-2xl border border-slate-100 bg-white py-2 shadow-xl">
                   <div className="mb-1 border-b border-slate-100 px-4 py-2">
                     <p className="truncate font-bold text-slate-800">
-                      {user?.user_metadata?.full_name || "Creator"}
+                      {ov?.username || user?.user_metadata?.full_name || "Creator"}
                     </p>
                     <p className="truncate text-xs text-slate-500">{user?.email}</p>
                   </div>
