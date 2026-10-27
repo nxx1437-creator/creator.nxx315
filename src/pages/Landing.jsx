@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { LogIn, ArrowRight, Sparkles, Users, Film, Coins, Trophy, Hash } from "lucide-react";
 import { supabase } from "../lib/supabaseClient.js";
 import { fmtNum } from "../components/landing/ui.jsx";
-import { Logo, INK, GLASS, GRAD_TEXT } from "../components/landing/theme.jsx";
+import { Logo, INK, GLASS } from "../components/landing/theme.jsx";
 import HowItWorks from "../components/landing/HowItWorks.jsx";
 import Features from "../components/landing/Features.jsx";
 import Ranking from "../components/landing/Ranking.jsx";
@@ -22,9 +22,12 @@ const CSS = `
 .nx-marquee { animation: nx-marquee 28s linear infinite; }
 .nx-float { animation: nx-float 5s ease-in-out infinite; }
 .nx-float-2 { animation: nx-float 6.5s ease-in-out -2s infinite; }
+@keyframes nx-twinkle { 0%,100% { opacity: .3; transform: scale(.75) rotate(0deg); } 50% { opacity: 1; transform: scale(1.1) rotate(25deg); } }
+.nx-twinkle { animation: nx-twinkle 3.2s ease-in-out infinite; }
+.nx-twinkle-2 { animation: nx-twinkle 4.1s ease-in-out -1.5s infinite; }
 .nx-rise { animation: nx-rise .8s cubic-bezier(.2,.7,.2,1) both; }
 @media (prefers-reduced-motion: reduce) {
-  .nx-marquee, .nx-float, .nx-float-2, .nx-rise { animation: none; }
+  .nx-marquee, .nx-float, .nx-float-2, .nx-rise, .nx-twinkle, .nx-twinkle-2 { animation: none; }
 }
 `;
 
@@ -71,41 +74,59 @@ function Header() {
 /* ---------- game art (SVG tự vẽ) ---------- */
 function GameBlock({ className = "" }) {
   return (
-    <svg viewBox="0 0 100 100" className={className} aria-hidden="true">
+    <svg viewBox="0 0 100 100" className={`drop-shadow-[0_10px_12px_rgba(180,83,9,0.3)] ${className}`} aria-hidden="true">
       <defs>
-        <linearGradient id="nx-gb" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#fef08a" />
-          <stop offset="1" stopColor="#facc15" />
+        <linearGradient id="nx-gb-t" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#fefce8" />
+          <stop offset="1" stopColor="#fde047" />
+        </linearGradient>
+        <linearGradient id="nx-gb-l" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#fbbf24" />
+          <stop offset="1" stopColor="#f59e0b" />
+        </linearGradient>
+        <linearGradient id="nx-gb-r" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#f59e0b" />
+          <stop offset="1" stopColor="#b45309" />
         </linearGradient>
       </defs>
-      <ellipse cx="50" cy="92" rx="34" ry="6" fill="#064e3b" opacity=".14" />
-      <polygon points="50,10 90,31 50,52 10,31" fill="url(#nx-gb)" />
-      <polygon points="10,31 50,52 50,90 10,69" fill="#f59e0b" />
-      <polygon points="90,31 50,52 50,90 90,69" fill="#d97706" />
-      <polygon points="50,10 90,31 50,52 10,31" fill="none" stroke="#fff" strokeOpacity=".5" strokeWidth="1.5" />
-      <circle cx="28" cy="58" r="3.4" fill="#78350f" />
-      <circle cx="40" cy="64" r="3.4" fill="#78350f" />
-      <path d="M26 70 Q35 78 44 73" stroke="#78350f" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <g strokeLinejoin="round" stroke="#b45309" strokeOpacity=".28" strokeWidth="2">
+        <polygon points="50,10 90,31 50,52 10,31" fill="url(#nx-gb-t)" />
+        <polygon points="10,31 50,52 50,90 10,69" fill="url(#nx-gb-l)" />
+        <polygon points="90,31 50,52 50,90 90,69" fill="url(#nx-gb-r)" />
+      </g>
+      <polygon points="28,25 50,14 62,20 40,32" fill="#fff" opacity=".55" />
+      <ellipse cx="24" cy="56" rx="3.4" ry="4.2" fill="#78350f" transform="rotate(26 24 56)" />
+      <ellipse cx="38" cy="63.5" rx="3.4" ry="4.2" fill="#78350f" transform="rotate(26 38 63.5)" />
+      <path d="M23 68Q32 77 43 73" stroke="#78350f" strokeWidth="3" fill="none" strokeLinecap="round" />
     </svg>
   );
 }
 
 function BoltDrop({ className = "" }) {
   return (
-    <svg viewBox="0 0 100 120" className={className} aria-hidden="true">
+    <svg viewBox="0 0 100 120" className={`drop-shadow-[0_14px_16px_rgba(239,68,68,0.32)] ${className}`} aria-hidden="true">
       <defs>
         <linearGradient id="nx-bd-o" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#fdba74" />
           <stop offset="1" stopColor="#ef4444" />
         </linearGradient>
         <linearGradient id="nx-bd-c" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#cffafe" />
+          <stop offset="0" stopColor="#ecfeff" />
           <stop offset="1" stopColor="#22d3ee" />
         </linearGradient>
       </defs>
       <path d="M50 6C50 6 90 46 90 76A40 40 0 0 1 10 76C10 46 50 6 50 6Z" fill="url(#nx-bd-o)" />
       <path d="M50 24C50 24 78 52 78 76A28 28 0 0 1 22 76C22 52 50 24 50 24Z" fill="url(#nx-bd-c)" />
       <path d="M55 42L35 78H49L44 104L67 66H52Z" fill="#fff" />
+      <ellipse cx="30" cy="62" rx="5" ry="14" fill="#fff" opacity=".4" transform="rotate(20 30 62)" />
+    </svg>
+  );
+}
+
+function Spark({ className = "", color = "#fff" }) {
+  return (
+    <svg viewBox="0 0 24 24" className={`pointer-events-none absolute ${className}`} aria-hidden="true">
+      <path d="M12 0l2.6 9.4L24 12l-9.4 2.6L12 24l-2.6-9.4L0 12l9.4-2.6z" fill={color} />
     </svg>
   );
 }
@@ -115,18 +136,27 @@ function Hero({ hashtags }) {
   const tags = String(hashtags || "").split(/[\s,]+/).filter(Boolean).map((t) => t.replace(/^#/, ""));
   return (
     <section className="relative mx-auto max-w-4xl px-4 pb-8 pt-10 md:pt-24 md:text-center">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-24 left-1/2 h-[680px] w-screen -translate-x-1/2"
+        style={{ background: "radial-gradient(60% 48% at 78% 30%,rgba(255,255,255,.7),transparent 70%),radial-gradient(50% 42% at 8% 10%,rgba(86,160,138,.45),transparent 70%),radial-gradient(55% 42% at 96% 88%,rgba(150,216,230,.6),transparent 70%)" }}
+      />
+      <Spark className="nx-twinkle right-6 top-4 h-5 w-5" color="#34d399" />
+      <Spark className="nx-twinkle-2 right-16 top-[17rem] h-4 w-4" color="#fff" />
+      <Spark className="nx-twinkle left-3 top-[27rem] h-3.5 w-3.5" color="#22d3ee" />
+      <Spark className="nx-twinkle-2 hidden md:block md:left-24 md:top-40 md:h-6 md:w-6" color="#fff" />
       <div className="nx-rise relative z-10 flex flex-col items-start md:items-center">
         <span className="relative inline-flex w-full items-center gap-2 whitespace-nowrap rounded-full border border-emerald-700/25 bg-white/50 py-2.5 pl-4 pr-4 font-mono text-[10.5px] font-bold uppercase tracking-[0.1em] text-emerald-800 backdrop-blur sm:w-auto sm:text-[11px] sm:tracking-[0.16em]">
           <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-600" />
           Sân chơi dành riêng cho Gaming Creator
-          <GameBlock className="nx-float pointer-events-none absolute -left-6 -top-9 z-20 h-12 w-12 -rotate-6" />
+          <GameBlock className="nx-float pointer-events-none absolute -left-2 -top-9 z-20 h-12 w-12 -rotate-6" />
         </span>
 
         <div className="relative mt-7 w-full md:w-auto">
           <BoltDrop className="nx-float-2 pointer-events-none absolute right-0 top-[32%] z-0 h-20 w-16 sm:h-28 sm:w-24 md:-right-28 md:top-1/2 md:-translate-y-1/2" />
           <h1 className={`relative z-10 text-[2.3rem] leading-[1.14] sm:text-6xl md:text-7xl ${INK}`}>
             Chơi game. Quay clip.
-            <span className={`block [text-wrap:balance] ${GRAD_TEXT}`}>Biến view thành tiền.</span>
+            <span className="block [text-wrap:balance]"><span className="bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 bg-clip-text text-transparent [-webkit-box-decoration-break:clone] [box-decoration-break:clone]">Biến view thành tiền.</span></span>
           </h1>
         </div>
 
@@ -244,5 +274,6 @@ export default function Landing() {
       <Footer />
     </div>
   );
-     }
+      }
+            
                
