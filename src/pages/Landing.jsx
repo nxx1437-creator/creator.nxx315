@@ -74,53 +74,45 @@ function Header() {
 }
 
 /* ---------- game art (SVG tự vẽ) ---------- */
-function GameBlock({ className = "" }) {
+function GamePad({ className = "" }) {
   return (
-    <svg viewBox="0 0 100 100" className={`drop-shadow-[0_10px_12px_rgba(180,83,9,0.3)] ${className}`} aria-hidden="true">
+    <svg viewBox="0 0 100 100" className={`drop-shadow-[0_10px_12px_rgba(67,56,202,0.28)] ${className}`} aria-hidden="true">
       <defs>
-        <linearGradient id="nx-gb-t" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#fefce8" />
-          <stop offset="1" stopColor="#fde047" />
-        </linearGradient>
-        <linearGradient id="nx-gb-l" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#fbbf24" />
-          <stop offset="1" stopColor="#f59e0b" />
-        </linearGradient>
-        <linearGradient id="nx-gb-r" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#f59e0b" />
-          <stop offset="1" stopColor="#b45309" />
+        <linearGradient id="nx-gp" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#a5b4fc" />
+          <stop offset="1" stopColor="#6366f1" />
         </linearGradient>
       </defs>
-      <g strokeLinejoin="round" stroke="#b45309" strokeOpacity=".28" strokeWidth="2">
-        <polygon points="50,10 90,31 50,52 10,31" fill="url(#nx-gb-t)" />
-        <polygon points="10,31 50,52 50,90 10,69" fill="url(#nx-gb-l)" />
-        <polygon points="90,31 50,52 50,90 90,69" fill="url(#nx-gb-r)" />
-      </g>
-      <polygon points="28,25 50,14 62,20 40,32" fill="#fff" opacity=".55" />
-      <ellipse cx="24" cy="56" rx="3.4" ry="4.2" fill="#78350f" transform="rotate(26 24 56)" />
-      <ellipse cx="38" cy="63.5" rx="3.4" ry="4.2" fill="#78350f" transform="rotate(26 38 63.5)" />
-      <path d="M23 68Q32 77 43 73" stroke="#78350f" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <path
+        d="M24 34C14 34 7 46 7 62c0 12 5 20 13 20 7 0 10-6 16-12h28c6 6 9 12 16 12 8 0 13-8 13-20 0-16-7-28-17-28z"
+        fill="url(#nx-gp)" stroke="#4338ca" strokeOpacity=".35" strokeWidth="2" strokeLinejoin="round"
+      />
+      <path d="M22 40c8-6 22-8 30-8" stroke="#fff" strokeOpacity=".55" strokeWidth="4" strokeLinecap="round" fill="none" />
+      <rect x="22" y="52" width="20" height="7" rx="3.5" fill="#fff" />
+      <rect x="28.5" y="45.5" width="7" height="20" rx="3.5" fill="#fff" />
+      <circle cx="68" cy="50" r="4.5" fill="#34d399" />
+      <circle cx="78" cy="59" r="4.5" fill="#fbbf24" />
+      <circle cx="68" cy="68" r="4.5" fill="#fb7185" />
+      <circle cx="58" cy="59" r="4.5" fill="#22d3ee" />
     </svg>
   );
 }
 
-function BoltDrop({ className = "" }) {
+function GoldCoin({ className = "" }) {
   return (
-    <svg viewBox="0 0 100 120" className={`drop-shadow-[0_14px_16px_rgba(239,68,68,0.32)] ${className}`} aria-hidden="true">
+    <svg viewBox="0 0 100 100" className={`drop-shadow-[0_12px_14px_rgba(217,119,6,0.32)] ${className}`} aria-hidden="true">
       <defs>
-        <linearGradient id="nx-bd-o" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#fdba74" />
-          <stop offset="1" stopColor="#ef4444" />
-        </linearGradient>
-        <linearGradient id="nx-bd-c" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#ecfeff" />
-          <stop offset="1" stopColor="#22d3ee" />
+        <linearGradient id="nx-coin" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#fef3c7" />
+          <stop offset=".55" stopColor="#fbbf24" />
+          <stop offset="1" stopColor="#d97706" />
         </linearGradient>
       </defs>
-      <path d="M50 6C50 6 90 46 90 76A40 40 0 0 1 10 76C10 46 50 6 50 6Z" fill="url(#nx-bd-o)" />
-      <path d="M50 24C50 24 78 52 78 76A28 28 0 0 1 22 76C22 52 50 24 50 24Z" fill="url(#nx-bd-c)" />
-      <path d="M55 42L35 78H49L44 104L67 66H52Z" fill="#fff" />
-      <ellipse cx="30" cy="62" rx="5" ry="14" fill="#fff" opacity=".4" transform="rotate(20 30 62)" />
+      <circle cx="50" cy="58" r="38" fill="#b45309" />
+      <circle cx="50" cy="50" r="38" fill="url(#nx-coin)" stroke="#b45309" strokeOpacity=".35" strokeWidth="2" />
+      <circle cx="50" cy="50" r="28" fill="none" stroke="#fff" strokeOpacity=".7" strokeWidth="3" strokeDasharray="2 5" strokeLinecap="round" />
+      <polygon points="50,32 55.9,44.2 69,46.1 59.5,55.4 61.8,68.5 50,62.3 38.2,68.5 40.5,55.4 31,46.1 44.1,44.2" fill="#fff" fillOpacity=".92" />
+      <ellipse cx="34" cy="32" rx="9" ry="5" fill="#fff" opacity=".5" transform="rotate(-35 34 32)" />
     </svg>
   );
 }
@@ -150,23 +142,21 @@ function Hero({ hashtags }) {
       <div className="nx-rise relative z-10 flex flex-col items-start md:items-center">
         <span className="relative inline-flex w-full items-center gap-2 whitespace-nowrap rounded-full border border-emerald-700/25 bg-white/50 py-2.5 pl-4 pr-4 font-mono text-[10.5px] font-bold uppercase tracking-[0.1em] text-emerald-800 backdrop-blur sm:w-auto sm:text-[11px] sm:tracking-[0.16em]">
           <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-600" />
-          Sân chơi dành riêng cho Gaming Creator
-          <GameBlock className="nx-float pointer-events-none absolute -left-3 top-5 -z-10 h-14 w-14 -rotate-6 opacity-90" />
+          Chương trình Creator · Nxx315
+          <GamePad className="nx-float pointer-events-none absolute -left-3 top-4 -z-10 h-14 w-14 -rotate-6" />
         </span>
 
         <div className="relative mt-6 w-full md:w-auto">
-          <BoltDrop className="nx-float-2 pointer-events-none absolute right-0 top-[46%] z-0 h-14 w-11 sm:h-20 sm:w-16 md:-right-12 md:top-[20%] md:h-24 md:w-[4.5rem]" />
+          <GoldCoin className="nx-float-2 pointer-events-none absolute right-0 top-[40%] z-0 h-14 w-14 sm:h-20 sm:w-20 md:-right-16 md:top-[8%] md:h-24 md:w-24" />
           <h1 className={`nx-h1 relative z-10 ${INK}`}>
-            Chơi game. Quay clip.
+            Quay clip.<br className="md:hidden" /> Leo top.
             <br />
-            Biến view thành{" "}
-            <span className="whitespace-nowrap bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 bg-clip-text text-transparent">phần thưởng.</span>
+            <span className="whitespace-nowrap bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 bg-clip-text text-transparent">Ẵm thưởng lớn!.</span>
           </h1>
         </div>
 
         <p className="mt-7 max-w-xl text-[1.05rem] leading-[1.8] text-slate-600 md:text-lg">
-          Dành cho các <b className={INK}>Gamer</b> và <b className={INK}>Creator</b>. Làm video review/trải nghiệm
-          game trên <b className={INK}>Nxx315 Studio</b> kèm hashtag{" "}
+          Quay video review, trải nghiệm <b className={INK}>Nxx315 Studio</b> rồi đăng lên TikTok hoặc YouTube kèm hashtag{" "}
           {tags.map((t) => (
             <span
               key={t}
@@ -174,9 +164,8 @@ function Hero({ hashtags }) {
             >
               <Hash size={14} />{t}
             </span>
-          ))}{" "}
-          lên TikTok/YouTube để nhận <b className={INK}>Gift Code VIP</b> và <b className={INK}>tiền mặt</b> mỗi tháng.
-          Clip chất lượng + view căng = thưởng nặng!
+          ))}
+          . Video được duyệt nhận <b className={INK}>Gift Code VIP</b>, top bảng xếp hạng cuối tháng nhận <b className={INK}>tiền mặt</b>.
         </p>
 
         <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
@@ -196,7 +185,7 @@ function Hero({ hashtags }) {
         </div>
 
         <p className="mt-6 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-          ▸ Miễn phí · Không giới hạn số video · Trả thưởng minh bạch
+          ▸ Đăng ký miễn phí · Không giới hạn số video · Chốt thưởng cuối tháng
         </p>
       </div>
     </section>
@@ -278,5 +267,5 @@ export default function Landing() {
       <Footer />
     </div>
   );
-                                                         }
-
+    }
+                 
