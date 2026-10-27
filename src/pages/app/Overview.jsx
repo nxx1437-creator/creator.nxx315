@@ -1,34 +1,23 @@
 import React, { memo, useMemo } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { Send, Trophy, Film, ArrowRight, Play, MessageSquare, ExternalLink } from "lucide-react";
-import useSession from "../../hooks/useSession.js";
-import { Card, PLATFORMS, getTier } from "../../components/creator/creatorUi.jsx";
+import { Card, Avatar, PLATFORMS, getTier } from "../../components/creator/creatorUi.jsx";
 import {
   CARD, EventCard, RequirementCard, StatsCard,
 } from "../../components/creator/OverviewParts.jsx";
 
-const UserCard = memo(function UserCard({ username, tierName, greet, onVideos, onRanking }) {
-  const seed = encodeURIComponent(username || "Nxx315");
+const UserCard = memo(function UserCard({ username, avatar, tierName, greet, onVideos, onRanking }) {
   return (
     <Card className={CARD}>
       <div className="flex items-center gap-4">
         <div className="relative shrink-0">
-          <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border-[3px] border-slate-200 bg-white shadow-sm">
-            <img
-              src={`https://api.dicebear.com/7.x/bottts/svg?seed=${seed}&radius=50&backgroundColor=e2e8f0`}
-              alt="Avatar"
-              width={80}
-              height={80}
-              decoding="async"
-              className="h-full w-full object-cover"
-            />
-          </div>
+          <Avatar src={avatar} name={username} size={80} />
           <span className="absolute -bottom-1 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-700 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white shadow-sm">
             🔍 {tierName}
           </span>
         </div>
 
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-mono text-[9px] font-bold tracking-widest text-emerald-600">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> CREATOR HQ · LIVE
           </span>
@@ -133,7 +122,6 @@ const RecentVideos = memo(function RecentVideos({ recent, onAll }) {
 export default function Overview() {
   const navigate = useNavigate();
   const { ov } = useOutletContext();
-  const { profile } = useSession();
 
   const { greet, monthLabel } = useMemo(() => {
     const hour = new Date().getHours();
@@ -155,7 +143,8 @@ export default function Overview() {
   return (
     <div className="space-y-4 pb-10">
       <UserCard
-        username={profile?.username}
+        username={ov.username}
+        avatar={ov.avatar}
         tierName={tier.name}
         greet={greet}
         onVideos={goVideos}
@@ -168,4 +157,4 @@ export default function Overview() {
       <RecentVideos recent={ov.recent} onAll={goVideos} />
     </div>
   );
-}
+        }
