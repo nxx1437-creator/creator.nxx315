@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { SectionTitle, GLASS, INK } from "./ui.jsx";
+import { SectionTitle, GLASS, INK } from "./theme.jsx";
 
 const QA = [
   [
@@ -64,3 +64,4 @@ export default function Faq() {
     </section>
   );
 }
+
