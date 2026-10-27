@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles, Trophy, MessageSquare, Gamepad2, LogIn } from "lucide-react";
-import { Logo } from "./ui.jsx";
+import { Logo } from "./theme.jsx";
 import { MAIN_SITE } from "../../lib/supabaseClient.js";
 
 export function FinalCta() {
@@ -70,4 +70,5 @@ export function Footer() {
       </div>
     </footer>
   );
-              }
+}
+
