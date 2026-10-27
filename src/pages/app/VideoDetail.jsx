@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, useOutletContext } from "react-router-dom";
-import { ArrowLeft, AlertCircle, Eye, Heart, MessageSquare, Share2, Calendar, ListChecks, RefreshCw, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { ArrowLeft, AlertCircle, Eye, Heart, MessageSquare, Share2, Calendar, ListChecks, RefreshCw, CheckCircle2, XCircle, Clock, ChevronDown } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
 import { Card, StatusPill } from "../../components/creator/creatorUi.jsx";
 import {
@@ -252,27 +252,36 @@ export default function VideoDetail() {
         </div>
       </Card>
 
-      {/* PHẦN YÊU CẦU VIDEO ĐÃ ĐƯỢC THÊM TRẠNG THÁI */}
-      <Card>
-        <p className="mb-3 flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500">
-          <ListChecks size={14} /> ▸ YÊU CẦU VIDEO
-        </p>
-        {REQUIREMENTS.length === 0 ? (
-          <p className="text-sm text-slate-500">Các yêu cầu sẽ được cập nhật sau.</p>
-        ) : (
-          <ul className="space-y-3">
-            {REQUIREMENTS.map((r, i) => (
-              <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700">
-                {getRequirementStatus(r, i)}
-                <span className="min-w-0 break-words">{r}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-        {REQUIREMENTS.length > 0 && (
-          <p className="mt-3 text-[11px] text-slate-400">Chi tiết đầy đủ xem ở mục Thể lệ chương trình.</p>
-        )}
-      </Card>
+      {/* PHẦN YÊU CẦU VIDEO (DẠNG THU GỌN) */}
+<Card>
+  <button 
+    onClick={() => setShowRequirements(!showRequirements)}
+    className="flex w-full items-center justify-between font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500"
+  >
+    <span className="flex items-center gap-2">
+      <ListChecks size={14} /> ▸ YÊU CẦU VIDEO
+    </span>
+    <ChevronDown size={16} className={`transition-transform ${showRequirements ? 'rotate-180' : ''}`} />
+  </button>
+
+  {showRequirements && (
+    <div className="mt-4 pt-4 border-t border-slate-100 animate-in fade-in slide-in-from-top-2">
+      {REQUIREMENTS.length === 0 ? (
+        <p className="text-sm text-slate-500">Các yêu cầu sẽ được cập nhật sau.</p>
+      ) : (
+        <ul className="space-y-3">
+          {REQUIREMENTS.map((r, i) => (
+            <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700">
+              {getRequirementStatus(r, i)}
+              <span className="min-w-0 break-words">{r}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="mt-3 text-[11px] text-slate-400">Chi tiết đầy đủ xem ở mục Thể lệ chương trình.</p>
+    </div>
+  )}
+</Card>
 
       <div className="grid grid-cols-2 gap-3">
         <StatBox label="LƯỢT XEM" value={vn(video.views || 0)} Icon={Eye} />
