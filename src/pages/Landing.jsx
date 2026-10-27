@@ -30,6 +30,7 @@ const CSS = `
 @keyframes nx-pop { from { opacity: 0; transform: translateY(26px) scale(.55) rotate(-12deg); } to { opacity: .6; transform: translateY(0) scale(1) rotate(0deg); } }
 @keyframes nx-bob-a { 0%,100% { transform: translateY(0) scale(1) rotate(-6deg); } 50% { transform: translateY(-14px) scale(1.16) rotate(4deg); } }
 @keyframes nx-bob-b { 0%,100% { transform: translateY(0) scale(1) rotate(8deg); } 50% { transform: translateY(-16px) scale(1.18) rotate(-4deg); } }
+.nx-icon-a, .nx-icon-b { will-change: transform, opacity; }
 .nx-icon-a { animation: nx-pop 1.1s cubic-bezier(.2,.8,.2,1) .2s both, nx-bob-a 4.6s ease-in-out 1.3s infinite; }
 .nx-icon-b { animation: nx-pop 1.1s cubic-bezier(.2,.8,.2,1) .45s both, nx-bob-b 5.4s ease-in-out 1.55s infinite; }
 @keyframes nx-shimmer { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
@@ -38,10 +39,6 @@ const CSS = `
 .nx-shine { animation: nx-shine 3.6s ease-in-out 1.5s infinite; }
 .nx-rise { animation: nx-rise .8s cubic-bezier(.2,.7,.2,1) both; }
 .nx-d1 { animation-delay: .05s; } .nx-d2 { animation-delay: .18s; } .nx-d3 { animation-delay: .32s; } .nx-d4 { animation-delay: .46s; } .nx-d5 { animation-delay: .6s; }
-@media (prefers-reduced-motion: reduce) {
-  .nx-marquee, .nx-float, .nx-float-2, .nx-rise, .nx-twinkle, .nx-twinkle-2, .nx-icon-a, .nx-icon-b, .nx-shimmer, .nx-shine { animation: none; }
-  .nx-icon-a, .nx-icon-b { opacity: .6; }
-}
 `;
 
 function usePublicStats() {
@@ -62,8 +59,7 @@ function Reveal({ children }) {
   const [on, setOn] = useState(false);
   useEffect(() => {
     const el = ref.current;
-    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!el || reduce || !("IntersectionObserver" in window)) { setOn(true); return; }
+    if (!el || !("IntersectionObserver" in window)) { setOn(true); return; }
     const io = new IntersectionObserver(
       ([e]) => { if (e.isIntersecting) { setOn(true); io.disconnect(); } },
       { threshold: 0.08, rootMargin: "0px 0px -6% 0px" }
@@ -72,7 +68,7 @@ function Reveal({ children }) {
     return () => io.disconnect();
   }, []);
   return (
-    <div ref={ref} className={`transition-all duration-700 ease-out ${on ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}>
+    <div ref={ref} className={`transition-[opacity,transform] duration-700 ease-out ${on ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0 will-change-[opacity,transform]"}`}>
       {children}
     </div>
   );
@@ -82,8 +78,7 @@ function CountUp({ value }) {
   const [n, setN] = useState(0);
   useEffect(() => {
     const to = Number(value) || 0;
-    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!to || reduce) { setN(to); return; }
+    if (!to) { setN(0); return; }
     let raf, t0 = null;
     const step = (t) => {
       if (t0 === null) t0 = t;
@@ -106,7 +101,7 @@ function Header() {
     ["#hoi-dap", "Hỏi đáp"],
   ];
   return (
-    <header className="sticky top-0 z-40 border-b border-white/70 bg-white/60 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-white/70 bg-white/85 md:bg-white/60 md:backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Link to="/"><Logo /></Link>
         <nav className="hidden items-center gap-8 text-sm font-semibold text-slate-600 md:flex">
@@ -128,13 +123,14 @@ function Header() {
 /* ---------- game art (SVG tự vẽ) ---------- */
 function GamePad({ className = "" }) {
   return (
-    <svg viewBox="0 0 100 100" className={`drop-shadow-[0_10px_12px_rgba(67,56,202,0.28)] ${className}`} aria-hidden="true">
+    <svg viewBox="0 0 100 100" className={className} aria-hidden="true">
       <defs>
         <linearGradient id="nx-gp" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#a5b4fc" />
           <stop offset="1" stopColor="#6366f1" />
         </linearGradient>
       </defs>
+      <ellipse cx="50" cy="90" rx="34" ry="5" fill="#312e81" opacity=".2" />
       <path
         d="M24 34C14 34 7 46 7 62c0 12 5 20 13 20 7 0 10-6 16-12h28c6 6 9 12 16 12 8 0 13-8 13-20 0-16-7-28-17-28z"
         fill="url(#nx-gp)" stroke="#4338ca" strokeOpacity=".35" strokeWidth="2" strokeLinejoin="round"
@@ -152,7 +148,7 @@ function GamePad({ className = "" }) {
 
 function GoldCoin({ className = "" }) {
   return (
-    <svg viewBox="0 0 100 100" className={`drop-shadow-[0_12px_14px_rgba(217,119,6,0.32)] ${className}`} aria-hidden="true">
+    <svg viewBox="0 0 100 100" className={className} aria-hidden="true">
       <defs>
         <linearGradient id="nx-coin" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#fef3c7" />
@@ -160,6 +156,7 @@ function GoldCoin({ className = "" }) {
           <stop offset="1" stopColor="#d97706" />
         </linearGradient>
       </defs>
+      <ellipse cx="50" cy="97" rx="28" ry="3.5" fill="#78350f" opacity=".22" />
       <circle cx="50" cy="58" r="38" fill="#b45309" />
       <circle cx="50" cy="50" r="38" fill="url(#nx-coin)" stroke="#b45309" strokeOpacity=".35" strokeWidth="2" />
       <circle cx="50" cy="50" r="28" fill="none" stroke="#fff" strokeOpacity=".7" strokeWidth="3" strokeDasharray="2 5" strokeLinecap="round" />
@@ -192,7 +189,7 @@ function Hero({ hashtags }) {
       <Spark className="nx-twinkle left-3 top-[27rem] h-3.5 w-3.5" color="#22d3ee" />
       <Spark className="nx-twinkle-2 hidden md:block md:left-24 md:top-40 md:h-6 md:w-6" color="#fff" />
       <div className="relative z-10 flex flex-col items-start md:items-center">
-        <span className="nx-rise nx-d1 relative inline-flex w-full items-center gap-2 whitespace-nowrap rounded-full border border-emerald-700/25 bg-white/50 py-2.5 pl-4 pr-4 font-mono text-[10.5px] font-bold uppercase tracking-[0.1em] text-emerald-800 backdrop-blur sm:w-auto sm:text-[11px] sm:tracking-[0.16em]">
+        <span className="nx-rise nx-d1 relative inline-flex w-full items-center gap-2 whitespace-nowrap rounded-full border border-emerald-700/25 bg-white/60 py-2.5 pl-4 pr-4 font-mono text-[10.5px] font-bold uppercase tracking-[0.1em] text-emerald-800 isolate sm:w-auto sm:text-[11px] sm:tracking-[0.16em]">
           <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-600" />
           Chương trình Creator · Nxx315
           <GamePad className="nx-icon-a pointer-events-none absolute -left-3 top-4 -z-10 h-14 w-14" />
@@ -250,8 +247,8 @@ function Ticker() {
   const games = ["Roblox", "Free Fire", "Genshin Impact", "Liên Quân", "PUBG Mobile", "Minecraft", "Mobile Legends", "Honkai Star Rail"];
   const row = [...games, ...games];
   return (
-    <div className="relative my-6 overflow-hidden border-y border-emerald-900/10 bg-white/50 py-4 backdrop-blur">
-      <div style={{ maskImage: "linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)", WebkitMaskImage: "linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)" }}>
+    <div className="relative my-6 overflow-hidden border-y border-emerald-900/10 bg-white/50 py-4">
+      <div>
       <div className="nx-marquee flex w-max items-center gap-10 whitespace-nowrap">
         {row.map((g, i) => (
           <span key={i} className="flex items-center gap-10 text-xl font-black text-emerald-900/30 sm:text-2xl">
@@ -261,6 +258,8 @@ function Ticker() {
         ))}
       </div>
       </div>
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-14 bg-gradient-to-r from-[#e6f4f0] to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-14 bg-gradient-to-l from-[#e6f4f0] to-transparent" />
     </div>
   );
 }
@@ -296,12 +295,12 @@ export default function Landing() {
       <style>{CSS}</style>
 
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg,#a7d2c2 0,#e3f3ee 900px,#eaf6f3 55%,#cdeaf0 100%)" }} />
-        <div className="absolute left-1/2 top-24 h-[380px] w-[380px] -translate-x-1/2 rounded-full bg-white/60 blur-[100px]" />
-        <div className="absolute -right-32 top-[30rem] h-[460px] w-[460px] rounded-full bg-[#9edbe6]/60 blur-[120px]" />
-        <div className="absolute -left-32 top-[70rem] h-[460px] w-[460px] rounded-full bg-[#a7d2c2]/60 blur-[120px]" />
         <div
-          className="absolute inset-0 opacity-[0.3]"
+          className="absolute inset-0"
+          style={{ background: "radial-gradient(520px 520px at 50% 170px,rgba(255,255,255,.55),transparent 70%),radial-gradient(560px 560px at 100% 600px,rgba(158,219,230,.55),transparent 70%),radial-gradient(560px 560px at 0% 1250px,rgba(167,210,194,.55),transparent 70%),linear-gradient(180deg,#a7d2c2 0,#e3f3ee 900px,#eaf6f3 55%,#cdeaf0 100%)" }}
+        />
+        <div
+          className="absolute inset-x-0 top-0 h-[1100px] opacity-30"
           style={{ backgroundImage: "radial-gradient(rgba(6,78,59,.18) 1px, transparent 1px)", backgroundSize: "26px 26px" }}
         />
       </div>
@@ -320,5 +319,5 @@ export default function Landing() {
       <Footer />
     </div>
   );
-          }
-          
+            }
+        
