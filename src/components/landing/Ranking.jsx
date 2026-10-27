@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Timer, Trophy, Gift, Flame, Users, Video } from "lucide-react";
-import { SectionTitle, GlassCard, INK, fmtNum, timeAgo } from "./ui.jsx";
+import { SectionTitle, GlassCard, INK } from "./theme.jsx";
+import { fmtNum, timeAgo } from "./ui.jsx";
 
 
 function useMonthEnd() {
@@ -193,5 +194,5 @@ export default function Ranking({ stats }) {
       </div>
     </section>
   );
-                  }
-              
+                                       }
+            
