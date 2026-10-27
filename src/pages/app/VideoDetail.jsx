@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { 
   ArrowLeft, ExternalLink, Eye, Heart, MessageSquare, Share2, 
-  AlertCircle, LineChart, Play
+  AlertCircle, LineChart
 } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
 
@@ -40,15 +40,6 @@ export default function VideoDetail() {
     }
   ];
 
-  // Chỉ nhúng iframe nếu là YouTube
-  const getYoutubeEmbed = (url) => {
-    if (!url) return null;
-    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([A-Za-z0-9_-]{11})/);
-    return match ? `https://www.youtube.com/embed/${match[1]}` : null;
-  };
-
-  const youtubeEmbedUrl = video.platform === 'youtube' ? getYoutubeEmbed(video.url) : null;
-
   return (
     <div className="space-y-4 pb-10">
       <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-600 font-semibold px-1 mb-2 mt-2">
@@ -72,60 +63,35 @@ export default function VideoDetail() {
         </div>
       </div>
 
-      {/* KHUNG HIỂN THỊ VIDEO */}
-      <div className="w-full rounded-2xl overflow-hidden shadow-sm bg-slate-100 relative min-h-[300px] max-h-[450px] flex justify-center">
-        
-        {/* Nếu là YouTube -> Nhúng iframe */}
-        {youtubeEmbedUrl ? (
-          <div className="w-full h-[300px] sm:h-[400px]">
-            <iframe 
-              src={youtubeEmbedUrl} 
-              className="w-full h-full border-0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-              allowFullScreen
-              title="YouTube video player"
-            ></iframe>
-          </div>
+      {/* KHUNG HÌNH VỀ BAN ĐẦU (KHÔNG BỊ ÉP DỌC) */}
+      <div className="w-full rounded-2xl overflow-hidden shadow-sm bg-slate-100 relative min-h-[300px] flex items-center justify-center">
+        {video.thumbnail_url ? (
+          <img 
+            src={video.thumbnail_url} 
+            alt={video.title} 
+            className="w-full h-auto max-h-[400px] object-contain"
+          />
         ) : (
-          // Nếu là TikTok hoặc link lỗi -> Hiện ảnh bìa
-          <a 
-            href={video.url} 
-            target="_blank" 
-            rel="noreferrer"
-            className="relative block w-full h-[300px] sm:h-[400px] group"
-          >
-            {video.thumbnail_url ? (
-              <img 
-                src={video.thumbnail_url} 
-                alt={video.title} 
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-slate-400 bg-slate-200">
-                Không có ảnh bìa
-              </div>
-            )}
-            
-            <div className="absolute inset-0 bg-black/20 flex items-center justify-center transition group-hover:bg-black/40">
-               <div className="h-14 w-14 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center text-white border border-white/50 group-hover:scale-110 transition">
-                 <Play size={28} fill="currentColor" className="ml-1" />
-               </div>
-            </div>
-
-            <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-3 flex items-center justify-between text-white">
-               <div className="flex items-center gap-2 text-xs font-semibold">
-                  <ExternalLink size={14} /> Bấm để xem trên {video.platform}
-               </div>
-            </div>
-          </a>
+          <div className="w-full h-[300px] flex items-center justify-center text-slate-400 bg-slate-200">
+            Không có ảnh bìa
+          </div>
         )}
+      </div>
+
+      {/* NÚT MỞ VIDEO NẰM RIÊNG BÊN DƯỚI */}
+      <div className="flex justify-center mt-2">
+        <a 
+          href={video.url} 
+          target="_blank" 
+          rel="noreferrer" 
+          className="flex items-center gap-2 rounded-full bg-cyan-600 px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-cyan-700 transition"
+        >
+          <ExternalLink size={16} /> Xem video trên {video.platform}
+        </a>
       </div>
 
       <div className="px-1 flex items-center justify-between text-xs text-slate-500 font-mono mt-2">
         <span>{new Date(video.created_at).toLocaleDateString("vi-VN")} · {video.platform?.toUpperCase()}</span>
-        <a href={video.url} target="_blank" rel="noreferrer" className="flex items-center gap-1 rounded-full bg-emerald-500 px-4 py-2 text-white font-bold text-xs shadow-sm hover:bg-emerald-600 transition">
-          Mở trên {video.platform} <ExternalLink size={14} />
-        </a>
       </div>
 
       {/* LÝ DO TỪ CHỐI */}
@@ -227,4 +193,4 @@ export default function VideoDetail() {
       </div>
     </div>
   );
-      }
+               }
