@@ -84,7 +84,6 @@ function OrnHex() {
   );
 }
 
-// Thẻ chính có icon mờ to đằng sau
 function StepCard({ children, bgIcon }) {
   return (
     <div className="relative z-10 rounded-[2rem] border border-white bg-white/95 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl overflow-hidden">
@@ -112,7 +111,9 @@ export default function Onboarding() {
   const [tiktokUrl, setTiktokUrl] = useState("");
   const [ytPreview, setYtPreview] = useState(null); 
   const [ttPreview, setTtPreview] = useState(null); 
-  const [isDiscordLinked, setIsDiscordLinked] = useState(false);
+  
+  const [discordData, setDiscordData] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
 
   const changeStep = (newStep) => {
     setStep(newStep);
@@ -122,24 +123,34 @@ export default function Onboarding() {
   const nextStep = () => changeStep(Math.min(step + 1, 4));
   const prevStep = () => changeStep(Math.max(step - 1, 1));
 
-  // Kiểm tra Discord có độ trễ
   useEffect(() => {
-    const checkDiscordStatus = async () => {
+    const checkUserData = async () => {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const { data: { user } } = await supabase.auth.getUser();
-      const discordIdentity = user?.identities?.find(id => id.provider === 'discord');
       
-      if (discordIdentity) {
-        setIsDiscordLinked(true);
-        if (step < 4) {
-          changeStep(4);
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+        
+        if (profile) setUserProfile(profile);
+        else setUserProfile(user.user_metadata);
+
+        const discordIdentity = user?.identities?.find(id => id.provider === 'discord');
+        if (discordIdentity) {
+          setDiscordData(discordIdentity.identity_data);
+          if (step < 4) {
+            changeStep(4);
+          }
         }
       }
       setIsCheckingAuth(false);
     };
     
-    checkDiscordStatus();
+    checkUserData();
   }, []);
 
   const handleLinkDiscord = async () => {
@@ -149,7 +160,6 @@ export default function Onboarding() {
       const { error } = await supabase.auth.linkIdentity({
         provider: 'discord',
         options: { 
-          // CHỈ ĐỊNH RÕ RÀNG QUAY VỀ TRANG ONBOARDING CỦA WEB CREATOR
           redirectTo: `${window.location.origin}/onboarding` 
         },
       });
@@ -220,9 +230,8 @@ export default function Onboarding() {
         <Loader2 size={32} className="animate-spin text-cyan-600" />
       </div>
     );
-  }
-
-  const renderStep1 = () => (
+        }
+    const renderStep1 = () => (
     <StepCard bgIcon={<Sparkles />}>
       <div className="inline-flex items-center gap-2 rounded-full border border-cyan-600/20 bg-cyan-50 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-cyan-700">
         <span className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" /> ONBOARDING
@@ -258,11 +267,32 @@ export default function Onboarding() {
     <StepCard bgIcon={<User />}>
       <p className="font-mono text-[10px] font-bold tracking-widest text-slate-400 uppercase">STEP 02 . PROFILE</p>
       <h2 className="mt-2 text-2xl font-extrabold text-slate-900">Hồ sơ của bạn</h2>
-      <div className="mt-6 rounded-xl border border-cyan-100 bg-cyan-50/50 p-4">
-        <p className="text-[13px] leading-relaxed text-cyan-800">
-          Tài khoản của bạn đã được đồng bộ với <strong>Nxx315 Studio</strong>. Bạn không cần tạo lại hồ sơ ở đây.
-        </p>
+      
+      <div className="mt-6 flex items-center gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        {userProfile?.avatar_url || userProfile?.picture ? (
+          <img src={userProfile.avatar_url || userProfile.picture} alt="Avatar" className="h-14 w-14 rounded-full object-cover border border-slate-200" />
+        ) : (
+          <div className="h-14 w-14 rounded-full bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold text-xl">
+            {userProfile?.username?.charAt(0) || userProfile?.full_name?.charAt(0) || "U"}
+          </div>
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="text-[15px] font-bold text-slate-900 truncate">
+            {userProfile?.username || userProfile?.full_name || "Người dùng Nxx315"}
+          </p>
+          <p className="text-[13px] text-slate-500 truncate">
+            {userProfile?.email || "Chưa cập nhật email"}
+          </p>
+          <p className="mt-1 text-[10px] font-semibold text-emerald-600 bg-emerald-50 inline-block px-2 py-0.5 rounded-md">
+            Đã đồng bộ với Web chính
+          </p>
+        </div>
       </div>
+      
+      <p className="mt-4 text-[13px] text-slate-500 italic">
+        Bạn có thể thay đổi ảnh đại diện và tên hiển thị trong phần Cài đặt của web chính.
+      </p>
+
       <div className="mt-8 flex items-center justify-between">
         <button onClick={prevStep} className="flex items-center gap-2 text-[14px] font-semibold text-slate-500 hover:text-slate-900">
           <ArrowLeft size={16} /> Quay lại
@@ -278,22 +308,46 @@ export default function Onboarding() {
     <StepCard bgIcon={<MessageSquare />}>
       <p className="font-mono text-[10px] font-bold tracking-widest text-slate-400 uppercase">STEP 03 . DISCORD</p>
       <h2 className="mt-2 text-2xl font-extrabold text-slate-900">Liên kết Discord</h2>
-      <p className="mt-3 text-[14px] leading-relaxed text-slate-600">
-        Chương trình creator chạy trên Discord: thông báo, hỗ trợ, thể lệ và các kèo riêng đều ở đó. Bạn cần liên kết tài khoản và tham gia server cộng đồng mới tiếp tục được.
-      </p>
-      <button 
-        onClick={handleLinkDiscord}
-        disabled={loading || isDiscordLinked}
-        className={`mt-6 flex w-full items-center justify-center gap-2 rounded-full border px-5 py-3 text-[14px] font-bold transition disabled:opacity-70
-          ${isDiscordLinked 
-            ? 'border-emerald-500 bg-emerald-50 text-emerald-600' 
-            : 'border-[#5865F2] bg-[#5865F2]/10 text-[#5865F2] hover:bg-[#5865F2] hover:text-white'}`}
-      >
-        {loading ? <><Loader2 size={18} className="animate-spin" /> Đang kết nối...</> : 
-         isDiscordLinked ? <><Check size={18} /> Đã liên kết Discord</> : 
-         <><MessageSquare size={18} /> Liên kết Discord</>}
-      </button>
+      
+      {!discordData ? (
+        <p className="mt-3 text-[14px] leading-relaxed text-slate-600">
+          Chương trình creator chạy trên Discord: thông báo, hỗ trợ, thể lệ và các kèo riêng đều ở đó. Bạn cần liên kết tài khoản và tham gia server cộng đồng mới tiếp tục được.
+        </p>
+      ) : (
+        <p className="mt-3 text-[14px] leading-relaxed text-emerald-600 font-medium">
+          Tuyệt vời! Tài khoản Discord của bạn đã được liên kết thành công.
+        </p>
+      )}
+
+      {discordData ? (
+        <div className="mt-4 flex items-center gap-3 rounded-xl border border-indigo-200 bg-indigo-50 p-4">
+          {discordData.avatar_url ? (
+            <img src={discordData.avatar_url} alt="Discord" className="h-12 w-12 rounded-full object-cover border-2 border-indigo-200" />
+          ) : (
+            <div className="h-12 w-12 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold text-lg">
+              {discordData.full_name?.charAt(0) || discordData.name?.charAt(0) || "D"}
+            </div>
+          )}
+          <div className="flex-1">
+            <p className="text-[14px] font-bold text-indigo-900">{discordData.full_name || discordData.name || "Discord User"}</p>
+            <p className="text-[12px] text-indigo-600">@{discordData.preferred_username || discordData.user_name || "unknown"}</p>
+          </div>
+          <div className="h-6 w-6 rounded-full bg-emerald-500 text-white flex items-center justify-center">
+            <Check size={14} />
+          </div>
+        </div>
+      ) : (
+        <button 
+          onClick={handleLinkDiscord}
+          disabled={loading}
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-full border border-[#5865F2] bg-[#5865F2]/10 px-5 py-3 text-[14px] font-bold text-[#5865F2] transition hover:bg-[#5865F2] hover:text-white disabled:opacity-70"
+        >
+          {loading ? <><Loader2 size={18} className="animate-spin" /> Đang kết nối...</> : <><MessageSquare size={18} /> Liên kết Discord</>}
+        </button>
+      )}
+      
       {errorMsg && <p className="mt-3 text-center text-xs font-semibold text-rose-500">{errorMsg}</p>}
+      
       <div className="mt-8 flex items-center justify-between">
         <button onClick={prevStep} className="flex items-center gap-2 text-[14px] font-semibold text-slate-500 hover:text-slate-900">
           <ArrowLeft size={16} /> Quay lại
@@ -374,7 +428,7 @@ export default function Onboarding() {
       <div className="w-full max-w-md relative z-10">
         <div className="mb-6 flex flex-wrap gap-2 relative z-20">
           {[1, 2, 3, 4].map((num) => {
-            const isPast = step > num || (num === 3 && isDiscordLinked);
+            const isPast = step > num || (num === 3 && discordData);
             const isActive = step === num && !isPast;
             
             return (
@@ -405,4 +459,4 @@ export default function Onboarding() {
       </div>
     </div>
   );
-        }
+      }
