@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate, NavLink } from "react-router-dom";
-import { LayoutDashboard, Trophy, Film, Gift, Settings as SettingsIcon } from "lucide-react"; // Sửa thành Settings as SettingsIcon
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import useSession from "./hooks/useSession.js";
 import { supabase } from "./lib/supabaseClient.js";
 
-// Import các trang
 import VideoDetail from "./pages/app/VideoDetail.jsx";
 import CreatorProfile from "./pages/app/CreatorProfile.jsx";
 import PublicVideo from "./pages/app/PublicVideo.jsx";
@@ -19,51 +17,9 @@ import Overview from "./pages/app/Overview.jsx";
 import Ranking from "./pages/app/Ranking.jsx";
 import Videos from "./pages/app/Videos.jsx";
 import Rewards from "./pages/app/Rewards.jsx";
-import Settings from "./pages/app/Settings.jsx"; // Trang Settings vẫn giữ nguyên tên này
+import Settings from "./pages/app/Settings.jsx";
 
-// Menu điều hướng dưới cùng
-function BottomNav() {
-  const TABS = [
-    { to: "/app", end: true, label: "TỔNG QUAN", Icon: LayoutDashboard },
-    { to: "/app/ranking", label: "XẾP HẠNG", Icon: Trophy },
-    { to: "/app/videos", label: "VIDEO", Icon: Film },
-    { to: "/app/rewards", label: "PHẦN THƯỞNG", Icon: Gift },
-    { to: "/app/settings", label: "THÊM", Icon: SettingsIcon }, // Dùng SettingsIcon ở đây
-  ];
-
-  return (
-    <nav className="fixed inset-x-3 bottom-3 z-40 mx-auto max-w-md rounded-[2rem] border border-white bg-white/95 px-2 py-2 shadow-[0_8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl md:max-w-xl">
-      <div className="grid grid-cols-5">
-        {TABS.map(({ to, end, label, Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={end}
-            className={({ isActive }) =>
-              `flex flex-col items-center gap-1 rounded-2xl py-2.5 text-[9px] font-bold tracking-wide transition-colors ${
-                isActive ? "text-emerald-600" : "text-slate-400 hover:text-slate-600"
-              }`
-            }
-          >
-            <Icon size={20} strokeWidth={2.5} />
-            {label}
-          </NavLink>
-        ))}
-      </div>
-    </nav>
-  );
-}
-
-// Component bảo vệ Onboarding
-function OnboardingProtected({ children }) {
-  const { session, loading } = useSession();
-  if (loading) return <div className="min-h-screen bg-[#f4fbf9]"></div>;
-  if (!session) return <Navigate to="/login" replace />;
-  return children;
-}
-
-// Component bảo vệ App
-function AppProtected({ children }) {
+function Protected({ children }) {
   const { session, loading } = useSession();
   const [checkingStatus, setCheckingStatus] = useState(true);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
@@ -74,26 +30,23 @@ function AppProtected({ children }) {
       return;
     }
 
+    const localOnboarded = localStorage.getItem(`onboarded_${session.user.id}`);
+    if (localOnboarded === "true") {
+      setNeedsOnboarding(false);
+      setCheckingStatus(false);
+      return;
+    }
+
     const checkUserStatus = async () => {
       try {
-        const localOnboarded = localStorage.getItem(`onboarded_${session.user.id}`);
-        if (localOnboarded === "true") {
-          setNeedsOnboarding(false);
-          setCheckingStatus(false);
-          return;
-        }
-
         const { data: channels, error } = await supabase
           .from("creator_channels")
           .select("platform")
           .eq("user_id", session.user.id)
           .limit(1);
-          
         if (error) throw error;
-
-        if (!channels || channels.length === 0) {
-          setNeedsOnboarding(true);
-        } else {
+        if (!channels || channels.length === 0) setNeedsOnboarding(true);
+        else {
           localStorage.setItem(`onboarded_${session.user.id}`, "true");
           setNeedsOnboarding(false);
         }
@@ -103,10 +56,10 @@ function AppProtected({ children }) {
         setCheckingStatus(false);
       }
     };
-
     checkUserStatus();
   }, [session]);
 
+  // Nếu đang tải thì trả về khoảng trắng, không hiện vòng xoay hay nháy nháy
   if (loading || checkingStatus) {
     return <div className="min-h-screen bg-[#f4fbf9]"></div>;
   }
@@ -117,35 +70,38 @@ function AppProtected({ children }) {
   return children;
 }
 
+function OnboardingProtected({ children }) {
+  const { session, loading } = useSession();
+
+  if (loading) return <div className="min-h-screen bg-[#f4fbf9]"></div>;
+  if (!session) return <Navigate to="/login" replace />;
+
+  return children;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Trang Public */}
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Navigate to="/login" replace />} />
 
-        {/* Trang Onboarding (Độc lập, không có Layout) */}
-        <Route 
-          path="/onboarding" 
+        <Route
+          path="/onboarding"
           element={
             <OnboardingProtected>
               <Onboarding />
             </OnboardingProtected>
-          } 
+          }
         />
 
-        {/* Các trang trong App (Có Layout và Menu dưới) */}
-        <Route 
-          path="/app" 
+        <Route
+          path="/app"
           element={
-            <AppProtected>
-              <div className="relative">
-                <AppLayout />
-                <BottomNav />
-              </div>
-            </AppProtected>
+            <Protected>
+              <AppLayout />
+            </Protected>
           }
         >
           <Route index element={<Overview />} />
@@ -165,4 +121,4 @@ export default function App() {
       </Routes>
     </BrowserRouter>
   );
-}
+            }
