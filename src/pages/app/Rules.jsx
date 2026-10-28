@@ -62,8 +62,9 @@ export default function Rules() {
           <section>
             <h2 className="font-bold text-slate-900 mb-2 text-[15px]">3. ĐIỀU KIỆN VIDEO HỢP LỆ</h2>
             <p className="mb-2">Video phải đáp ứng tất cả điều kiện sau:</p>
-            <ol className="list-decimal pl-5 space-y-1">
+              <ol className="list-decimal pl-5 space-y-1">
               <li>Được đăng công khai trên kênh đã liên kết.</li>
+              <li>Có thời lượng tối thiểu <strong>1 phút</strong>.</li>
               <li>Có nội dung giới thiệu NXX315 Studio.</li>
               <li>Có hashtag <strong className="text-cyan-600">#Nxx315Studio</strong> trong tiêu đề hoặc mô tả.</li>
               <li>Có tiêu đề và mô tả phù hợp với nội dung video.</li>
