@@ -51,15 +51,14 @@ function evaluate(video, tags, content) {
     hashtag: tags.every((t) => content.includes(t.toLowerCase())) ? OK : FAIL,
     title: plainTitle.length >= 3 ? OK : FAIL,
   };
-  const anyHit = video.status === "rejected" && REQUIREMENTS.some(hit);
 
   return REQUIREMENTS.map((r) => {
     if (video.status === "approved") return OK;
     if (video.status === "rejected") {
       if (hit(r)) return FAIL;
       if (r.key in auto) return auto[r.key];
-      return anyHit ? OK : NA;
-    }
+      return NA; // chưa được xét thì không báo đạt
+        }
     // đang chờ duyệt
     return r.key in auto ? auto[r.key] : WAIT;
   });
