@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, useOutletContext } from "react-router-dom";
-import { ArrowLeft, AlertCircle, Eye, Heart, MessageSquare, Share2, Calendar, ListChecks, RefreshCw, CheckCircle2, XCircle, Clock, ChevronDown } from "lucide-react";
+import {
+  ArrowLeft, AlertCircle, Eye, Heart, MessageSquare, Share2, Calendar,
+  ListChecks, RefreshCw, ChevronDown,
+} from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
 import { Card, StatusPill } from "../../components/creator/creatorUi.jsx";
 import {
@@ -16,18 +19,65 @@ const fmtDay = (d) => {
   return t && !Number.isNaN(t.getTime()) ? dayFmt.format(t) : "—";
 };
 
-/* ====== YÊU CẦU VIDEO (lấy từ Thể lệ chương trình) ====== */
+/* ====== YÊU CẦU VIDEO (rút gọn từ Thể lệ) ====== */
+const OK = "ok";
+const FAIL = "fail";
+const WAIT = "wait";
+const NA = "na";
+
+// words: từ khóa trong ghi chú từ chối của admin để biết mục nào không đạt
 const REQUIREMENTS = [
-  "Đăng công khai trên kênh TikTok/YouTube đã liên kết với tài khoản Creator của bạn.",
-  "Nội dung giới thiệu NXX315 Studio, rõ ràng, dễ hiểu và trung thực.",
-  "Gắn đủ hashtag bắt buộc (xem phần Hashtag ở trên) trong tiêu đề hoặc mô tả.",
-  "Có tiêu đề và mô tả phù hợp với nội dung video.",
-  "Do bạn tự làm hoặc có quyền sử dụng hợp pháp, không sao chép hay đăng lại nội dung của người khác.",
-  "Chưa từng được gửi nhận thưởng trước đó, mỗi video chỉ được xét thưởng một lần.",
-  "Không mua lượt xem, lượt thích, bình luận và không dùng bot hay tương tác giả.",
-  "Tuân thủ quy định của nền tảng đăng tải và pháp luật hiện hành.",
-  "Số liệu được chốt sau 7 ngày kể từ lúc đăng công khai, cần đạt đồng thời lượt xem và lượt thích/tim của mốc thưởng.",
+  { key: "channel", text: "Đăng công khai trên kênh đã liên kết", words: ["kênh", "liên kết", "riêng tư", "công khai"] },
+  { key: "duration", text: "Thời lượng tối thiểu 1 phút", words: ["ngắn", "thời lượng"] },
+  { key: "content", text: "Nội dung giới thiệu NXX315 Studio", words: ["không liên quan", "nội dung", "sai sự thật", "gây hiểu lầm"] },
+  { key: "hashtag", text: "Có đủ hashtag bắt buộc", words: ["hashtag"] },
+  { key: "title", text: "Có tiêu đề và mô tả phù hợp", words: ["tiêu đề", "mô tả"] },
+  { key: "original", text: "Tự làm hoặc có quyền sử dụng", words: ["sao chép", "đăng lại", "bản quyền", "quyền sử dụng"] },
+  { key: "unique", text: "Chưa gửi nhận thưởng trước đó", words: ["đã gửi", "trùng", "một lần"] },
+  { key: "fake", text: "Không mua tương tác, không dùng bot", words: ["bot", "gian lận", "mua", "tương tác giả", "spam"] },
+  { key: "rules", text: "Tuân thủ quy định nền tảng và pháp luật", words: ["vi phạm", "quy định", "pháp luật"] },
 ];
+
+// Trả về trạng thái từng yêu cầu: OK (✓) / FAIL (✕) / WAIT (° đang duyệt) / NA (không rõ)
+function evaluate(video, tags, content) {
+  const note = (video.admin_note || "").toLowerCase();
+  const hit = (r) => r.words.some((w) => note.includes(w));
+  const plainTitle = (video.title || "").replace(/#[^\s#]+/g, "").trim();
+
+  // Các mục hệ thống tự kiểm tra được
+  const auto = {
+    channel: OK, // đã qua bước kiểm tra kênh khi gửi
+    unique: OK, // mỗi link chỉ gửi được một lần
+    hashtag: tags.every((t) => content.includes(t.toLowerCase())) ? OK : FAIL,
+    title: plainTitle.length >= 3 ? OK : FAIL,
+  };
+  const anyHit = video.status === "rejected" && REQUIREMENTS.some(hit);
+
+  return REQUIREMENTS.map((r) => {
+    if (video.status === "approved") return OK;
+    if (video.status === "rejected") {
+      if (hit(r)) return FAIL;
+      if (r.key in auto) return auto[r.key];
+      return anyHit ? OK : NA;
+    }
+    // đang chờ duyệt
+    return r.key in auto ? auto[r.key] : WAIT;
+  });
+}
+
+function StateIcon({ s }) {
+  const base = "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full";
+  if (s === OK) {
+    return <span className={`${base} bg-emerald-500 text-[10px] font-black leading-none text-white`}>✓</span>;
+  }
+  if (s === FAIL) {
+    return <span className={`${base} bg-rose-500 text-[10px] font-black leading-none text-white`}>✕</span>;
+  }
+  if (s === WAIT) {
+    return <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full border-[3px] border-amber-400" />;
+  }
+  return <span className={`${base} bg-slate-200 text-[10px] font-black leading-none text-slate-500`}>–</span>;
+}
 
 function StatBox({ label, value, Icon, hint }) {
   return (
@@ -67,8 +117,6 @@ export default function VideoDetail() {
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
-  
-  // KHAI BÁO STATE CHO PHẦN THU GỌN YÊU CẦU
   const [showRequirements, setShowRequirements] = useState(false);
 
   useEffect(() => {
@@ -87,7 +135,7 @@ export default function VideoDetail() {
             .limit(200),
         ]);
         if (off) return;
-        if (v.error) throw v.error; 
+        if (v.error) throw v.error;
         setVideo(v.data || null);
         setSamples(s.data || []);
       } catch (e) {
@@ -141,32 +189,8 @@ export default function VideoDetail() {
 
   const content = ((video.title || "") + " " + (video.url || "")).toLowerCase();
   const pf = video.platform?.toUpperCase();
-
-  // Hàm kiểm tra trạng thái từng yêu cầu
-  const getRequirementStatus = (reqText, index) => {
-    if (video.status === 'rejected') {
-      if (video.admin_note?.toLowerCase().includes('hashtag') && index === 2) {
-        return <XCircle size={16} className="text-rose-500 shrink-0 mt-0.5" />;
-      }
-      return <XCircle size={16} className="text-rose-500 shrink-0 mt-0.5" />;
-    }
-
-    if (video.status === 'approved') {
-      return <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />;
-    }
-
-    if (video.status === 'pending') {
-      if (index === 2) {
-        const hasAllTags = tags.every(tag => content.includes(tag.toLowerCase()));
-        return hasAllTags 
-          ? <CheckCircle2 size={16} className="text-emerald-500 shrink-0 mt-0.5" />
-          : <XCircle size={16} className="text-rose-500 shrink-0 mt-0.5" />;
-      }
-      return <Clock size={16} className="text-amber-500 shrink-0 mt-0.5" />;
-    }
-
-    return <Clock size={16} className="text-slate-400 shrink-0 mt-0.5" />;
-  };
+  const states = evaluate(video, tags, content);
+  const okCount = states.filter((s) => s === OK).length;
 
   return (
     <div className="space-y-4 pb-10">
@@ -247,33 +271,55 @@ export default function VideoDetail() {
         </div>
       </Card>
 
-      {/* PHẦN YÊU CẦU VIDEO (DẠNG THU GỌN) */}
+      {/* YÊU CẦU VIDEO (THU GỌN) */}
       <Card>
-        <button 
+        <button
           onClick={() => setShowRequirements(!showRequirements)}
           className="flex w-full items-center justify-between font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500"
         >
           <span className="flex items-center gap-2">
             <ListChecks size={14} /> ▸ YÊU CẦU VIDEO
+            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-600">
+              {okCount}/{REQUIREMENTS.length}
+            </span>
           </span>
-          <ChevronDown size={16} className={`transition-transform ${showRequirements ? 'rotate-180' : ''}`} />
+          <ChevronDown
+            size={16}
+            className={`transition-transform ${showRequirements ? "rotate-180" : ""}`}
+          />
         </button>
 
         {showRequirements && (
-          <div className="mt-4 pt-4 border-t border-slate-100 animate-in fade-in slide-in-from-top-2">
-            {REQUIREMENTS.length === 0 ? (
-              <p className="text-sm text-slate-500">Các yêu cầu sẽ được cập nhật sau.</p>
-            ) : (
-              <ul className="space-y-3">
-                {REQUIREMENTS.map((r, i) => (
-                  <li key={i} className="flex items-start gap-2.5 text-sm text-slate-700">
-                    {getRequirementStatus(r, i)}
-                    <span className="min-w-0 break-words">{r}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <p className="mt-3 text-[11px] text-slate-400">Chi tiết đầy đủ xem ở mục Thể lệ chương trình.</p>
+          <div className="mt-4 border-t border-slate-100 pt-4">
+            <ul className="space-y-2.5">
+              {REQUIREMENTS.map((r, i) => (
+                <li key={r.key} className="flex items-start gap-2.5 text-sm">
+                  <StateIcon s={states[i]} />
+                  <span
+                    className={`min-w-0 break-words ${
+                      states[i] === FAIL ? "font-semibold text-rose-600" : "text-slate-700"
+                    }`}
+                  >
+                    {r.text}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-slate-100 pt-3 text-[11px] text-slate-500">
+              <span className="flex items-center gap-1.5">
+                <StateIcon s={OK} /> Đạt
+              </span>
+              <span className="flex items-center gap-1.5">
+                <StateIcon s={FAIL} /> Không đạt
+              </span>
+              <span className="flex items-center gap-1.5">
+                <StateIcon s={WAIT} /> Đang duyệt
+              </span>
+            </div>
+            <p className="mt-2 text-[11px] text-slate-400">
+              Chi tiết đầy đủ xem ở mục Thể lệ chương trình.
+            </p>
           </div>
         )}
       </Card>
@@ -301,4 +347,4 @@ export default function VideoDetail() {
       <HistoryCard samples={rows} />
     </div>
   );
-                                                }
+          }                                           }
