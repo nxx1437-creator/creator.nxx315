@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 import useSession from "./hooks/useSession.js";
 import { supabase } from "./lib/supabaseClient.js";
 
+// Import các trang
 import VideoDetail from "./pages/app/VideoDetail.jsx";
 import CreatorProfile from "./pages/app/CreatorProfile.jsx";
 import PublicVideo from "./pages/app/PublicVideo.jsx";
@@ -30,36 +32,42 @@ function Protected({ children }) {
       return;
     }
 
-    const localOnboarded = localStorage.getItem(`onboarded_${session.user.id}`);
-    if (localOnboarded === "true") {
-      setNeedsOnboarding(false);
-      setCheckingStatus(false);
-      return;
-    }
-
     const checkUserStatus = async () => {
       try {
+        // 1. Ưu tiên kiểm tra cờ trong localStorage trước
+        const localOnboarded = localStorage.getItem(`onboarded_${session.user.id}`);
+        if (localOnboarded === "true") {
+          setNeedsOnboarding(false);
+          setCheckingStatus(false);
+          return;
+        }
+
+        // 2. Nếu chưa có cờ, kiểm tra trong Database xem đã có kênh chưa
         const { data: channels, error } = await supabase
           .from("creator_channels")
           .select("platform")
           .eq("user_id", session.user.id)
           .limit(1);
+          
         if (error) throw error;
-        if (!channels || channels.length === 0) setNeedsOnboarding(true);
-        else {
+
+        if (!channels || channels.length === 0) {
+          setNeedsOnboarding(true);
+        } else {
           localStorage.setItem(`onboarded_${session.user.id}`, "true");
           setNeedsOnboarding(false);
         }
       } catch (err) {
+        console.error("Lỗi check user status:", err);
         setNeedsOnboarding(false);
       } finally {
         setCheckingStatus(false);
       }
     };
+
     checkUserStatus();
   }, [session]);
 
-  // Nếu đang tải thì trả về khoảng trắng, không hiện vòng xoay hay nháy nháy
   if (loading || checkingStatus) {
     return <div className="min-h-screen bg-[#f4fbf9]"></div>;
   }
@@ -121,4 +129,4 @@ export default function App() {
       </Routes>
     </BrowserRouter>
   );
-                        }
+}
