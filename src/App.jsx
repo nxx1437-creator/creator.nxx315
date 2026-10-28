@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import useSession from "./hooks/useSession.js";
 import { supabase } from "./lib/supabaseClient.js";
 
@@ -21,7 +20,16 @@ import Videos from "./pages/app/Videos.jsx";
 import Rewards from "./pages/app/Rewards.jsx";
 import Settings from "./pages/app/Settings.jsx";
 
-function Protected({ children }) {
+// 1. Component bảo vệ Onboarding (Chỉ cần đăng nhập, không cần check kênh)
+function OnboardingProtected() {
+  const { session, loading } = useSession();
+  if (loading) return <div className="min-h-screen bg-[#f4fbf9]"></div>;
+  if (!session) return <Navigate to="/login" replace />;
+  return <Outlet />;
+}
+
+// 2. Component bảo vệ App (Check đăng nhập + check đã onboard chưa)
+function AppProtected() {
   const { session, loading } = useSession();
   const [checkingStatus, setCheckingStatus] = useState(true);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
@@ -34,7 +42,7 @@ function Protected({ children }) {
 
     const checkUserStatus = async () => {
       try {
-        // 1. Ưu tiên kiểm tra cờ trong localStorage trước
+        // Đọc cờ "đã onboard" từ localStorage trước
         const localOnboarded = localStorage.getItem(`onboarded_${session.user.id}`);
         if (localOnboarded === "true") {
           setNeedsOnboarding(false);
@@ -42,7 +50,7 @@ function Protected({ children }) {
           return;
         }
 
-        // 2. Nếu chưa có cờ, kiểm tra trong Database xem đã có kênh chưa
+        // Nếu chưa có cờ, check DB xem đã có kênh chưa
         const { data: channels, error } = await supabase
           .from("creator_channels")
           .select("platform")
@@ -58,8 +66,8 @@ function Protected({ children }) {
           setNeedsOnboarding(false);
         }
       } catch (err) {
-        console.error("Lỗi check user status:", err);
-        setNeedsOnboarding(false);
+        console.error(err);
+        setNeedsOnboarding(false); // Lỗi mạng thì cho qua
       } finally {
         setCheckingStatus(false);
       }
@@ -75,58 +83,43 @@ function Protected({ children }) {
   if (!session) return <Navigate to="/login" replace />;
   if (needsOnboarding) return <Navigate to="/onboarding" replace />;
 
-  return children;
-}
-
-function OnboardingProtected({ children }) {
-  const { session, loading } = useSession();
-
-  if (loading) return <div className="min-h-screen bg-[#f4fbf9]"></div>;
-  if (!session) return <Navigate to="/login" replace />;
-
-  return children;
+  // Trả về AppLayout, bên trong AppLayout sẽ có <Outlet /> để render các trang con
+  return <AppLayout />;
 }
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Các trang Public */}
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Navigate to="/login" replace />} />
 
-        <Route
-          path="/onboarding"
-          element={
-            <OnboardingProtected>
-              <Onboarding />
-            </OnboardingProtected>
-          }
-        />
+        {/* Trang Onboarding (Đứng độc lập, không có menu dưới) */}
+        <Route element={<OnboardingProtected />}>
+          <Route path="/onboarding" element={<Onboarding />} />
+        </Route>
 
-        <Route
-          path="/app"
-          element={
-            <Protected>
-              <AppLayout />
-            </Protected>
-          }
-        >
-          <Route index element={<Overview />} />
-          <Route path="ranking" element={<Ranking />} />
-          <Route path="videos" element={<Videos />} />
-          <Route path="rewards" element={<Rewards />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="payout" element={<Payout />} />
-          <Route path="help" element={<Help />} />
-          <Route path="videos/:id" element={<VideoDetail />} />
-          <Route path="creator/:uid" element={<CreatorProfile />} />
-          <Route path="creator/:uid/video/:id" element={<PublicVideo />} />
-          <Route path="rules" element={<Rules />} />
+        {/* Các trang trong App (Có menu dưới, yêu cầu đã onboard) */}
+        <Route element={<AppProtected />}>
+          <Route path="/app" element={<AppLayout />}>
+            <Route index element={<Overview />} />
+            <Route path="ranking" element={<Ranking />} />
+            <Route path="videos" element={<Videos />} />
+            <Route path="rewards" element={<Rewards />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="payout" element={<Payout />} />
+            <Route path="help" element={<Help />} />
+            <Route path="videos/:id" element={<VideoDetail />} />
+            <Route path="creator/:uid" element={<CreatorProfile />} />
+            <Route path="creator/:uid/video/:id" element={<PublicVideo />} />
+            <Route path="rules" element={<Rules />} />
+          </Route>
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
-}
+        }
