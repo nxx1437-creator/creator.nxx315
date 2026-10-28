@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   ArrowRight, ArrowLeft, Check, Sparkles, User, MessageSquare, Youtube, Loader2
 } from "lucide-react";
-import { supabase } from "../lib/supabaseClient.js";
+import { supabase } from "../../lib/supabaseClient.js";
 
 // Component hiển thị thông tin kênh
 function ChannelPreview({ data }) {
