@@ -230,8 +230,10 @@ export default function Onboarding() {
   
   // LƯU CỜ ĐÁNH DẤU ĐÃ HOÀN THÀNH ONBOARDING
   const { data: { user } } = await supabase.auth.getUser();
-  if (user) localStorage.setItem(`onboarded_${user.id}`, "true");
-  
+  if (user) {
+    localStorage.setItem(`onboarded_${user.id}`, "true");
+  }
+
   localStorage.removeItem("onboarding_step");
   navigate("/app", { replace: true });
 };
@@ -239,7 +241,9 @@ export default function Onboarding() {
 const skipAndFinish = async () => {
   // LƯU CỜ KHI BẤM BỎ QUA
   const { data: { user } } = await supabase.auth.getUser();
-  if (user) localStorage.setItem(`onboarded_${user.id}`, "true");
+  if (user) {
+    localStorage.setItem(`onboarded_${user.id}`, "true");
+  }
   
   localStorage.removeItem("onboarding_step");
   navigate("/app", { replace: true });
