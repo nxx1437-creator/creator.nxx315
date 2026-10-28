@@ -103,6 +103,7 @@ export default function Rules() {
           <section>
             <h2 className="font-bold text-slate-900 mb-2 text-[15px]">5. QUY TRÌNH XÉT DUYỆT</h2>
             <ol className="list-decimal pl-5 space-y-1">
+             <li>Hệ thống kiểm tra tự động thời lượng và dùng AI hỗ trợ sơ duyệt nội dung; kết quả cuối cùng do admin quyết định.</li>
               <li>Hệ thống kiểm tra đường dẫn, kênh đăng tải và hashtag.</li>
               <li>Video không đạt điều kiện sẽ bị từ chối.</li>
               <li>Video vượt qua kiểm tra tự động sẽ chuyển sang trạng thái chờ xét duyệt.</li>
