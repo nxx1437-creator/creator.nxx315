@@ -39,10 +39,12 @@ const REQUIREMENTS = [
 ];
 
 // Trả về trạng thái từng yêu cầu: OK (✓) / FAIL (✕) / WAIT (° đang duyệt) / NA (không rõ)
-function evaluate(video, tags, content) {
+function evaluate(video, tags, content, minSec = 60) {
   const note = (video.admin_note || "").toLowerCase();
   const hit = (r) => r.words.some((w) => note.includes(w));
   const plainTitle = (video.title || "").replace(/#[^\s#]+/g, "").trim();
+  const dur = video.duration_seconds;
+  const verdict = video.ai_check?.content?.verdict;
 
   // Các mục hệ thống tự kiểm tra được
   const auto = {
@@ -51,6 +53,11 @@ function evaluate(video, tags, content) {
     hashtag: tags.every((t) => content.includes(t.toLowerCase())) ? OK : FAIL,
     title: plainTitle.length >= 3 ? OK : FAIL,
   };
+  // Thời lượng: có số liệu thì kết luận luôn
+  if (dur !== null && dur !== undefined) auto.duration = dur >= minSec ? OK : FAIL;
+  // Nội dung: AI chỉ kết luận khi chắc, còn lại để admin xem
+  if (verdict === "ok") auto.content = OK;
+  else if (verdict === "fail") auto.content = FAIL;
 
   return REQUIREMENTS.map((r) => {
     if (video.status === "approved") return OK;
@@ -58,7 +65,7 @@ function evaluate(video, tags, content) {
       if (hit(r)) return FAIL;
       if (r.key in auto) return auto[r.key];
       return NA; // chưa được xét thì không báo đạt
-        }
+    }
     // đang chờ duyệt
     return r.key in auto ? auto[r.key] : WAIT;
   });
@@ -188,7 +195,9 @@ export default function VideoDetail() {
 
   const content = ((video.title || "") + " " + (video.url || "")).toLowerCase();
   const pf = video.platform?.toUpperCase();
-  const states = evaluate(video, tags, content);
+  const minSec = Number(ctx.ov?.settings?.min_video_seconds) || 60;
+  const states = evaluate(video, tags, content, minSec);
+  const aiReason = video.ai_check?.content?.reason;
   const okCount = states.filter((s) => s === OK).length;
 
   return (
@@ -294,12 +303,15 @@ export default function VideoDetail() {
               {REQUIREMENTS.map((r, i) => (
                 <li key={r.key} className="flex items-start gap-2.5 text-sm">
                   <StateIcon s={states[i]} />
-                  <span
-                    className={`min-w-0 break-words ${
-                      states[i] === FAIL ? "font-semibold text-rose-600" : "text-slate-700"
-                    }`}
-                  >
-                    {r.text}
+                  <span className="min-w-0 break-words">
+                    <span
+                      className={states[i] === FAIL ? "font-semibold text-rose-600" : "text-slate-700"}
+                    >
+                      {r.text}
+                    </span>
+                    {r.key === "content" && aiReason && (
+                      <span className="mt-0.5 block text-[11px] text-slate-400">AI: {aiReason}</span>
+                    )}
                   </span>
                 </li>
               ))}
