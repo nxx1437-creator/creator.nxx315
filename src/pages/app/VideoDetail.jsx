@@ -312,8 +312,8 @@ export default function VideoDetail() {
               <span className="flex items-center gap-1.5">
                 <StateIcon s={FAIL} /> Không đạt
               </span>
-              <span className="flex items-center gap-1.5">
-                <StateIcon s={WAIT} /> Đang duyệt
+               <span className="flex items-center gap-1.5">
+                <StateIcon s={NA} /> Chưa xét
               </span>
             </div>
             <p className="mt-2 text-[11px] text-slate-400">
