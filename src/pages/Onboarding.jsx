@@ -121,7 +121,6 @@ export default function Onboarding() {
   const nextStep = () => changeStep(Math.min(step + 1, 4));
   const prevStep = () => changeStep(Math.max(step - 1, 1));
 
-  // SỬA LỖI 2: Kiểm tra Discord bằng cách lắng nghe sự kiện Auth
   useEffect(() => {
     let isMounted = true;
     
@@ -131,16 +130,13 @@ export default function Onboarding() {
       
       if (discordIdentity && isMounted) {
         setIsDiscordLinked(true);
-        // Nếu đang ở bước 3 hoặc ít hơn, nhảy lên bước 4
         if (step < 4) changeStep(4);
       }
       if (isMounted) setIsCheckingAuth(false);
     };
 
-    // Kiểm tra ngay lập tức
     checkDiscord();
 
-    // Lắng nghe sự kiện thay đổi trạng thái (dành cho trường hợp quay về từ Discord)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         const discordId = session?.user?.identities?.find(id => id.provider === 'discord');
@@ -172,13 +168,12 @@ export default function Onboarding() {
     }
   };
 
-  // SỬA LỖI 1: Lấy thông tin kênh từ Database sau khi liên kết thành công
+  // HÀM VERIFY ĐÃ SỬA: Lấy lại thông tin từ Database sau khi liên kết
   const verifyChannel = async (platform, url) => {
     if (!url) return null;
     setLoading(true);
     setErrorMsg("");
     try {
-      // 1. Gọi API liên kết kênh
       const { data: resData, error: resError } = await supabase.functions.invoke("creator-verify", {
         body: { action: "link_channel", platform, url }
       });
@@ -186,15 +181,14 @@ export default function Onboarding() {
       if (resError) throw resError;
       if (resData && resData.ok === false) throw new Error(resData.message || "Kênh không hợp lệ.");
 
-      // 2. Gọi RPC get_creator_overview để lấy lại thông tin kênh (Tên, Avatar)
+      // Gọi RPC để lấy thông tin kênh chuẩn (có Avatar, Tên)
       const { data: ovData, error: ovError } = await supabase.rpc("get_creator_overview");
-      
       if (ovError) throw ovError;
 
-      // 3. Tìm kênh vừa liên kết trong danh sách trả về
       const linkedChannel = ovData.channels?.find(c => c.platform === platform);
       
-      return linkedChannel || { ok: true }; // Trả về data kênh (có avatar_url, display_name)
+      if (linkedChannel) return linkedChannel;
+      return resData.channel || resData; 
     } catch (err) {
       setErrorMsg(`Lỗi kênh ${platform}: ${err.message || "Không thể xác minh"}`);
       return null;
@@ -218,71 +212,62 @@ export default function Onboarding() {
   };
 
   const handleFinish = async () => {
-  setErrorMsg("");
-  if (youtubeUrl && !ytPreview) {
-    const res = await verifyChannel("youtube", youtubeUrl);
-    if (!res) return; 
-  }
-  if (tiktokUrl && !ttPreview) {
-    const res = await verifyChannel("tiktok", tiktokUrl);
-    if (!res) return; 
-  }
-  
-  // LƯU CỜ ĐÁNH DẤU ĐÃ HOÀN THÀNH ONBOARDING
-  const { data: { user } } = await supabase.auth.getUser();
-  if (user) localStorage.setItem(`onboarded_${user.id}`, "true");
-  
-  localStorage.removeItem("onboarding_step");
-  navigate("/app", { replace: true });
-};
+    setErrorMsg("");
+    if (youtubeUrl && !ytPreview) {
+      const res = await verifyChannel("youtube", youtubeUrl);
+      if (!res) return; 
+    }
+    if (tiktokUrl && !ttPreview) {
+      const res = await verifyChannel("tiktok", tiktokUrl);
+      if (!res) return; 
+    }
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) localStorage.setItem(`onboarded_${user.id}`, "true");
 
-const skipAndFinish = async () => {
-  // LƯU CỜ KHI BẤM BỎ QUA
-  const { data: { user } } = await supabase.auth.getUser();
-  if (user) localStorage.setItem(`onboarded_${user.id}`, "true");
-  
-  localStorage.removeItem("onboarding_step");
-  navigate("/app", { replace: true });
-};
+    localStorage.removeItem("onboarding_step");
+    navigate("/app", { replace: true });
+  };
 
-  // --- CÁC BƯỚC RENDER ---
+  const skipAndFinish = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) localStorage.setItem(`onboarded_${user.id}`, "true");
+    
+    localStorage.removeItem("onboarding_step");
+    navigate("/app", { replace: true });
+  };
 
   const renderStep1 = () => (
-  <StepCard bgIcon={<Sparkles />}>
-    <div className="inline-flex items-center gap-2 rounded-full border border-cyan-600/20 bg-cyan-50 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-cyan-700">
-      <span className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" /> ONBOARDING
-    </div>
-    
-    {/* Đã bỏ thẻ <br/> và giảm font-size xuống text-[26px] để nằm gọn trên 1 dòng */}
-    <h1 className="mt-5 text-[26px] font-extrabold tracking-tight text-slate-900 leading-tight">
-      Chào mừng đến với <span className="text-cyan-600 whitespace-nowrap">Nxx315 Creator</span>
-    </h1>
-    
-    <p className="mt-4 text-[14px] leading-relaxed text-slate-600">
-      Đăng video TikTok/YouTube quảng bá Nxx315 → bot tự scrape → admin duyệt → bạn nhận thưởng.
-    </p>
-
-    <div className="mt-6 space-y-3">
-      <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-        <h3 className="text-[13px] font-bold text-cyan-600">01 . LIÊN KẾT KÊNH</h3>
-        <p className="mt-1 text-[13px] text-slate-600">Liên kết YouTube/TikTok để bot scrape video bạn đăng.</p>
+    <StepCard bgIcon={<Sparkles />}>
+      <div className="inline-flex items-center gap-2 rounded-full border border-cyan-600/20 bg-cyan-50 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest text-cyan-700">
+        <span className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" /> ONBOARDING
       </div>
-      <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-        <h3 className="text-[13px] font-bold text-cyan-600">02 . NHẬN THƯỞNG</h3>
-        <p className="mt-1 text-[13px] text-slate-600">Mỗi video duyệt = +X code xu. Top tháng nhận tiền mặt.</p>
+      <h1 className="mt-5 text-[26px] font-extrabold tracking-tight text-slate-900 leading-tight">
+        Chào mừng đến với <span className="text-cyan-600 whitespace-nowrap">Nxx315 Creator</span>
+      </h1>
+      <p className="mt-4 text-[14px] leading-relaxed text-slate-600">
+        Đăng video TikTok/YouTube quảng bá Nxx315 → bot tự scrape → admin duyệt → bạn nhận thưởng.
+      </p>
+      <div className="mt-6 space-y-3">
+        <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+          <h3 className="text-[13px] font-bold text-cyan-600">01 . LIÊN KẾT KÊNH</h3>
+          <p className="mt-1 text-[13px] text-slate-600">Liên kết YouTube/TikTok để bot scrape video bạn đăng.</p>
+        </div>
+        <div className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+          <h3 className="text-[13px] font-bold text-cyan-600">02 . NHẬN THƯỞNG</h3>
+          <p className="mt-1 text-[13px] text-slate-600">Mỗi video duyệt = +X code xu. Top tháng nhận tiền mặt.</p>
+        </div>
       </div>
-    </div>
-
-    <div className="mt-8 flex items-center justify-between">
-      <button onClick={nextStep} className="flex items-center gap-2 rounded-full bg-cyan-600 px-6 py-3 text-[14px] font-bold text-white transition hover:bg-cyan-700 active:scale-95 shadow-md shadow-cyan-600/20">
-        Bắt đầu <ArrowRight size={16} />
-      </button>
-      <button onClick={skipAndFinish} className="text-[14px] font-semibold text-slate-500 hover:text-slate-800">
-        Bỏ qua
-      </button>
-    </div>
-  </StepCard>
-);
+      <div className="mt-8 flex items-center justify-between">
+        <button onClick={nextStep} className="flex items-center gap-2 rounded-full bg-cyan-600 px-6 py-3 text-[14px] font-bold text-white transition hover:bg-cyan-700 active:scale-95 shadow-md shadow-cyan-600/20">
+          Bắt đầu <ArrowRight size={16} />
+        </button>
+        <button onClick={skipAndFinish} className="text-[14px] font-semibold text-slate-500 hover:text-slate-800">
+          Bỏ qua
+        </button>
+      </div>
+    </StepCard>
+  );
 
   const renderStep2 = () => (
     <StepCard bgIcon={<User />}>
@@ -403,36 +388,4 @@ const skipAndFinish = async () => {
 
       <div className="w-full max-w-md relative z-10">
         <div className="mb-6 flex flex-wrap gap-2 relative z-20">
-          {[1, 2, 3, 4].map((num) => {
-            const isPast = step > num || (num === 3 && isDiscordLinked);
-            const isActive = step === num && !isPast;
-            
-            return (
-              <div key={num} className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-[12px] font-semibold transition-colors ${isActive ? 'border-cyan-600 bg-cyan-50 text-cyan-700' : isPast ? 'border-emerald-200 bg-emerald-50 text-emerald-600' : 'border-slate-200 bg-white text-slate-400'}`}>
-                {isPast ? <Check size={14} /> : <span>{num}.</span>}
-                {num === 1 && "BẮT ĐẦU"}
-                {num === 2 && "HỒ SƠ"}
-                {num === 3 && "DISCORD"}
-                {num === 4 && "KÊNH"}
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="relative mt-2">
-          <div className="absolute -top-10 -left-8 z-0 pointer-events-none"><OrnTarget /></div>
-          <div className="absolute -top-12 -right-8 z-0 pointer-events-none"><OrnStar /></div>
-          <div className="absolute -bottom-8 -left-8 z-0 pointer-events-none"><OrnGem /></div>
-          <div className="absolute -bottom-10 -right-8 z-0 pointer-events-none"><OrnHex /></div>
-
-          <div className="relative z-10">
-            {step === 1 && renderStep1()}
-            {step === 2 && renderStep2()}
-            {step === 3 && renderStep3()}
-            {step === 4 && renderStep4()}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-    }
+          {[1, 2, 3,
