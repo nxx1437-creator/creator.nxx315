@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, NavLink } from "react-router-dom";
-import { LayoutDashboard, Trophy, Film, Gift, Settings } from "lucide-react";
+import { LayoutDashboard, Trophy, Film, Gift, Settings as SettingsIcon } from "lucide-react"; // Sửa thành Settings as SettingsIcon
 import useSession from "./hooks/useSession.js";
 import { supabase } from "./lib/supabaseClient.js";
 
@@ -19,16 +19,16 @@ import Overview from "./pages/app/Overview.jsx";
 import Ranking from "./pages/app/Ranking.jsx";
 import Videos from "./pages/app/Videos.jsx";
 import Rewards from "./pages/app/Rewards.jsx";
-import Settings from "./pages/app/Settings.jsx";
+import Settings from "./pages/app/Settings.jsx"; // Trang Settings vẫn giữ nguyên tên này
 
-// Menu điều hướng dưới cùng (Chỉ hiện khi vào App)
+// Menu điều hướng dưới cùng
 function BottomNav() {
   const TABS = [
     { to: "/app", end: true, label: "TỔNG QUAN", Icon: LayoutDashboard },
     { to: "/app/ranking", label: "XẾP HẠNG", Icon: Trophy },
     { to: "/app/videos", label: "VIDEO", Icon: Film },
     { to: "/app/rewards", label: "PHẦN THƯỞNG", Icon: Gift },
-    { to: "/app/settings", label: "THÊM", Icon: Settings },
+    { to: "/app/settings", label: "THÊM", Icon: SettingsIcon }, // Dùng SettingsIcon ở đây
   ];
 
   return (
@@ -165,4 +165,4 @@ export default function App() {
       </Routes>
     </BrowserRouter>
   );
-}
+  }
