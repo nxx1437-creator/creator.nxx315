@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, NavLink } from "react-router-dom";
+import { LayoutDashboard, Trophy, Film, Gift, Settings } from "lucide-react";
 import useSession from "./hooks/useSession.js";
 import { supabase } from "./lib/supabaseClient.js";
 
@@ -20,7 +21,40 @@ import Videos from "./pages/app/Videos.jsx";
 import Rewards from "./pages/app/Rewards.jsx";
 import Settings from "./pages/app/Settings.jsx";
 
-// Component bảo vệ Onboarding (Chỉ cần đăng nhập)
+// Menu điều hướng dưới cùng (Chỉ hiện khi vào App)
+function BottomNav() {
+  const TABS = [
+    { to: "/app", end: true, label: "TỔNG QUAN", Icon: LayoutDashboard },
+    { to: "/app/ranking", label: "XẾP HẠNG", Icon: Trophy },
+    { to: "/app/videos", label: "VIDEO", Icon: Film },
+    { to: "/app/rewards", label: "PHẦN THƯỞNG", Icon: Gift },
+    { to: "/app/settings", label: "THÊM", Icon: Settings },
+  ];
+
+  return (
+    <nav className="fixed inset-x-3 bottom-3 z-40 mx-auto max-w-md rounded-[2rem] border border-white bg-white/95 px-2 py-2 shadow-[0_8px_30px_rgba(0,0,0,0.08)] backdrop-blur-xl md:max-w-xl">
+      <div className="grid grid-cols-5">
+        {TABS.map(({ to, end, label, Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={end}
+            className={({ isActive }) =>
+              `flex flex-col items-center gap-1 rounded-2xl py-2.5 text-[9px] font-bold tracking-wide transition-colors ${
+                isActive ? "text-emerald-600" : "text-slate-400 hover:text-slate-600"
+              }`
+            }
+          >
+            <Icon size={20} strokeWidth={2.5} />
+            {label}
+          </NavLink>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
+// Component bảo vệ Onboarding
 function OnboardingProtected({ children }) {
   const { session, loading } = useSession();
   if (loading) return <div className="min-h-screen bg-[#f4fbf9]"></div>;
@@ -28,7 +62,7 @@ function OnboardingProtected({ children }) {
   return children;
 }
 
-// Component bảo vệ App (Check đăng nhập + check đã onboard chưa)
+// Component bảo vệ App
 function AppProtected({ children }) {
   const { session, loading } = useSession();
   const [checkingStatus, setCheckingStatus] = useState(true);
@@ -42,7 +76,6 @@ function AppProtected({ children }) {
 
     const checkUserStatus = async () => {
       try {
-        // 1. Đọc cờ "đã onboard" từ localStorage
         const localOnboarded = localStorage.getItem(`onboarded_${session.user.id}`);
         if (localOnboarded === "true") {
           setNeedsOnboarding(false);
@@ -50,7 +83,6 @@ function AppProtected({ children }) {
           return;
         }
 
-        // 2. Nếu chưa có cờ, check DB xem đã có kênh chưa
         const { data: channels, error } = await supabase
           .from("creator_channels")
           .select("platform")
@@ -66,7 +98,6 @@ function AppProtected({ children }) {
           setNeedsOnboarding(false);
         }
       } catch (err) {
-        console.error(err);
         setNeedsOnboarding(false);
       } finally {
         setCheckingStatus(false);
@@ -90,12 +121,12 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Các trang Public */}
+        {/* Trang Public */}
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Navigate to="/login" replace />} />
 
-        {/* Trang Onboarding (Đứng độc lập, KHÔNG CÓ Menu dưới) */}
+        {/* Trang Onboarding (Độc lập, không có Layout) */}
         <Route 
           path="/onboarding" 
           element={
@@ -105,12 +136,15 @@ export default function App() {
           } 
         />
 
-        {/* Các trang trong App (CÓ Menu dưới, yêu cầu đã onboard) */}
+        {/* Các trang trong App (Có Layout và Menu dưới) */}
         <Route 
           path="/app" 
           element={
             <AppProtected>
-              <AppLayout />
+              <div className="relative">
+                <AppLayout />
+                <BottomNav />
+              </div>
             </AppProtected>
           }
         >
@@ -131,4 +165,4 @@ export default function App() {
       </Routes>
     </BrowserRouter>
   );
-          }
+}
