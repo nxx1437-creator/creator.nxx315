@@ -388,4 +388,36 @@ export default function Onboarding() {
 
       <div className="w-full max-w-md relative z-10">
         <div className="mb-6 flex flex-wrap gap-2 relative z-20">
-          {[1, 2, 3,
+          {[1, 2, 3, 4].map((num) => {
+            const isPast = step > num || (num === 3 && isDiscordLinked);
+            const isActive = step === num && !isPast;
+            
+            return (
+              <div key={num} className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-[12px] font-semibold transition-colors ${isActive ? 'border-cyan-600 bg-cyan-50 text-cyan-700' : isPast ? 'border-emerald-200 bg-emerald-50 text-emerald-600' : 'border-slate-200 bg-white text-slate-400'}`}>
+                {isPast ? <Check size={14} /> : <span>{num}.</span>}
+                {num === 1 && "BẮT ĐẦU"}
+                {num === 2 && "HỒ SƠ"}
+                {num === 3 && "DISCORD"}
+                {num === 4 && "KÊNH"}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="relative mt-2">
+          <div className="absolute -top-10 -left-8 z-0 pointer-events-none"><OrnTarget /></div>
+          <div className="absolute -top-12 -right-8 z-0 pointer-events-none"><OrnStar /></div>
+          <div className="absolute -bottom-8 -left-8 z-0 pointer-events-none"><OrnGem /></div>
+          <div className="absolute -bottom-10 -right-8 z-0 pointer-events-none"><OrnHex /></div>
+
+          <div className="relative z-10">
+            {step === 1 && renderStep1()}
+            {step === 2 && renderStep2()}
+            {step === 3 && renderStep3()}
+            {step === 4 && renderStep4()}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+      }
