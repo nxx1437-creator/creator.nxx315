@@ -347,4 +347,4 @@ export default function VideoDetail() {
       <HistoryCard samples={rows} />
     </div>
   );
-          }                                           }
+}
