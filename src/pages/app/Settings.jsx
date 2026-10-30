@@ -1,9 +1,10 @@
 import React from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
-import { LogOut, Bell, Sparkles, BookOpen, HelpCircle, Settings as SettingsIcon, X } from "lucide-react";
+import { LogOut, Bell, Sparkles, BookOpen, HelpCircle, Settings as SettingsIcon, X, LayoutDashboard, Trophy, Film, Gift, Coins } from "lucide-react";
 import useSession from "../../hooks/useSession.js";
 import { supabase } from "../../lib/supabaseClient.js";
 import { Card, Eyebrow, ChannelLinkCard, GuideVideo } from "../../components/creator/creatorUi.jsx";
+import DiscordLinkCard from "../../components/creator/DiscordLinkCard.jsx";
 
 // Component menu giả lập theo ảnh 14
 const MenuSidebar = ({ onClose }) => (
@@ -16,7 +17,7 @@ const MenuSidebar = ({ onClose }) => (
           </div>
           <button onClick={onClose}><X size={20} className="text-slate-400" /></button>
         </div>
-        
+
         <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2 px-3">Sân chơi</p>
         <div className="space-y-1">
           {[ {i: <LayoutDashboard size={18}/>, t: "Tổng quan"}, {i: <Trophy size={18}/>, t: "Xếp hạng"}, {i: <Film size={18}/>, t: "Video"} ].map((item, idx) => (
@@ -59,7 +60,7 @@ export default function Settings() {
   const { session } = useSession();
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = React.useState(false);
-  
+
   const by = Object.fromEntries((ov?.channels || []).map((c) => [c.platform, c]));
 
   const signOut = async () => {
@@ -92,6 +93,8 @@ export default function Settings() {
            <ChannelLinkCard platform="tiktok" channel={by.tiktok} onChanged={reload} />
         </div>
 
+        <DiscordLinkCard />
+
         <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/80 p-5 shadow-sm">
           <Eyebrow className="font-bold text-slate-500">▸ Tài khoản</Eyebrow>
           <div className="mt-4">
@@ -109,4 +112,4 @@ export default function Settings() {
       </div>
     </>
   );
-               }
+      }
