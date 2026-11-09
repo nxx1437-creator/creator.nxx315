@@ -1,0 +1,39 @@
+import { useEffect } from "react";
+
+export default function useAutoReload(interval = 60000) {
+  useEffect(() => {
+    // Lấy thời gian build hiện tại lúc web vừa load
+    const currentBuildTime = import.meta.env.VITE_BUILD_TIME || "dev";
+
+    const checkUpdate = async () => {
+      try {
+        // Fetch lại file index.html (kèm timestamp để bypass cache)
+        const res = await fetch(`/?t=${Date.now()}`, {
+          headers: { "Cache-Control": "no-cache" },
+        });
+        const html = await res.text();
+
+        // Trích xuất thời gian build từ thẻ meta trong index.html
+        const match = html.match(/<meta name="build-time" content="([^"]+)"/);
+        const newBuildTime = match ? match[1] : "dev";
+
+        // Nếu thời gian build trên server khác với lúc web vừa load -> Có bản mới
+        if (
+          currentBuildTime !== "dev" &&
+          newBuildTime !== "dev" &&
+          currentBuildTime !== newBuildTime
+        ) {
+          console.log("🚀 Phát hiện bản cập nhật mới, đang tải lại...");
+          window.location.reload();
+        }
+      } catch (error) {
+        // Bỏ qua lỗi mạng để không làm phiền người dùng
+      }
+    };
+
+    // Kiểm tra ngay lần đầu, và sau đó cứ mỗi `interval` (60s) check 1 lần
+    checkUpdate();
+    const timer = setInterval(checkUpdate, interval);
+    return () => clearInterval(timer);
+  }, [interval]);
+}
