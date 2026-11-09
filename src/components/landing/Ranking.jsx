@@ -49,7 +49,7 @@ export default function Ranking({ stats }) {
   const vn = new Date(Date.now() + 7 * 3600e3);
   const monthNum = vn.getUTCMonth() + 1;
   const month = `${monthNum}/${vn.getUTCFullYear()}`;
-  const prize = stats?.settings?.event_prize_text || "50k VNĐ + 35K xu";
+  const prize = stats?.settings?.event_prize_text || "50,000 VNĐ + 35K xu";
   const top = stats?.top || [];
   const recent = stats?.recent || [];
 
