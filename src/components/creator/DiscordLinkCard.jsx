@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "../lib/supabase"; // sửa đường dẫn cho đúng file supabase của bạn
+import { supabase } from "../lib/supabaseClient.js"; 
 
 export default function DiscordLinkCard() {
   const [code, setCode] = useState("");
