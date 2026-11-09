@@ -183,7 +183,6 @@ function Spark({ className = "", color = "#fff" }) {
 function Hero({ hashtags }) {
   const tags = String(hashtags || "").split(/[\s,]+/).filter(Boolean).map((t) => t.replace(/^#/, ""));
   return (
-    // Sử dụng w-full và px rộng để sát tường trên màn hình lớn
     <section className="relative mx-auto w-full px-6 pb-8 pt-10 md:pt-24 md:text-center sm:px-10 lg:px-16">
       <div
         aria-hidden="true"
@@ -202,19 +201,18 @@ function Hero({ hashtags }) {
           <GamePad className="nx-icon-a pointer-events-none absolute -left-3 top-4 -z-10 h-14 w-14" />
         </span>
 
-        <div className="nx-rise nx-d2 relative mt-6 w-full md:w-auto">
-          {/* Căn chỉnh lại đồng xu cho rộng rãi */}
-          <GoldCoin className="nx-icon-b pointer-events-none absolute -right-8 top-[20%] z-0 h-16 w-16 sm:h-20 sm:w-20 md:-right-24 md:top-[5%] md:h-32 md:w-32" />
+        <div className="nx-rise nx-d2 relative mt-8 w-full md:w-auto">
+          {/* Đồng xu đã được thu nhỏ và né chữ trên mobile */}
+          <GoldCoin className="nx-icon-b pointer-events-none absolute -right-2 -top-8 z-0 h-14 w-14 sm:h-20 sm:w-20 md:-right-24 md:top-[5%] md:h-32 md:w-32" />
           
           <h1 className={`nx-h1 relative z-10 ${INK}`}>
-            Quay clip. Leo top. <br className="hidden md:block" />
-            <span className="nx-shimmer inline-block mt-1 md:mt-2 bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 bg-clip-text text-transparent">
+            Quay clip. <br className="hidden sm:block" /> Leo top. <br className="hidden md:block" />
+            <span className="nx-shimmer inline-block mt-2 md:mt-3 bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 bg-clip-text text-transparent">
               Ẵm thưởng thật.
             </span>
           </h1>
         </div>
 
-        {/* Đoạn văn giãn rộng sát tường */}
         <p className="nx-rise nx-d3 mt-7 max-w-4xl text-[1.05rem] leading-[1.8] text-slate-600 md:max-w-5xl md:text-xl">
           Quay video review, trải nghiệm <b className={INK}>Nxx315 Studio</b> rồi đăng lên TikTok hoặc YouTube kèm hashtag{" "}
           {tags.map((t) => (
@@ -251,7 +249,6 @@ function Hero({ hashtags }) {
     </section>
   );
 }
-
 /* ---------- ticker + stats ---------- */
 function Ticker() {
   const games = ["Roblox", "Free Fire", "Genshin Impact", "Liên Quân", "PUBG Mobile", "Minecraft", "Mobile Legends", "Honkai Star Rail"];
