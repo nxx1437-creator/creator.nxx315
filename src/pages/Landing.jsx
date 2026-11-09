@@ -26,7 +26,15 @@ const CSS = `
 .nx-twinkle { animation: nx-twinkle 3.2s ease-in-out infinite; }
 .nx-twinkle-2 { animation: nx-twinkle 4.1s ease-in-out -1.5s infinite; }
 .nx-h1 { font-size: clamp(2rem, 10vw, 3.8rem); line-height: 1.12; }
-@media (min-width: 768px) { .nx-h1 { font-size: clamp(2.4rem, 5.6vw, 3.6rem); line-height: 1.18; white-space: nowrap; } }
+
+/* Đã xóa white-space: nowrap để chữ tự động xuống dòng đẹp trên Desktop */
+@media (min-width: 768px) { 
+  .nx-h1 { 
+    font-size: clamp(2.6rem, 5vw, 4.2rem); 
+    line-height: 1.2; 
+  } 
+}
+
 @keyframes nx-pop { from { opacity: 0; transform: translateY(26px) scale(.55) rotate(-12deg); } to { opacity: .6; transform: translateY(0) scale(1) rotate(0deg); } }
 @keyframes nx-bob-a { 0%,100% { transform: translateY(0) scale(1) rotate(-6deg); } 50% { transform: translateY(-14px) scale(1.16) rotate(4deg); } }
 @keyframes nx-bob-b { 0%,100% { transform: translateY(0) scale(1) rotate(8deg); } 50% { transform: translateY(-16px) scale(1.18) rotate(-4deg); } }
@@ -100,7 +108,8 @@ function Header() {
   ];
   return (
     <header className="sticky top-0 z-40 border-b border-white/70 bg-white/85 md:bg-white/60 md:backdrop-blur-xl">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+      {/* Nới rộng container ra max-w-7xl để sát tường hơn */}
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
         <Link to="/"><Logo /></Link>
         <nav className="hidden items-center gap-8 text-sm font-semibold text-slate-600 md:flex">
           {links.map(([href, label]) => (
@@ -176,16 +185,18 @@ function Spark({ className = "", color = "#fff" }) {
 function Hero({ hashtags }) {
   const tags = String(hashtags || "").split(/[\s,]+/).filter(Boolean).map((t) => t.replace(/^#/, ""));
   return (
-    <section className="relative mx-auto max-w-5xl px-4 pb-8 pt-10 md:pt-24 md:text-center">
+    // Nới rộng container ra max-w-6xl
+    <section className="relative mx-auto max-w-6xl px-4 pb-8 pt-10 md:pt-24 md:text-center sm:px-6 lg:px-8">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-24 left-1/2 h-[680px] w-screen -translate-x-1/2"
         style={{ background: "radial-gradient(60% 48% at 78% 30%,rgba(255,255,255,.7),transparent 70%),radial-gradient(50% 42% at 8% 10%,rgba(86,160,138,.45),transparent 70%),radial-gradient(55% 42% at 96% 88%,rgba(150,216,230,.6),transparent 70%)" }}
       />
-      <Spark className="nx-twinkle right-6 top-4 h-5 w-5" color="#34d399" />
-      <Spark className="nx-twinkle-2 right-16 top-[17rem] h-4 w-4" color="#fff" />
-      <Spark className="nx-twinkle left-3 top-[27rem] h-3.5 w-3.5" color="#22d3ee" />
+      <Spark className="nx-twinkle right-6 top-4 h-5 w-5 md:right-12" color="#34d399" />
+      <Spark className="nx-twinkle-2 right-16 top-[17rem] h-4 w-4 md:right-32" color="#fff" />
+      <Spark className="nx-twinkle left-3 top-[27rem] h-3.5 w-3.5 md:left-16" color="#22d3ee" />
       <Spark className="nx-twinkle-2 hidden md:block md:left-24 md:top-40 md:h-6 md:w-6" color="#fff" />
+      
       <div className="relative z-10 flex flex-col items-start md:items-center">
         <span className="nx-rise nx-d1 relative inline-flex w-full items-center gap-2 whitespace-nowrap rounded-full border border-emerald-700/25 bg-white/60 py-2.5 pl-4 pr-4 font-mono text-[10.5px] font-bold uppercase tracking-[0.1em] text-emerald-800 isolate sm:w-auto sm:text-[11px] sm:tracking-[0.16em]">
           <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-600" />
@@ -194,15 +205,18 @@ function Hero({ hashtags }) {
         </span>
 
         <div className="nx-rise nx-d2 relative mt-6 w-full md:w-auto">
-          <GoldCoin className="nx-icon-b pointer-events-none absolute right-0 top-[40%] z-0 h-14 w-14 sm:h-20 sm:w-20 md:-right-16 md:top-[8%] md:h-24 md:w-24" />
+          {/* Đã căn chỉnh lại vị trí đồng xu trên Desktop cho cân đối, không đè chữ */}
+          <GoldCoin className="nx-icon-b pointer-events-none absolute -right-6 top-[20%] z-0 h-16 w-16 sm:h-20 sm:w-20 md:-right-20 md:top-[10%] md:h-28 md:w-28" />
+          
           <h1 className={`nx-h1 relative z-10 ${INK}`}>
-            Quay clip.<br className="md:hidden" /> Leo top.
-            <br />
-            <span className="nx-shimmer whitespace-nowrap bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 bg-clip-text text-transparent">Ẵm thưởng thật.</span>
+            Quay clip. Leo top. <br className="hidden md:block" />
+            <span className="nx-shimmer inline-block mt-1 md:mt-2 bg-gradient-to-r from-emerald-500 via-cyan-500 to-blue-500 bg-clip-text text-transparent">
+              Ẵm thưởng thật.
+            </span>
           </h1>
         </div>
 
-        <p className="nx-rise nx-d3 mt-7 max-w-xl text-[1.05rem] leading-[1.8] text-slate-600 md:text-lg">
+        <p className="nx-rise nx-d3 mt-7 max-w-xl text-[1.05rem] leading-[1.8] text-slate-600 md:max-w-2xl md:text-lg">
           Quay video review, trải nghiệm <b className={INK}>Nxx315 Studio</b> rồi đăng lên TikTok hoặc YouTube kèm hashtag{" "}
           {tags.map((t) => (
             <span
@@ -268,7 +282,8 @@ function StatsStrip({ stats }) {
     [Coins, "Giải thưởng đã tặng", stats?.coins],
   ];
   return (
-    <section className="mx-auto max-w-6xl px-4 py-6">
+    // Nới rộng container ra max-w-7xl
+    <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <div className={`${GLASS} grid grid-cols-3 divide-x divide-emerald-900/10 rounded-[2rem] py-6 md:py-9`}>
         {items.map(([Icon, label, value]) => (
           <div key={label} className="flex flex-col items-center px-2 text-center">
@@ -316,6 +331,6 @@ export default function Landing() {
       <Footer />
     </div>
   );
-      }
+}
             
         
