@@ -49,7 +49,7 @@ export default function Ranking({ stats }) {
   const vn = new Date(Date.now() + 7 * 3600e3);
   const monthNum = vn.getUTCMonth() + 1;
   const month = `${monthNum}/${vn.getUTCFullYear()}`;
-  const prize = stats?.settings?.event_prize_text || "700K VNĐ + 150H VIP";
+  const prize = stats?.settings?.event_prize_text || "50k VNĐ + 35K xu";
   const top = stats?.top || [];
   const recent = stats?.recent || [];
 
@@ -82,7 +82,7 @@ export default function Ranking({ stats }) {
           <div className="p-5 text-center">
             <p className="flex items-center justify-center gap-1.5 text-[11px] font-bold uppercase text-slate-500"><Trophy size={13} /> Tổng giải thưởng</p>
             <p className="mt-2 text-xl font-black text-emerald-600">
-              1.8M<span className="text-sm text-slate-500">đ</span> + 900h
+              50k<span className="text-sm text-slate-500">đ</span> + 35k xu
             </p>
           </div>
         </div>
@@ -115,7 +115,7 @@ export default function Ranking({ stats }) {
         <GlassCard className="p-6 lg:col-span-2">
           <div className="mb-6 flex items-center justify-between">
             <p className={`flex items-center gap-2 text-sm font-bold ${INK}`}><Gift size={16} className="text-emerald-600" /> Vừa nhận thưởng</p>
-            <span className="text-[11px] font-bold uppercase text-slate-500">Tổng: {fmtNum(82716)} giờ</span>
+            <span className="text-[11px] font-bold uppercase text-slate-500">Tổng: {fmtNum(82716)} Xu</span>
           </div>
           {recent.length === 0 ? (
             <p className="py-8 text-center text-sm text-slate-500">Chưa có ai nhận thưởng tháng này.</p>
