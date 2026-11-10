@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, X, ExternalLink, RefreshCw, ShieldAlert, Loader2, Wand2, ArrowLeft } from "lucide-react";
+import { Check, X, ExternalLink, RefreshCw, ShieldAlert, Loader2, ArrowLeft } from "lucide-react";
 import useSession from "../hooks/useSession.js";
 import { supabase } from "../lib/supabaseClient.js";
 
@@ -23,15 +23,7 @@ const LABEL = { pending: "Chờ duyệt", approved: "Đã duyệt", rejected: "T
 const num = (v) => (v == null ? "—" : Number(v).toLocaleString("vi-VN"));
 const when = (d) => (d ? new Date(d).toLocaleString("vi-VN") : "—");
 
-function genCode() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let s = "";
-  for (let i = 0; i < 6; i++) s += chars[Math.floor(Math.random() * chars.length)];
-  return `NXX-${s}`;
-}
-
 function ReviewCard({ item, name, onDone }) {
-  const [code, setCode] = useState(() => genCode());
   const [coins, setCoins] = useState(DEFAULT_COINS);
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
@@ -39,13 +31,13 @@ function ReviewCard({ item, name, onDone }) {
   const pending = item.status === "pending";
 
   const run = async (approve) => {
+    if (approve && !window.confirm(`Duyệt và cộng ${Number(coins).toLocaleString("vi-VN")} xu cho creator?`)) return;
     if (!approve && !window.confirm("Từ chối video này?")) return;
     setBusy(true);
     setErr("");
     const { data, error } = await supabase.rpc("admin_review_intro_video", {
       p_id: item.id,
       p_approve: approve,
-      p_code: approve ? code : null,
       p_coins: approve ? Number(coins) : null,
       p_note: note || null,
     });
@@ -69,6 +61,9 @@ function ReviewCard({ item, name, onDone }) {
               {LABEL[item.status] || item.status}
             </span>
             <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold uppercase text-slate-600">{item.platform}</span>
+            {item.duration_seconds != null && (
+              <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">{item.duration_seconds}s</span>
+            )}
           </div>
           <p className="mt-1.5 line-clamp-2 text-sm font-bold text-slate-800">{item.title || "(chưa có tiêu đề)"}</p>
           <p className="mt-0.5 text-xs text-slate-500">
@@ -106,31 +101,16 @@ function ReviewCard({ item, name, onDone }) {
 
       {pending ? (
         <div className="mt-4 space-y-2.5 border-t border-slate-100 pt-4">
-          <div className="grid grid-cols-[1fr_6.5rem] gap-2">
-            <div className="flex gap-1.5">
-              <input
-                value={code}
-                onChange={(e) => setCode(e.target.value.toUpperCase())}
-                placeholder="Gift code"
-                className="w-full min-w-0 rounded-xl border border-slate-200 px-3 py-2 font-mono text-sm font-bold outline-none focus:border-emerald-500"
-              />
-              <button
-                type="button"
-                onClick={() => setCode(genCode())}
-                title="Tạo code mới"
-                className="shrink-0 rounded-xl border border-slate-200 px-2.5 text-slate-600 hover:bg-slate-50"
-              >
-                <Wand2 size={16} />
-              </button>
-            </div>
+          <div>
             <input
               type="number"
               min="1"
               value={coins}
               onChange={(e) => setCoins(e.target.value)}
-              placeholder="Xu"
+              placeholder="Số xu thưởng"
               className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm font-bold outline-none focus:border-emerald-500"
             />
+            <p className="mt-1 text-xs text-slate-500">Bấm Duyệt là xu cộng thẳng vào tài khoản creator.</p>
           </div>
           <input
             value={note}
@@ -160,9 +140,9 @@ function ReviewCard({ item, name, onDone }) {
         </div>
       ) : (
         <div className="mt-3 space-y-1 border-t border-slate-100 pt-3 text-xs text-slate-600">
-          {item.gift_code && (
+          {item.status === "approved" && item.coins != null && (
             <p>
-              Code: <b className="font-mono">{item.gift_code}</b> · {num(item.coins)} xu
+              Đã cộng <b>{num(item.coins)}</b> xu
             </p>
           )}
           {item.admin_note && <p>Ghi chú: {item.admin_note}</p>}
@@ -288,4 +268,4 @@ export default function AdminVideos() {
       </main>
     </div>
   );
-                                 }
+            }
