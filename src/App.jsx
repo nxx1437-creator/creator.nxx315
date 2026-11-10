@@ -119,7 +119,7 @@ export default function App() {
           <Route path="creator/:uid" element={<CreatorProfile />} />
           <Route path="creator/:uid/video/:id" element={<PublicVideo />} />
           <Route path="rules" element={<Rules />} />
-          <Route path="/admin" element={<AdminVideos />} />
+          <Route path="/admin/videos" element={<AdminVideos />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
