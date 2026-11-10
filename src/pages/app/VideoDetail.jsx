@@ -28,7 +28,7 @@ const NA = "na";
 // words: từ khóa trong ghi chú từ chối của admin để biết mục nào không đạt
 const REQUIREMENTS = [
   { key: "channel", text: "Đăng công khai trên kênh đã liên kết", words: ["kênh", "liên kết", "riêng tư", "công khai"] },
-  { key: "duration", text: "Thời lượng tối thiểu 1 phút", words: ["ngắn", "thời lượng"] },
+  { key: "duration", text: "Thời lượng tối thiểu", words: ["ngắn", "thời lượng"] },
   { key: "content", text: "Nội dung giới thiệu NXX315 Studio", words: ["không liên quan", "nội dung", "sai sự thật", "gây hiểu lầm"] },
   { key: "hashtag", text: "Có đủ hashtag bắt buộc", words: ["hashtag"] },
   { key: "title", text: "Có tiêu đề và mô tả phù hợp", words: ["tiêu đề", "mô tả"] },
@@ -39,7 +39,7 @@ const REQUIREMENTS = [
 ];
 
 // Trả về trạng thái từng yêu cầu: OK (✓) / FAIL (✕) / WAIT (° đang duyệt) / NA (không rõ)
-function evaluate(video, tags, content, minSec = 60) {
+function evaluate(video, tags, content, minSec = 20) {
   const note = (video.admin_note || "").toLowerCase();
   const hit = (r) => r.words.some((w) => note.includes(w));
   const plainTitle = (video.title || "").replace(/#[^\s#]+/g, "").trim();
@@ -195,7 +195,7 @@ export default function VideoDetail() {
 
   const content = ((video.title || "") + " " + (video.url || "")).toLowerCase();
   const pf = video.platform?.toUpperCase();
-  const minSec = Number(ctx.ov?.settings?.min_video_seconds) || 60;
+  const minSec = Number(ctx.ov?.settings?.min_video_seconds) || 20;
   const states = evaluate(video, tags, content, minSec);
   const aiReason = video.ai_check?.content?.reason;
   const okCount = states.filter((s) => s === OK).length;
@@ -307,7 +307,7 @@ export default function VideoDetail() {
                     <span
                       className={states[i] === FAIL ? "font-semibold text-rose-600" : "text-slate-700"}
                     >
-                      {r.text}
+                      {r.key === "duration" ? `Thời lượng tối thiểu ${minSec} giây` : r.text}
                     </span>
                     {r.key === "content" && aiReason && (
                       <span className="mt-0.5 block text-[11px] text-slate-400">AI: {aiReason}</span>
@@ -324,7 +324,7 @@ export default function VideoDetail() {
               <span className="flex items-center gap-1.5">
                 <StateIcon s={FAIL} /> Không đạt
               </span>
-               <span className="flex items-center gap-1.5">
+              <span className="flex items-center gap-1.5">
                 <StateIcon s={NA} /> Chưa xét
               </span>
             </div>
@@ -358,4 +358,4 @@ export default function VideoDetail() {
       <HistoryCard samples={rows} />
     </div>
   );
-}
+  }
