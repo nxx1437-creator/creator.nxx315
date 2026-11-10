@@ -3,8 +3,7 @@ import { useOutletContext, useNavigate } from "react-router-dom";
 import { LogOut, Bell, Sparkles, BookOpen, HelpCircle, Settings as SettingsIcon, X, LayoutDashboard, Trophy, Film, Gift, Coins } from "lucide-react";
 import useSession from "../../hooks/useSession.js";
 import { supabase } from "../../lib/supabaseClient.js";
-import { Card, Eyebrow, ChannelLinkCard, GuideVideo } from "../../components/creator/creatorUi.jsx";
-import DiscordLinkCard from "../../components/creator/DiscordLinkCard.jsx";
+import { Card, Eyebrow, ChannelLinkCard } from "../../components/creator/creatorUi.jsx";
 
 // Component menu giả lập theo ảnh 14
 const MenuSidebar = ({ onClose }) => (
@@ -84,16 +83,12 @@ export default function Settings() {
           </button>
         </div>
 
-        <GuideVideo url={ov?.settings?.link_guide_video} />
-
         <Eyebrow className="px-1 font-bold text-slate-500 mt-4">▸ Kênh liên kết</Eyebrow>
         <div className="bg-white/80 rounded-[2rem] p-2 shadow-sm border border-white">
            <ChannelLinkCard platform="youtube" channel={by.youtube} onChanged={reload} />
            <div className="h-px bg-slate-100 mx-4"></div>
            <ChannelLinkCard platform="tiktok" channel={by.tiktok} onChanged={reload} />
         </div>
-
-        <DiscordLinkCard />
 
         <Card className="relative overflow-hidden rounded-[2rem] border-white bg-white/80 p-5 shadow-sm">
           <Eyebrow className="font-bold text-slate-500">▸ Tài khoản</Eyebrow>
@@ -112,4 +107,4 @@ export default function Settings() {
       </div>
     </>
   );
-      }
+               }
