@@ -5,8 +5,8 @@ import { SectionTitle, GlassCard, INK } from "./theme.jsx";
 const ITEMS = [
   {
     Icon: Gift,
-    title: "Phần thưởng tiền mặt & Gift Code",
-    text: "Top Creator có lượt view và tương tác cao nhất sẽ nhận tiền mặt chuyển thẳng qua Bank/Momo. Video đạt chuẩn nhận ngay code VIP dùng trên hệ thống.",
+    title: "Phần thưởng tiền mặt & Coin",
+    text: "Top Creator có lượt view và tương tác cao nhất sẽ nhận tiền mặt chuyển thẳng qua Bank/Momo. Video đạt chuẩn nhận ngay xu khủng dùng trên hệ thống.",
     hero: true,
   },
   {
