@@ -64,7 +64,7 @@ export default function Rules() {
             <p className="mb-2">Video phải đáp ứng tất cả điều kiện sau:</p>
               <ol className="list-decimal pl-5 space-y-1">
               <li>Được đăng công khai trên kênh đã liên kết.</li>
-              <li>Có thời lượng tối thiểu <strong>1 phút</strong>.</li>
+              <li>Có thời lượng tối thiểu <strong> 30 giây</strong>.</li>
               <li>Có nội dung giới thiệu NXX315 Studio.</li>
               <li>Có hashtag <strong className="text-cyan-600">#Nxx315Studio</strong> trong tiêu đề hoặc mô tả.</li>
               <li>Có tiêu đề và mô tả phù hợp với nội dung video.</li>
