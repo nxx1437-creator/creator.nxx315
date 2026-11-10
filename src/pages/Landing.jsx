@@ -176,7 +176,7 @@ function Spark({ className = "", color = "#fff" }) {
 function Hero({ hashtags }) {
   const tags = String(hashtags || "").split(/[\s,]+/).filter(Boolean).map((t) => t.replace(/^#/, ""));
   return (
-    <section className="relative mx-auto max-w-5xl px-4 pb-8 pt-10 md:pt-24 md:text-center">
+    <section className="relative mx-auto max-w-6xl px-4 pb-8 pt-10 md:pt-24">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-24 left-1/2 h-[680px] w-screen -translate-x-1/2"
@@ -185,16 +185,16 @@ function Hero({ hashtags }) {
       <Spark className="nx-twinkle right-6 top-4 h-5 w-5" color="#34d399" />
       <Spark className="nx-twinkle-2 right-16 top-[17rem] h-4 w-4" color="#fff" />
       <Spark className="nx-twinkle left-3 top-[27rem] h-3.5 w-3.5" color="#22d3ee" />
-      <Spark className="nx-twinkle-2 hidden md:block md:left-24 md:top-40 md:h-6 md:w-6" color="#fff" />
-      <div className="relative z-10 flex flex-col items-start md:items-center">
+      <Spark className="nx-twinkle-2 hidden md:block md:right-24 md:top-[22rem] md:h-6 md:w-6" color="#fff" />
+      <div className="relative z-10 flex flex-col items-start">
         <span className="nx-rise nx-d1 relative inline-flex w-full items-center gap-2 whitespace-nowrap rounded-full border border-emerald-700/25 bg-white/60 py-2.5 pl-4 pr-4 font-mono text-[10.5px] font-bold uppercase tracking-[0.1em] text-emerald-800 isolate sm:w-auto sm:text-[11px] sm:tracking-[0.16em]">
           <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-600" />
           Chương trình Creator · Nxx315
-          <GamePad className="nx-icon-a pointer-events-none absolute -left-3 top-4 -z-10 h-14 w-14" />
+          <GamePad className="nx-icon-a pointer-events-none absolute -left-3 top-4 -z-10 h-14 w-14 md:left-auto md:-right-14 md:-top-2" />
         </span>
 
         <div className="nx-rise nx-d2 relative mt-6 w-full md:w-auto">
-          <GoldCoin className="nx-icon-b pointer-events-none absolute right-0 top-[40%] z-0 h-14 w-14 sm:h-20 sm:w-20 md:-right-16 md:top-[8%] md:h-24 md:w-24" />
+          <GoldCoin className="nx-icon-b pointer-events-none absolute right-0 top-[40%] z-0 h-14 w-14 sm:h-20 sm:w-20 md:-right-28 md:top-0 md:h-24 md:w-24" />
           <h1 className={`nx-h1 relative z-10 ${INK}`}>
             Quay clip.<br className="md:hidden" /> Leo top.
             <br />
@@ -316,8 +316,6 @@ export default function Landing() {
       <Footer />
     </div>
   );
-      }
-            
-        
+}
             
         
