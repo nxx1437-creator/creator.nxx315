@@ -19,6 +19,7 @@ import Ranking from "./pages/app/Ranking.jsx";
 import Videos from "./pages/app/Videos.jsx";
 import Rewards from "./pages/app/Rewards.jsx";
 import Settings from "./pages/app/Settings.jsx";
+import AdminVideos from "./pages/AdminVideos.jsx";
 
 function Protected({ children }) {
   const { session, loading } = useSession();
@@ -118,6 +119,7 @@ export default function App() {
           <Route path="creator/:uid" element={<CreatorProfile />} />
           <Route path="creator/:uid/video/:id" element={<PublicVideo />} />
           <Route path="rules" element={<Rules />} />
+          <Route path="/admin" element={<AdminVideos />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
