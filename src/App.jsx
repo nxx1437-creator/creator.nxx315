@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import useSession from "./hooks/useSession.js";
+import useAutoUpdate from "./lib/useAutoUpdate.js";
 import { supabase } from "./lib/supabaseClient.js";
 
 import VideoDetail from "./pages/app/VideoDetail.jsx";
@@ -80,6 +81,8 @@ function OnboardingProtected({ children }) {
 }
 
 export default function App() {
+  useAutoUpdate();
+
   return (
     <BrowserRouter>
       <Routes>
@@ -121,4 +124,5 @@ export default function App() {
       </Routes>
     </BrowserRouter>
   );
-            }
+          }
+
