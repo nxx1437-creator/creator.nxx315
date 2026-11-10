@@ -3,7 +3,7 @@ import React, {
 } from "react";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import {
-  Plus, Send, Loader2, ExternalLink, Film, Eye, Heart, MessageCircle, RefreshCw,
+  Plus, Send, Loader2, ExternalLink, Film, Eye, Heart, MessageCircle, RefreshCw, CheckCircle2,
 } from "lucide-react";
 import useSession from "../../hooks/useSession.js";
 import { supabase } from "../../lib/supabaseClient.js";
@@ -65,7 +65,7 @@ export function Stats({ it }) {
   );
 }
 
-const VideoItem = memo(function VideoItem({ it, onOpen }) {
+const VideoItem = memo(function VideoItem({ it, onOpen, legacyCode }) {
   return (
     <div onClick={() => onOpen(it.id)} className="cursor-pointer transition-transform active:scale-[0.98]">
       <Card className="!p-4">
@@ -109,7 +109,24 @@ const VideoItem = memo(function VideoItem({ it, onOpen }) {
           </div>
         </div>
 
-        {it.status === "approved" && it.gift_code && <CodeBox code={it.gift_code} coins={it.coins} />}
+        {it.status === "approved" && legacyCode && it.gift_code && (
+          <div onClick={(e) => e.stopPropagation()}>
+            <p className="mt-3 text-xs font-semibold text-amber-600">
+              Code cũ chưa nhập: chép code rồi nhập ở Ví trên web chính.
+            </p>
+            <CodeBox code={it.gift_code} coins={it.coins} />
+          </div>
+        )}
+        {it.status === "approved" && !legacyCode && it.coins > 0 && (
+          <div className="mt-3 flex items-center justify-between rounded-2xl bg-emerald-50 px-4 py-2.5">
+            <span className="flex items-center gap-2 text-sm font-bold text-emerald-700">
+              <CheckCircle2 size={17} /> Đã cộng vào ví
+            </span>
+            <span className="text-base font-extrabold text-emerald-700">
+              +{Number(it.coins).toLocaleString("vi-VN")} xu
+            </span>
+          </div>
+        )}
         {it.status === "rejected" && it.admin_note && (
           <p className="mt-3 rounded-xl border border-rose-100 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-600">
             Lý do: {it.admin_note}
@@ -137,10 +154,33 @@ export default function Videos() {
   const [pf, setPf] = useState("all");
   const [st, setSt] = useState("all");
   const [limit, setLimit] = useState(PAGE);
+  const [legacy, setLegacy] = useState(() => new Set()); // video duyệt từ trước, code chưa nhập
 
   const alive = useRef(true);
   const running = useRef(false);
   useEffect(() => () => { alive.current = false; }, []);
+
+  // Tìm các video cũ còn code chưa nhập (video mới được cộng xu thẳng nên không có trong danh sách này)
+  useEffect(() => {
+    if (!uid) return;
+    let on = true;
+    (async () => {
+      const [{ data: subs }, { data: reds }] = await Promise.all([
+        supabase
+          .from("intro_video_submissions")
+          .select("id,gift_code_id")
+          .eq("user_id", uid)
+          .eq("status", "approved"),
+        supabase.from("gift_code_redemptions").select("code_id").eq("user_id", uid),
+      ]);
+      if (!on) return;
+      const done = new Set((reds || []).map((r) => r.code_id));
+      setLegacy(
+        new Set((subs || []).filter((s) => s.gift_code_id && !done.has(s.gift_code_id)).map((s) => s.id))
+      );
+    })();
+    return () => { on = false; };
+  }, [uid, items]);
 
   const refresh = useCallback(async () => {
     if (running.current) return;
@@ -306,7 +346,7 @@ export default function Videos() {
           </div>
           <p className="mt-3 font-mono text-[11px] leading-relaxed text-slate-400">
             Hệ thống tự kiểm tra video có thuộc kênh bạn đã liên kết và có hashtag không. Video hợp lệ sẽ
-            chờ admin duyệt rồi gửi code xu.
+            chờ admin duyệt, được duyệt là xu cộng thẳng vào ví của bạn.
           </p>
         </Card>
       )}
@@ -349,7 +389,7 @@ export default function Videos() {
       ) : (
         <div className="space-y-3">
           {shown.slice(0, limit).map((it) => (
-            <VideoItem key={it.id} it={it} onOpen={openVideo} />
+            <VideoItem key={it.id} it={it} onOpen={openVideo} legacyCode={legacy.has(it.id)} />
           ))}
           {shown.length > limit && (
             <button
@@ -363,4 +403,4 @@ export default function Videos() {
       )}
     </div>
   );
-          }
+      }
