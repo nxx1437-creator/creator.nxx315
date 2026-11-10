@@ -1,9 +1,10 @@
 import React, { memo, useEffect, useState } from "react";
 import {
-  Play, ExternalLink, AlertCircle, LineChart, Clock, Gift,
+  Play, ExternalLink, AlertCircle, LineChart, Clock, Gift, CheckCircle2,
 } from "lucide-react";
 import { Card, CodeBox } from "./creatorUi.jsx";
 import { TIKTOK_LOGO, YOUTUBE_LOGO } from "./platformLogos.js";
+import { supabase } from "../../lib/supabaseClient.js";
 import {
   LOW_TIERS, TIERS, estimateReward, likeWord, vn,
 } from "../../lib/videoReward.js";
@@ -179,6 +180,49 @@ function Bar({ label, cur, target }) {
   );
 }
 
+// Phần thưởng thực nhận của video đã duyệt
+function ReceivedReward({ video }) {
+  // null: đang kiểm tra, true: xu đã vào ví, false: code cũ chưa nhập
+  const [claimed, setClaimed] = useState(null);
+  const codeId = video.gift_code_id;
+
+  useEffect(() => {
+    if (!codeId) { setClaimed(true); return undefined; }
+    let off = false;
+    supabase
+      .from("gift_code_redemptions")
+      .select("code_id")
+      .eq("code_id", codeId)
+      .maybeSingle()
+      .then(({ data }) => { if (!off) setClaimed(!!data); });
+    return () => { off = true; };
+  }, [codeId]);
+
+  if (claimed === null) return <div className="mt-3 h-14" />;
+
+  if (claimed) {
+    return (
+      <div className="mt-3 flex items-center justify-between rounded-2xl bg-emerald-50 px-4 py-3">
+        <span className="flex items-center gap-2 text-sm font-bold text-emerald-700">
+          <CheckCircle2 size={18} /> Đã cộng vào ví
+        </span>
+        <span className="text-lg font-extrabold text-emerald-700">
+          +{vn(video.coins || 0)} xu
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <p className="mt-3 text-xs font-semibold text-amber-600">
+        Code cũ chưa nhập: chép code rồi nhập ở Ví trên web chính.
+      </p>
+      <CodeBox code={video.gift_code} coins={video.coins} />
+    </>
+  );
+}
+
 export const RewardCard = memo(function RewardCard({ video }) {
   const views = Number(video.views) || 0;
   const likes = Number(video.likes) || 0;
@@ -243,11 +287,11 @@ export const RewardCard = memo(function RewardCard({ video }) {
       )}
 
       {real ? (
-        <CodeBox code={video.gift_code} coins={video.coins} />
+        <ReceivedReward video={video} />
       ) : (
         <p className="mt-3 text-[11px] leading-relaxed text-slate-400">
-          Đây là ước tính theo số liệu hiện tại. Thưởng thực nhận do admin chốt sau khi video đủ 7 ngày
-          và mỗi video chỉ nhận thưởng một lần.
+          Đây là ước tính theo số liệu hiện tại. Thưởng thực nhận do admin chốt sau khi video đủ 7 ngày,
+          xu được cộng thẳng vào ví và mỗi video chỉ nhận thưởng một lần.
         </p>
       )}
 
@@ -399,4 +443,3 @@ export const OpenButton = memo(function OpenButton({ url, platform }) {
     </a>
   );
 });
-        
