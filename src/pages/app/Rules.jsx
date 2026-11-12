@@ -4,7 +4,7 @@ import { Eyebrow } from "../../components/creator/creatorUi.jsx";
 export default function Rules() {
   return (
     <div className="space-y-4 pb-10">
-      {/* HEADER - CĂN TRÁI SÁT LỀ */}
+      {/* HEADER */}
       <div className="px-1 mb-6 text-left">
         <Eyebrow className="text-slate-500">▸ THỂ LỆ CHƯƠNG TRÌNH</Eyebrow>
         <h1 className="mt-1 text-[26px] font-extrabold text-slate-900 leading-tight">
@@ -24,7 +24,7 @@ export default function Rules() {
       {/* NỘI DUNG CHÍNH */}
       <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="space-y-6 text-[14px] leading-relaxed text-slate-700">
-          
+
           {/* 1 */}
           <section>
             <h2 className="font-bold text-slate-900 mb-2 text-[15px]">1. ĐIỀU KIỆN THAM GIA</h2>
@@ -62,9 +62,9 @@ export default function Rules() {
           <section>
             <h2 className="font-bold text-slate-900 mb-2 text-[15px]">3. ĐIỀU KIỆN VIDEO HỢP LỆ</h2>
             <p className="mb-2">Video phải đáp ứng tất cả điều kiện sau:</p>
-              <ol className="list-decimal pl-5 space-y-1">
+            <ol className="list-decimal pl-5 space-y-1">
               <li>Được đăng công khai trên kênh đã liên kết.</li>
-              <li>Có thời lượng tối thiểu <strong> 20 giây</strong>.</li>
+              <li>Có thời lượng tối thiểu <strong>20 giây</strong>.</li>
               <li>Có nội dung giới thiệu NXX315 Studio.</li>
               <li>Có hashtag <strong className="text-cyan-600">#Nxx315Studio</strong> trong tiêu đề hoặc mô tả.</li>
               <li>Có tiêu đề và mô tả phù hợp với nội dung video.</li>
@@ -92,7 +92,7 @@ export default function Rules() {
               <li>Tối đa 3 video trong mỗi 24 giờ.</li>
               <li>Tối đa 5 video đang chờ duyệt cùng lúc.</li>
               <li>Chỉ gửi video được đăng trên kênh đã liên kết.</li>
-              <li>Mỗi video chỉ được xét thưởng một lần.</li>
+              <li>Mỗi video được duyệt thưởng tối đa 3 lần (xem mục 6.1).</li>
             </ul>
             <div className="mt-2 text-[13px] text-rose-600 bg-rose-50 p-2.5 rounded-lg border border-rose-100">
               Nghiêm cấm tạo nhiều tài khoản hoặc lợi dụng lỗi hệ thống để vượt qua giới hạn.
@@ -103,12 +103,13 @@ export default function Rules() {
           <section>
             <h2 className="font-bold text-slate-900 mb-2 text-[15px]">5. QUY TRÌNH XÉT DUYỆT</h2>
             <ol className="list-decimal pl-5 space-y-1">
-             <li>Hệ thống kiểm tra tự động thời lượng và dùng AI hỗ trợ sơ duyệt nội dung; kết quả cuối cùng do admin quyết định.</li>
+              <li>Hệ thống kiểm tra tự động thời lượng và dùng AI hỗ trợ sơ duyệt nội dung; kết quả cuối cùng do admin quyết định.</li>
               <li>Hệ thống kiểm tra đường dẫn, kênh đăng tải và hashtag.</li>
               <li>Video không đạt điều kiện sẽ bị từ chối.</li>
               <li>Video vượt qua kiểm tra tự động sẽ chuyển sang trạng thái chờ xét duyệt.</li>
               <li>Admin kiểm tra nội dung, tính hợp lệ và dấu hiệu gian lận.</li>
               <li>Video chỉ được công nhận sau khi có kết quả duyệt chính thức.</li>
+              <li>Sau khi duyệt lần 1, video tăng lượt xem hoặc lượt thích/tim có thể được duyệt lại ở lần 2 và lần 3 để cộng thêm xu (xem mục 6.1).</li>
             </ol>
             <p className="mt-2 font-semibold text-[13px]">Thời gian duyệt dự kiến: 1–3 ngày làm việc.</p>
             <p className="mt-1 text-[13px] text-slate-500">Ban tổ chức có thể kiểm tra lại video sau khi duyệt nếu phát hiện dấu hiệu gian lận hoặc sai sót.</p>
@@ -123,11 +124,25 @@ export default function Rules() {
             <ul className="list-disc pl-5 space-y-1">
               <li>Sử dụng số liệu tại thời điểm chốt để xác định mức thưởng.</li>
               <li>Video phải đáp ứng đồng thời điều kiện lượt xem và lượt thích/tim của mốc thưởng tương ứng.</li>
-              <li>Lượt xem và lượt thích/tim tăng sau thời điểm chốt không làm thay đổi mức thưởng đã xác định.</li>
+              <li>Lần duyệt 1 dùng số liệu tại thời điểm chốt. Số liệu tăng thêm sau đó chỉ được tính khi video được duyệt lại ở lần 2 hoặc lần 3 (xem mục 6.1).</li>
               <li>Video phải được duyệt và xác minh hợp lệ trước khi nhận thưởng.</li>
               <li>Nếu số liệu không thể xác minh, ban tổ chức có thể yêu cầu bổ sung thông tin hoặc tạm hoãn xét thưởng.</li>
             </ul>
             <p className="mt-2 text-[13px] text-slate-500">Thời gian 7 ngày được tính từ lúc video đăng công khai, không phải từ lúc gửi xét duyệt.</p>
+
+            <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <h3 className="font-semibold text-[14px] text-slate-800 mb-1.5">6.1. Duyệt thưởng nhiều lần</h3>
+              <ul className="list-disc pl-5 space-y-1 text-[13px]">
+                <li>Mỗi video được duyệt tối đa 3 lần. Lần 1 sau khi chốt số liệu, lần 2 và lần 3 khi ban tổ chức kiểm tra lại số liệu.</li>
+                <li>Mỗi lần duyệt, hệ thống đối chiếu số liệu hiện tại với bảng thưởng ở mục 7.</li>
+                <li>Nếu video lên mốc cao hơn mức đã nhận, bạn được cộng thêm phần chênh lệch. Chưa lên mốc mới thì không cộng thêm.</li>
+                <li>Tổng xu của một video không vượt quá 50.000 xu.</li>
+                <li>Xu của mỗi lần duyệt được cộng thẳng vào ví.</li>
+              </ul>
+              <p className="mt-2 text-[13px] italic text-slate-500">
+                Ví dụ: Video TikTok duyệt lần 1 đạt 1.000 xem + 50 tim nhận 1.500 xu. Duyệt lần 2 đạt 5.000 xem + 200 tim (mốc 5.000 xu), bạn nhận thêm 3.500 xu, tổng 5.000 xu.
+              </p>
+            </div>
           </section>
 
           {/* 7 */}
@@ -140,7 +155,10 @@ export default function Rules() {
                 <div className="overflow-x-auto rounded-lg border border-slate-200">
                   <table className="w-full text-left text-[13px]">
                     <thead className="bg-slate-50 border-b border-slate-200">
-                      <tr><th className="px-3 py-2 font-semibold text-slate-700">Lượt xem sau 7 ngày</th><th className="px-3 py-2 font-semibold text-slate-700 text-right">Phần thưởng</th></tr>
+                      <tr>
+                        <th className="px-3 py-2 font-semibold text-slate-700">Lượt xem sau 7 ngày</th>
+                        <th className="px-3 py-2 font-semibold text-slate-700 text-right">Phần thưởng</th>
+                      </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       <tr><td className="px-3 py-2">Dưới 200 lượt xem</td><td className="px-3 py-2 text-right font-bold text-cyan-600">50 xu</td></tr>
@@ -150,12 +168,16 @@ export default function Rules() {
                   </table>
                 </div>
               </div>
+
               <div>
                 <h3 className="font-semibold text-[14px] text-slate-800 mb-1.5">7.2. Bảng thưởng YouTube</h3>
                 <div className="overflow-x-auto rounded-lg border border-slate-200">
                   <table className="w-full text-left text-[13px]">
                     <thead className="bg-slate-50 border-b border-slate-200">
-                      <tr><th className="px-3 py-2 font-semibold text-slate-700">Thành tích sau 7 ngày</th><th className="px-3 py-2 font-semibold text-slate-700 text-right">Phần thưởng</th></tr>
+                      <tr>
+                        <th className="px-3 py-2 font-semibold text-slate-700">Thành tích sau 7 ngày</th>
+                        <th className="px-3 py-2 font-semibold text-slate-700 text-right">Phần thưởng</th>
+                      </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       <tr><td className="px-3 py-2">1.000 lượt xem + 50 lượt thích</td><td className="px-3 py-2 text-right font-bold text-cyan-600">2.500 xu</td></tr>
@@ -167,12 +189,16 @@ export default function Rules() {
                   </table>
                 </div>
               </div>
+
               <div>
                 <h3 className="font-semibold text-[14px] text-slate-800 mb-1.5">7.3. Bảng thưởng TikTok</h3>
                 <div className="overflow-x-auto rounded-lg border border-slate-200">
                   <table className="w-full text-left text-[13px]">
                     <thead className="bg-slate-50 border-b border-slate-200">
-                      <tr><th className="px-3 py-2 font-semibold text-slate-700">Thành tích sau 7 ngày</th><th className="px-3 py-2 font-semibold text-slate-700 text-right">Phần thưởng</th></tr>
+                      <tr>
+                        <th className="px-3 py-2 font-semibold text-slate-700">Thành tích sau 7 ngày</th>
+                        <th className="px-3 py-2 font-semibold text-slate-700 text-right">Phần thưởng</th>
+                      </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       <tr><td className="px-3 py-2">1.000 lượt xem + 50 lượt tim</td><td className="px-3 py-2 text-right font-bold text-cyan-600">1.500 xu</td></tr>
@@ -184,13 +210,14 @@ export default function Rules() {
                   </table>
                 </div>
               </div>
+
               <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
                 <h3 className="font-semibold text-[14px] text-slate-800 mb-1.5">7.4. Nguyên tắc tính thưởng</h3>
                 <ul className="list-disc pl-5 space-y-1 text-[13px]">
                   <li>Video phải đạt đồng thời số lượt xem và lượt thích/tim của mốc tương ứng.</li>
                   <li>Mỗi video nhận mức thưởng cao nhất mà video đáp ứng đầy đủ điều kiện.</li>
-                  <li>Các mốc thưởng không cộng dồn.</li>
-                  <li>Video chỉ được nhận thưởng một lần.</li>
+                  <li>Các mốc thưởng không cộng dồn. Khi duyệt lại chỉ cộng phần chênh lệch giữa mốc mới và số xu đã nhận.</li>
+                  <li>Mỗi video được duyệt thưởng tối đa 3 lần, tổng thưởng không vượt mốc cao nhất.</li>
                   <li>Mức thưởng tối đa là 50.000 xu/video.</li>
                   <li>Video chưa đạt mốc đầu tiên được áp dụng bảng thưởng dưới 1.000 lượt xem.</li>
                   <li>Nếu video đạt nhiều mốc, chỉ áp dụng một mốc cao nhất hợp lệ.</li>
@@ -219,10 +246,10 @@ export default function Rules() {
             <p className="text-[13px] text-rose-600">Nếu nhập sai code quá 5 lần trong vòng 10 phút, chức năng nhập code sẽ bị khóa tạm thời trong 10 phút. Nghiêm cấm mua bán, trao đổi, sao chép hoặc sử dụng Gift Code trái phép.</p>
           </section>
 
-                    {/* 9 */}
+          {/* 9 */}
           <section>
             <h2 className="font-bold text-slate-900 mb-2 text-[15px]">9. BẢNG XẾP HẠNG CREATOR HÀNG THÁNG</h2>
-             <div className="mb-4">
+            <div className="mb-4">
               <h3 className="font-semibold text-[14px] text-slate-800 mb-1.5">9.1. Cách tính điểm</h3>
               <div className="mb-3 rounded-lg border border-cyan-200 bg-cyan-50 p-3 text-[13px] font-semibold text-cyan-800">
                 Điểm của một video = lượt xem + lượt thích/tim + bình luận.
@@ -247,35 +274,20 @@ export default function Rules() {
                 </ul>
               </div>
             </div>
+
             <div className="mb-4">
               <h3 className="font-semibold text-[14px] text-slate-800 mb-1.5">9.2. Cơ cấu giải thưởng</h3>
               <div className="overflow-x-auto rounded-lg border border-slate-200">
                 <table className="w-full text-left text-[13px]">
                   <thead className="bg-slate-50 border-b border-slate-200">
-                    <tr><th className="px-3 py-2 font-semibold text-slate-700">Thứ hạng</th><th className="px-3 py-2 font-semibold text-slate-700 text-right">Phần thưởng</th></tr>
+                    <tr>
+                      <th className="px-3 py-2 font-semibold text-slate-700">Thứ hạng</th>
+                      <th className="px-3 py-2 font-semibold text-slate-700 text-right">Phần thưởng</th>
+                    </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     <tr><td className="px-3 py-2">🥇 Top 1</td><td className="px-3 py-2 text-right font-bold text-amber-600">20.000 xu</td></tr>
-                    <tr><td className="px-3 py-2">🥈 Top 2</td><td className="px-3 py-2 text-right font-bold text-slate-500">10.000 xu</td></tr>
-                    <tr><td className="px-3 py-2">🥉 Top 3</td><td className="px-3 py-2 text-right font-bold text-orange-600">5.000 xu</td></tr>
-                  </tbody>
-                </table>
-              </div>
-              <p className="mt-2 text-[13px] font-semibold text-slate-700">Tổng ngân sách tối đa: 35.000 xu/tháng.</p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-[14px] text-slate-800 mb-1.5">9.3. Điều kiện nhận giải</h3>
-              <ul className="list-disc pl-5 space-y-1">
-                <li>Có ít nhất 3 video được duyệt trong tháng.</li>
-                <li>Không gian lận hoặc vi phạm thể lệ.</li>
-                <li>Thành tích phải được xác minh hợp lệ.</li>
-                <li>Mỗi người chỉ nhận một giải thưởng top tháng.</li>
-                <li>Giải thưởng dự kiến được trao trong vòng 7 ngày làm việc sau khi kết thúc tháng.</li>
-              </ul>
-              <p className="mt-2 text-[13px] italic text-slate-500">Nếu chỉ có một hoặc hai người đủ điều kiện, chỉ trao giải tương ứng cho những người đó. Nếu không có người đủ điều kiện, tháng đó không trao giải. Ban tổ chức có quyền kiểm tra lại thành tích và điều chỉnh thứ hạng nếu phát hiện gian lận.</p>
-            </div>
-          </section>
-
+                    <tr><td className="px-3 py-2">🥈 Top 2</td><td className="px-3 py-2 text-right font
           {/* 10 */}
           <section>
             <h2 className="font-bold text-slate-900 mb-2 text-[15px]">10. CÁC HÀNH VI BỊ NGHIÊM CẤM</h2>
