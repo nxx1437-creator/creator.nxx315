@@ -14,6 +14,45 @@ import {
 const PAGE = 20;
 const AUTO_GAP = 10 * 60 * 1000; // tự làm mới tối đa 10 phút/lần
 const KEY = "nxx_videos_last_refresh";
+const MAX_ROUNDS = 3; // khớp với hệ thống duyệt của admin
+
+function RoundSteps({ status, round }) {
+  if (status === "rejected") return null;
+  const done = status === "approved" ? Math.max(round || 1, 1) : 0;
+  return (
+    <div className="mt-3">
+      <div className="flex flex-wrap items-center gap-1.5">
+        {Array.from({ length: MAX_ROUNDS }, (_, i) => {
+          const n = i + 1;
+          const ok = n <= done;
+          const current = n === done + 1;
+          return (
+            <span
+              key={n}
+              className={`flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-bold ${
+                ok
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                  : current
+                  ? "border-cyan-200 bg-cyan-50 text-cyan-700"
+                  : "border-slate-200 bg-white text-slate-400"
+              }`}
+            >
+              {ok && <CheckCircle2 size={11} />}
+              Duyệt lần {n}
+            </span>
+          );
+        })}
+      </div>
+      <p className="mt-1.5 text-[11px] text-slate-400">
+        {status === "pending"
+          ? "Đang chờ duyệt lần 1."
+          : done < MAX_ROUNDS
+          ? "Video tăng lượt xem sẽ được duyệt lại và cộng thêm xu."
+          : "Video đã duyệt đủ các lần."}
+      </p>
+    </div>
+  );
+}
 
 // Tạo 1 lần, dùng chung cho mọi video
 const dateFmt = new Intl.DateTimeFormat("vi-VN", { dateStyle: "short", timeStyle: "short" });
@@ -65,7 +104,7 @@ export function Stats({ it }) {
   );
 }
 
-const VideoItem = memo(function VideoItem({ it, onOpen, legacyCode }) {
+const VideoItem = memo(function VideoItem({ it, onOpen, legacyCode, round }) {
   return (
     <div onClick={() => onOpen(it.id)} className="cursor-pointer transition-transform active:scale-[0.98]">
       <Card className="!p-4">
@@ -110,6 +149,7 @@ const VideoItem = memo(function VideoItem({ it, onOpen, legacyCode }) {
         </div>
 
         {it.status === "approved" && legacyCode && it.gift_code && (
+         <RoundSteps status={it.status} round={round} />
           <div onClick={(e) => e.stopPropagation()}>
             <p className="mt-3 text-xs font-semibold text-amber-600">
               Code cũ chưa nhập: chép code rồi nhập ở Ví trên web chính.
@@ -120,7 +160,7 @@ const VideoItem = memo(function VideoItem({ it, onOpen, legacyCode }) {
         {it.status === "approved" && !legacyCode && it.coins > 0 && (
           <div className="mt-3 flex items-center justify-between rounded-2xl bg-emerald-50 px-4 py-2.5">
             <span className="flex items-center gap-2 text-sm font-bold text-emerald-700">
-              <CheckCircle2 size={17} /> Đã cộng vào ví
+              <CheckCircle2 size={17} /> Đã cộng vào ví{round > 1 ? ` (${round} lần duyệt)` : ""}
             </span>
             <span className="text-base font-extrabold text-emerald-700">
               +{Number(it.coins).toLocaleString("vi-VN")} xu
@@ -154,7 +194,8 @@ export default function Videos() {
   const [pf, setPf] = useState("all");
   const [st, setSt] = useState("all");
   const [limit, setLimit] = useState(PAGE);
-  const [legacy, setLegacy] = useState(() => new Set()); // video duyệt từ trước, code chưa nhập
+  const [legacy, setLegacy] = useState(() => new Set());
+  const [rounds, setRounds] = useState({});
 
   const alive = useRef(true);
   const running = useRef(false);
@@ -206,6 +247,20 @@ export default function Videos() {
       if (alive.current) setRefreshing(false);
     }
   }, [reload]);
+
+  useEffect(() => {
+  if (!uid) return;
+  let on = true;
+  supabase
+    .from("intro_video_submissions")
+    .select("id,review_round")
+    .eq("user_id", uid)
+    .eq("status", "approved")
+    .then(({ data }) => {
+      if (on) setRounds(Object.fromEntries((data || []).map((r) => [r.id, r.review_round])));
+    });
+  return () => { on = false; };
+}, [uid, items]);
 
   // Tự làm mới khi vào trang, nhưng tối đa 10 phút/lần
   useEffect(() => {
@@ -346,7 +401,8 @@ export default function Videos() {
           </div>
           <p className="mt-3 font-mono text-[11px] leading-relaxed text-slate-400">
             Hệ thống tự kiểm tra video có thuộc kênh bạn đã liên kết và có hashtag không. Video hợp lệ sẽ
-            chờ admin duyệt, được duyệt là xu cộng thẳng vào ví của bạn.
+            chờ admin duyệt lần 1, được duyệt là xu cộng thẳng vào ví. Video tăng lượt xem sẽ được duyệt
+            lại (tối đa 3 lần) và cộng thêm phần xu chênh lệch.
           </p>
         </Card>
       )}
@@ -389,7 +445,7 @@ export default function Videos() {
       ) : (
         <div className="space-y-3">
           {shown.slice(0, limit).map((it) => (
-            <VideoItem key={it.id} it={it} onOpen={openVideo} legacyCode={legacy.has(it.id)} />
+            <VideoItem key={it.id} it={it} onOpen={openVideo} legacyCode={legacy.has(it.id)} round={rounds[it.id] || 0} />
           ))}
           {shown.length > limit && (
             <button
