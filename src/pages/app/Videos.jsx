@@ -16,6 +16,23 @@ const AUTO_GAP = 10 * 60 * 1000; // tự làm mới tối đa 10 phút/lần
 const KEY = "nxx_videos_last_refresh";
 const MAX_ROUNDS = 3; // khớp với hệ thống duyệt của admin
 
+// Tạo 1 lần, dùng chung cho mọi video
+const dateFmt = new Intl.DateTimeFormat("vi-VN", { dateStyle: "short", timeStyle: "short" });
+
+const lastRefresh = () => {
+  try { return Number(sessionStorage.getItem(KEY)) || 0; } catch { return 0; }
+};
+const stampRefresh = () => {
+  try { sessionStorage.setItem(KEY, String(Date.now())); } catch { /* bỏ qua */ }
+};
+
+const STATUS_TABS = [
+  ["all", "Tất cả"],
+  ["pending", "Đang chờ"],
+  ["approved", "Đã duyệt"],
+  ["rejected", "Bị từ chối"],
+];
+
 function RoundSteps({ status, round }) {
   if (status === "rejected") return null;
   const done = status === "approved" ? Math.max(round || 1, 1) : 0;
@@ -53,23 +70,6 @@ function RoundSteps({ status, round }) {
     </div>
   );
 }
-
-// Tạo 1 lần, dùng chung cho mọi video
-const dateFmt = new Intl.DateTimeFormat("vi-VN", { dateStyle: "short", timeStyle: "short" });
-
-const lastRefresh = () => {
-  try { return Number(sessionStorage.getItem(KEY)) || 0; } catch { return 0; }
-};
-const stampRefresh = () => {
-  try { sessionStorage.setItem(KEY, String(Date.now())); } catch { /* bỏ qua */ }
-};
-
-const STATUS_TABS = [
-  ["all", "Tất cả"],
-  ["pending", "Đang chờ"],
-  ["approved", "Đã duyệt"],
-  ["rejected", "Bị từ chối"],
-];
 
 function Chip({ active, onClick, dot, label, count }) {
   return (
@@ -148,7 +148,7 @@ const VideoItem = memo(function VideoItem({ it, onOpen, legacyCode, round }) {
           </div>
         </div>
 
-                        <RoundSteps status={it.status} round={round} />
+        <RoundSteps status={it.status} round={round} />
 
         {it.status === "approved" && legacyCode && it.gift_code && (
           <div onClick={(e) => e.stopPropagation()}>
@@ -195,8 +195,8 @@ export default function Videos() {
   const [pf, setPf] = useState("all");
   const [st, setSt] = useState("all");
   const [limit, setLimit] = useState(PAGE);
-  const [legacy, setLegacy] = useState(() => new Set());
-  const [rounds, setRounds] = useState({});
+  const [legacy, setLegacy] = useState(() => new Set()); // video duyệt từ trước, code chưa nhập
+  const [rounds, setRounds] = useState({}); // số lần đã duyệt của từng video
 
   const alive = useRef(true);
   const running = useRef(false);
@@ -224,6 +224,21 @@ export default function Videos() {
     return () => { on = false; };
   }, [uid, items]);
 
+  // Lấy số lần duyệt của các video đã duyệt
+  useEffect(() => {
+    if (!uid) return;
+    let on = true;
+    supabase
+      .from("intro_video_submissions")
+      .select("id,review_round")
+      .eq("user_id", uid)
+      .eq("status", "approved")
+      .then(({ data }) => {
+        if (on) setRounds(Object.fromEntries((data || []).map((r) => [r.id, r.review_round])));
+      });
+    return () => { on = false; };
+  }, [uid, items]);
+
   const refresh = useCallback(async () => {
     if (running.current) return;
     running.current = true;
@@ -248,20 +263,6 @@ export default function Videos() {
       if (alive.current) setRefreshing(false);
     }
   }, [reload]);
-
-  useEffect(() => {
-  if (!uid) return;
-  let on = true;
-  supabase
-    .from("intro_video_submissions")
-    .select("id,review_round")
-    .eq("user_id", uid)
-    .eq("status", "approved")
-    .then(({ data }) => {
-      if (on) setRounds(Object.fromEntries((data || []).map((r) => [r.id, r.review_round])));
-    });
-  return () => { on = false; };
-}, [uid, items]);
 
   // Tự làm mới khi vào trang, nhưng tối đa 10 phút/lần
   useEffect(() => {
@@ -446,7 +447,13 @@ export default function Videos() {
       ) : (
         <div className="space-y-3">
           {shown.slice(0, limit).map((it) => (
-            <VideoItem key={it.id} it={it} onOpen={openVideo} legacyCode={legacy.has(it.id)} round={rounds[it.id] || 0} />
+            <VideoItem
+              key={it.id}
+              it={it}
+              onOpen={openVideo}
+              legacyCode={legacy.has(it.id)}
+              round={rounds[it.id] || 0}
+            />
           ))}
           {shown.length > limit && (
             <button
@@ -460,4 +467,4 @@ export default function Videos() {
       )}
     </div>
   );
-      }
+}
