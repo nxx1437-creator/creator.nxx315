@@ -124,8 +124,8 @@ export default function Rules() {
             <ul className="list-disc pl-5 space-y-1">
               <li>Sử dụng số liệu tại thời điểm chốt để xác định mức thưởng.</li>
               <li>Video phải đáp ứng đồng thời điều kiện lượt xem và lượt thích/tim của mốc thưởng tương ứng.</li>
-              <li>Lần duyệt 1 dùng số liệu tại thời điểm chốt. Số liệu tăng thêm sau đó chỉ được tính khi video được duyệt lại ở lần 2 hoặc lần 3 (xem mục 6.1).</li>
-              <li>Video phải được duyệt và xác minh hợp lệ trước khi nhận thưởng.</li>
+              <li>Lần duyệt 1 dùng số liệu tại thời.</li>
+                <li>Video phải được duyệt và xác minh hợp lệ trước khi nhận thưởng.</li>
               <li>Nếu số liệu không thể xác minh, ban tổ chức có thể yêu cầu bổ sung thông tin hoặc tạm hoãn xét thưởng.</li>
             </ul>
             <p className="mt-2 text-[13px] text-slate-500">Thời gian 7 ngày được tính từ lúc video đăng công khai, không phải từ lúc gửi xét duyệt.</p>
@@ -143,9 +143,8 @@ export default function Rules() {
                 Ví dụ: Video TikTok duyệt lần 1 đạt 1.000 xem + 50 tim nhận 1.500 xu. Duyệt lần 2 đạt 5.000 xem + 200 tim (mốc 5.000 xu), bạn nhận thêm 3.500 xu, tổng 5.000 xu.
               </p>
             </div>
-          </section>
-
-          {/* 7 */}
+          </section> 
+                    {/* 7 */}
           <section>
             <h2 className="font-bold text-slate-900 mb-2 text-[15px]">7. BẢNG THƯỞNG VIDEO</h2>
             <p className="mb-3">Mức thưởng phụ thuộc vào nền tảng, lượt xem và lượt thích/tim hợp lệ.</p>
@@ -287,94 +286,74 @@ export default function Rules() {
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     <tr><td className="px-3 py-2">🥇 Top 1</td><td className="px-3 py-2 text-right font-bold text-amber-600">20.000 xu</td></tr>
-                    <tr><td className="px-3 py-2">🥈 Top 2</td><td className="px-3 py-2 text-right font
+                    <tr><td className="px-3 py-2">🥈 Top 2</td><td className="px-3 py-2 text-right font-bold text-slate-500">10.000 xu</td></tr>
+                    <tr><td className="px-3 py-2">🥉 Top 3</td><td className="px-3 py-2 text-right font-bold text-orange-600">5.000 xu</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-2 text-[13px] font-semibold text-slate-700">Tổng ngân sách tối đa: 35.000 xu/tháng.</p>
+            </div>
+
+            <div>
+              <h3 className="font-semibold text-[14px] text-slate-800 mb-1.5">9.3. Điều kiện nhận giải</h3>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Có ít nhất 3 video được duyệt trong tháng.</li>
+                <li>Không gian lận hoặc vi phạm thể lệ.</li>
+                <li>Thành tích phải được xác minh hợp lệ.</li>
+                <li>Mỗi người chỉ nhận một giải thưởng top tháng.</li>
+                <li>Giải thưởng dự kiến được trao trong vòng 7 ngày làm việc sau khi kết thúc tháng.</li>
+              </ul>
+              <p className="mt-2 text-[13px] italic text-slate-500">Nếu chỉ có một hoặc hai người đủ điều kiện, chỉ trao giải tương ứng cho những người đó. Nếu không có người đủ điều kiện, tháng đó không trao giải. Ban tổ chức có quyền kiểm tra lại thành tích và điều chỉnh thứ hạng nếu phát hiện gian lận.</p>
+            </div>
+          </section>
+
           {/* 10 */}
           <section>
             <h2 className="font-bold text-slate-900 mb-2 text-[15px]">10. CÁC HÀNH VI BỊ NGHIÊM CẤM</h2>
             <p className="mb-2">Người tham gia không được:</p>
             <ul className="list-disc pl-5 space-y-1 text-rose-700">
-              <li>Mua lượt xem, lượt thích, lượt tim hoặc bình luận để tăng thưởng.</li>
-              <li>Sử dụng bot hoặc dịch vụ tạo tương tác giả.</li>
-              <li>Sao chép video hoặc sử dụng nội dung trái phép.</li>
-              <li>Tạo nhiều tài khoản Creator để nhận thưởng nhiều lần.</li>
-              <li>Gửi video trùng lặp nhằm trục lợi.</li>
-              <li>Giả mạo thông tin hoặc sử dụng kênh không thuộc quyền quản lý hợp pháp.</li>
-              <li>Lợi dụng lỗi hệ thống để nhận thêm xu hoặc Gift Code.</li>
-              <li>Cố tình cung cấp thông tin sai lệch về NXX315 Studio.</li>
-              <li>Đe dọa, xúc phạm hoặc quấy rối admin và người tham gia khác.</li>
+              <li>Mua lượt xem, lượt thích, lượt tim hoặc bình luận để tăng thành tích.</li>
+              <li>Dùng bot, phần mềm hoặc dịch vụ tự động để tăng tương tác.</li>
+              <li>Tạo nhiều tài khoản Creator hoặc liên kết kênh không thuộc quyền quản lý của mình.</li>
+              <li>Gửi video sao chép, mạo danh hoặc đăng lại nội dung của người khác.</li>
+              <li>Đăng nội dung sai sự thật, gây hiểu lầm hoặc vi phạm pháp luật.</li>
+              <li>Mua bán, trao đổi hoặc sao chép Gift Code.</li>
+              <li>Lợi dụng lỗi hệ thống để nhận thưởng hoặc vượt giới hạn gửi video.</li>
             </ul>
-            <p className="mt-2 text-[13px] text-slate-600">Các hành vi có bản chất tương tự nhằm gian lận hoặc phá hoại chương trình cũng có thể bị xử lý.</p>
           </section>
 
           {/* 11 */}
           <section>
             <h2 className="font-bold text-slate-900 mb-2 text-[15px]">11. XỬ LÝ VI PHẠM</h2>
-            <p className="mb-2">Tùy theo tính chất và mức độ vi phạm, ban tổ chức có thể áp dụng một hoặc nhiều biện pháp:</p>
+            <p className="mb-2">Tùy mức độ, ban tổ chức có thể áp dụng một hoặc nhiều biện pháp sau:</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Cảnh cáo hoặc từ chối video.</li>
-              <li>Hủy kết quả duyệt và điểm số không hợp lệ.</li>
-              <li>Tạm hoãn phần thưởng trong thời gian xác minh.</li>
-              <li>Thu hồi Gift Code hoặc xu được xác định là nhận trái phép.</li>
-              <li>Loại khỏi bảng xếp hạng hoặc hủy giải thưởng liên quan.</li>
-              <li>Khóa quyền tham gia chương trình trong thời hạn nhất định hoặc vĩnh viễn đối với vi phạm nghiêm trọng.</li>
+              <li>Từ chối video hoặc hủy kết quả duyệt.</li>
+              <li>Thu hồi xu thưởng đã cộng cho video vi phạm.</li>
+              <li>Hủy điểm xếp hạng và tính lại thứ hạng.</li>
+              <li>Loại khỏi bảng xếp hạng và giải thưởng top tháng.</li>
+              <li>Khóa tài khoản Creator.</li>
             </ul>
-            <p className="mt-2 text-[13px] text-slate-600">Việc xử lý cần dựa trên căn cứ xác minh phù hợp. Người tham gia có quyền khiếu nại nếu cho rằng quyết định xử lý chưa chính xác.</p>
           </section>
 
           {/* 12 */}
           <section>
-            <h2 className="font-bold text-slate-900 mb-2 text-[15px]">12. KÊNH HỖ TRỢ</h2>
-            <p className="mb-2">Nếu gặp vấn đề về tài khoản, video, xét duyệt, Gift Code hoặc giải thưởng, người tham gia có thể liên hệ:</p>
-            <ul className="list-disc pl-5 space-y-1 font-semibold text-slate-800">
-              <li>Zalo: 0865245988</li>
-              <li>Email: nxx315hub@gmail.com</li>
+            <h2 className="font-bold text-slate-900 mb-2 text-[15px]">12. QUYỀN CỦA BAN TỔ CHỨC VÀ THAY ĐỔI THỂ LỆ</h2>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Quyết định của ban tổ chức về việc duyệt video, mức thưởng và thứ hạng là quyết định cuối cùng.</li>
+              <li>Ban tổ chức có quyền cập nhật thể lệ, bảng thưởng hoặc kết thúc chương trình khi cần thiết.</li>
+              <li>Thể lệ mới có hiệu lực kể từ thời điểm được đăng trên trang này.</li>
+              <li>Việc tiếp tục tham gia chương trình đồng nghĩa với việc chấp nhận thể lệ mới.</li>
             </ul>
-            <p className="mt-2 text-[13px] text-slate-500">Khi gửi yêu cầu hỗ trợ, vui lòng cung cấp đường dẫn video và thông tin cần thiết để quá trình xác minh được thuận tiện. Không cung cấp mật khẩu Google, mã xác minh hoặc thông tin bảo mật tài khoản cho người khác.</p>
           </section>
 
           {/* 13 */}
           <section>
-            <h2 className="font-bold text-slate-900 mb-2 text-[15px]">13. QUYỀN RIÊNG TƯ VÀ DỮ LIỆU</h2>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Google được sử dụng để xác thực đăng nhập.</li>
-              <li>NXX315 Studio không tự động đăng video thay người tham gia.</li>
-              <li>Tên người dùng, ảnh đại diện kênh và điểm số có thể được hiển thị trên bảng xếp hạng hoặc mục Vừa được duyệt.</li>
-              <li>Đường dẫn video và số liệu công khai có thể được sử dụng để kiểm tra điều kiện và xác minh phần thưởng.</li>
-              <li>Dữ liệu cá nhân được xử lý theo chính sách quyền riêng tư và quy định pháp luật hiện hành.</li>
-            </ul>
-            <p className="mt-2 text-[13px] text-slate-600">Người tham gia không được sử dụng dữ liệu thu thập được để giả mạo, quấy rối hoặc xâm phạm quyền lợi của người khác.</p>
+            <h2 className="font-bold text-slate-900 mb-2 text-[15px]">13. HỖ TRỢ</h2>
+            <p>Nếu có thắc mắc hoặc khiếu nại về video, thưởng hoặc xếp hạng, vui lòng gửi yêu cầu tại Trung tâm Trợ giúp của NXX315 Studio để được hỗ trợ.</p>
           </section>
 
-          {/* 14 */}
-          <section>
-            <h2 className="font-bold text-slate-900 mb-2 text-[15px]">14. THAY ĐỔI VÀ TẠM DỪNG CHƯƠNG TRÌNH</h2>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Ban tổ chức có quyền cập nhật thể lệ để phù hợp với tình hình vận hành.</li>
-              <li>Các thay đổi sẽ được thông báo trên website NXX315 Studio.</li>
-              <li>Những thay đổi ảnh hưởng đáng kể đến quyền lợi người tham gia cần được thông báo rõ ràng.</li>
-              <li>Ban tổ chức có thể tạm dừng hoặc kết thúc chương trình khi cần thiết và sẽ thông báo trước trong phạm vi có thể thực hiện.</li>
-            </ul>
-            <p className="mt-2 text-[13px] text-slate-600">Các thay đổi phải tuân thủ quy định pháp luật và không được tùy tiện tước bỏ phần thưởng đã được xác nhận hợp lệ.</p>
-          </section>
-
-          {/* 15 */}
-          <section>
-            <h2 className="font-bold text-slate-900 mb-2 text-[15px]">15. CAM KẾT THAM GIA</h2>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Bằng việc tham gia chương trình Creator, người tham gia xác nhận đã đọc, hiểu và đồng ý tuân thủ thể lệ.</li>
-              <li>Người tham gia có trách nhiệm đảm bảo tính hợp lệ của nội dung, số liệu và thông tin cung cấp; đồng thời không thực hiện hành vi gian lận hoặc trục lợi.</li>
-              <li>NXX315 Studio có quyền từ chối trao thưởng đối với video không hợp lệ và xử lý hành vi vi phạm theo thể lệ đã công bố.</li>
-            </ul>
-          </section>
-        </div>
-
-        {/* FOOTER CAM KẾT */}
-        <div className="mt-8 pt-6 border-t border-slate-200 text-center">
-          <p className="font-bold text-slate-800 text-sm">NXX315 STUDIO – CREATOR PROGRAM</p>
-          <p className="text-[13px] text-slate-500 mt-1">Minh bạch trong xét duyệt – Công bằng trong xếp hạng – Nghiêm túc với mọi hành vi gian lận.</p>
         </div>
       </div>
     </div>
   );
-}
-          
+          }
