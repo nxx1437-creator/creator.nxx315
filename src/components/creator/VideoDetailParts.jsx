@@ -289,10 +289,11 @@ export const RewardCard = memo(function RewardCard({ video }) {
       {real ? (
         <ReceivedReward video={video} />
       ) : (
-        <p className="mt-3 text-[11px] leading-relaxed text-slate-400">
-          Đây là ước tính theo số liệu hiện tại. Thưởng thực nhận do admin chốt sau khi video đủ 7 ngày,
-          xu được cộng thẳng vào ví và mỗi video chỉ nhận thưởng một lần.
-        </p>
+          <p className="mt-3 text-[11px] leading-relaxed text-slate-400">
+  Đây là ước tính theo số liệu hiện tại. Admin duyệt tối đa 3 lần, mỗi lần video lên mốc cao hơn
+  thì được cộng thêm phần chênh lệch. Xu được cộng thẳng vào ví.
+</p>
+      
       )}
 
       <details className="mt-3">
