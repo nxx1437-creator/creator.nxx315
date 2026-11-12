@@ -148,8 +148,10 @@ const VideoItem = memo(function VideoItem({ it, onOpen, legacyCode, round }) {
           </div>
         </div>
 
+                <RoundSteps status={it.status} round={round} />
+
         {it.status === "approved" && legacyCode && it.gift_code && (
-         <RoundSteps status={it.status} round={round} />
+          <div onClick={(e) => e.stopPropagation()}>
           <div onClick={(e) => e.stopPropagation()}>
             <p className="mt-3 text-xs font-semibold text-amber-600">
               Code cũ chưa nhập: chép code rồi nhập ở Ví trên web chính.
