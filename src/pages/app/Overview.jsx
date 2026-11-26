@@ -1,6 +1,6 @@
 import React, { memo, useMemo } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { Send, Trophy, Film, ArrowRight, Play, MessageSquare, ExternalLink } from "lucide-react";
+import { Send, Trophy, Film, ArrowRight, Play } from "lucide-react";
 import { Card, Avatar, PLATFORMS, getTier } from "../../components/creator/creatorUi.jsx";
 import {
   CARD, EventCard, RequirementCard, StatsCard,
@@ -12,18 +12,18 @@ const UserCard = memo(function UserCard({ username, avatar, tierName, greet, onV
       <div className="flex items-center gap-4">
         <div className="relative shrink-0">
           <Avatar src={avatar} name={username} size={80} />
-          <span className="absolute -bottom-1 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-700 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white shadow-sm">
+          <span className="absolute -bottom-1 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-700 px-2 py-0.5 text-[9px] font-bold uppercase text-white shadow-sm">
             🔍 {tierName}
           </span>
         </div>
 
         <div className="min-w-0 flex-1">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-mono text-[9px] font-bold tracking-widest text-emerald-600">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-mono text-[9px] font-bold text-emerald-600">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> CREATOR HQ · LIVE
           </span>
           <p className="mt-1.5 text-[13px] text-slate-500">{greet}</p>
           <h1 className="truncate text-2xl font-extrabold text-cyan-600">{username || "Creator"}</h1>
-          <p className="mt-1.5 font-mono text-[9px] font-bold tracking-widest text-slate-400">
+          <p className="mt-1.5 font-mono text-[9px] font-bold text-slate-400">
             ▸ HUD NHIỆM VỤ CỦA BẠN —<br />30 NGÀY GẦN NHẤT.
           </p>
         </div>
@@ -53,42 +53,20 @@ const UserCard = memo(function UserCard({ username, avatar, tierName, greet, onV
   );
 });
 
-const DiscordCard = memo(function DiscordCard() {
-  return (
-    <Card className={CARD}>
-      <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#5865F2] text-white shadow-sm">
-          <MessageSquare size={20} />
-        </div>
-        <div>
-          <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">CỘNG ĐỒNG</p>
-          <h3 className="text-[15px] font-bold text-slate-800">Vào Discord creator</h3>
-          <p className="mb-4 mt-1 text-[13px] leading-relaxed text-slate-600">
-            Thông báo campaign, tin trả thưởng và hỗ trợ trực tiếp từ team — kèm /rank và /stats ngay trong Discord sau khi bạn liên kết tài khoản.
-          </p>
-          <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 py-3 text-sm font-bold text-white shadow-md">
-            Vào Discord <ExternalLink size={16} />
-          </button>
-        </div>
-      </div>
-    </Card>
-  );
-});
-
 const RecentVideos = memo(function RecentVideos({ recent, onAll }) {
   return (
     <div>
       <div className="mb-3 flex items-center justify-between px-1">
-        <span className="flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-widest text-slate-500">
+        <span className="flex items-center gap-2 font-mono text-[11px] font-bold uppercase text-slate-500">
           <Play size={14} /> VIDEO GẦN ĐÂY
         </span>
-        <button onClick={onAll} className="font-mono text-[11px] font-bold tracking-widest text-cyan-600">
+        <button onClick={onAll} className="font-mono text-[11px] font-bold text-cyan-600">
           XEM TẤT CẢ →
         </button>
       </div>
 
       {recent && recent.length === 0 ? (
-        <div className="rounded-[2rem] border-2 border-dashed border-slate-300 bg-white px-5 py-8 text-center">
+        <div className="rounded border-2 border-dashed border-slate-300 bg-white px-5 py-8 text-center">
           <Film size={32} className="mx-auto mb-3 text-slate-300" />
           <p className="text-[15px] font-bold text-slate-800">
             Chưa có video. Đăng video đầu tiên để bắt đầu tích điểm.
@@ -136,7 +114,7 @@ export default function Overview() {
   const goRanking = useMemo(() => () => navigate("/app/ranking"), [navigate]);
   const goRules = useMemo(() => () => navigate("/app/rules"), [navigate]);
 
-  if (!ov) return <div className="h-screen bg-[#f4fbf9]" />;
+  if (!ov) return <div className="h-screen bg-canvas" />;
 
   const tier = getTier(ov.approved || 0);
 
@@ -153,8 +131,7 @@ export default function Overview() {
       <EventCard monthLabel={monthLabel} />
       <RequirementCard approved={ov.month_approved} onRules={goRules} />
       <StatsCard ov={ov} />
-      <DiscordCard />
       <RecentVideos recent={ov.recent} onAll={goVideos} />
     </div>
   );
-    }
+}
