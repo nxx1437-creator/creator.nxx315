@@ -9,7 +9,7 @@ export const PLATFORMS = {
 
 export const STATUS = {
   pending: { label: "Đang chờ", cls: "border-amber-200 bg-amber-50 text-amber-600", Icon: Clock },
-  approved: { label: "Đã duyệt", cls: "border-emerald-200 bg-emerald-50 text-emerald-600", Icon: CheckCircle2 },
+  approved: { label: "Đã duyệt", cls: "border-green-200 bg-green-50 text-green-700", Icon: CheckCircle2 },
   rejected: { label: "Bị từ chối", cls: "border-rose-200 bg-rose-50 text-rose-600", Icon: XCircle },
 };
 
@@ -33,23 +33,15 @@ export const fmt = (n) => {
 // 1. CARD: nền trắng đặc, không blur -> nhẹ hơn nhiều trên điện thoại
 export function Card({ children, className = "" }) {
   return (
-    <div
-      className={`relative overflow-hidden rounded-[2rem] border border-white bg-white p-5 shadow-sm ${className}`}
-    >
+    <div className={`relative overflow-hidden rounded border border-rule bg-white p-5 ${className}`}>
       {children}
-      {/* Đường kẻ màu xanh dưới đáy thẻ */}
-      <span className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-cyan-400/0 via-cyan-400/50 to-blue-500/0" />
     </div>
   );
 }
 
 // 2. EYEBROW (Chữ nhỏ trên tiêu đề)
 export function Eyebrow({ children, className = "" }) {
-  return (
-    <p className={`font-mono text-[11px] uppercase tracking-[0.18em] text-slate-500 font-semibold ${className}`}>
-      {children}
-    </p>
-  );
+  return <p className={`text-[13px] text-mute ${className}`}>{children}</p>;
 }
 
 // 3. STATUS PILL (Nhãn trạng thái)
@@ -80,7 +72,7 @@ export function Avatar({ src, name, size = 48 }) {
   ) : (
     <span
       style={{ width: size, height: size }}
-      className="flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 font-bold text-white shadow-sm"
+      className="flex shrink-0 items-center justify-center rounded-full bg-ink font-bold text-white shadow-sm"
     >
       {letter}
     </span>
@@ -110,7 +102,7 @@ export function CodeBox({ code, coins }) {
         </span>
       </div>
       <div className="mt-2 flex items-center gap-2">
-        <code className="min-w-0 flex-1 truncate rounded-xl border border-emerald-200 bg-white px-3 py-2.5 text-center font-mono text-sm font-bold tracking-wider text-slate-800">
+        <code className="min-w-0 flex-1 truncate rounded-xl border border-emerald-200 bg-white px-3 py-2.5 text-center font-mono text-sm font-bold text-slate-800">
           {code}
         </code>
         <button
@@ -194,7 +186,7 @@ export function ChannelLinkCard({ platform, channel, onChanged }) {
           <span className="text-base font-bold text-slate-800">{meta.name}</span>
         </div>
         <span
-          className={`rounded-full border px-3 py-1 font-mono text-[10px] font-bold tracking-widest ${
+          className={`rounded-full border px-3 py-1 font-mono text-[10px] font-bold ${
             channel
               ? "border-emerald-200 bg-emerald-50 text-emerald-600"
               : "border-slate-200 bg-slate-50 text-slate-500"
@@ -310,4 +302,4 @@ export function GuideVideo({ url }) {
       </div>
     </Card>
   );
-  }
+}
