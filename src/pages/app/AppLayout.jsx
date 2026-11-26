@@ -1,69 +1,65 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import {
-  LayoutDashboard, Trophy, Film, Gift, Settings, AlertTriangle,
-  Download, Search, Bell, Globe, LogOut, User,
-} from "lucide-react";
+import { NavLink, Link, Outlet, useNavigate } from "react-router-dom";
+import { LayoutDashboard, Trophy, Film, Gift, Settings, Search, Bell, LogOut } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient.js";
 import useSession from "../../hooks/useSession.js";
 import SearchModal from "../../components/SearchModal.jsx";
 import NotificationDropdown from "../../components/NotificationDropdown.jsx";
 
 const TABS = [
-  { to: "/app", end: true, label: "TỔNG QUAN", Icon: LayoutDashboard },
-  { to: "/app/ranking", label: "XẾP HẠNG", Icon: Trophy },
-  { to: "/app/videos", label: "VIDEO", Icon: Film },
-  { to: "/app/rewards", label: "PHẦN THƯỞNG", Icon: Gift },
-  { to: "/app/settings", label: "THÊM", Icon: Settings },
+  { to: "/app", end: true, label: "Tổng quan", Icon: LayoutDashboard },
+  { to: "/app/ranking", label: "Xếp hạng", Icon: Trophy },
+  { to: "/app/videos", label: "Video", Icon: Film },
+  { to: "/app/rewards", label: "Phần thưởng", Icon: Gift },
+  { to: "/app/settings", label: "Cài đặt", Icon: Settings },
 ];
 
 const LinkBanner = memo(function LinkBanner({ onGo }) {
   return (
-    <div className="flex items-start gap-3 rounded-3xl border border-amber-200 bg-amber-50 p-4 shadow-sm">
-      <AlertTriangle size={22} className="mt-0.5 shrink-0 text-amber-500" />
-      <div className="min-w-0 flex-1">
-        <p className="font-mono text-xs font-bold uppercase tracking-widest text-amber-900">
-          Bạn chưa liên kết kênh
-        </p>
-        <p className="mt-1 font-mono text-[11px] uppercase leading-relaxed tracking-wide text-amber-700">
-          Liên kết kênh TikTok hoặc YouTube để bắt đầu gửi video và nhận thưởng.
+    <div className="flex flex-col gap-3 border-y border-rule py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0">
+        <p className="text-[15px]" style={{ fontWeight: 450 }}>Bạn chưa liên kết kênh</p>
+        <p className="mt-0.5 text-[14px] leading-[1.5] text-mute">
+          Liên kết kênh TikTok hoặc YouTube để gửi video và nhận thưởng.
         </p>
       </div>
-      <button
-        onClick={onGo}
-        className="shrink-0 rounded-xl bg-amber-500 px-3 py-2 text-xs font-bold text-white shadow-sm"
-      >
-        Liên kết ngay
-      </button>
+      <button onClick={onGo} className="btn btn-primary shrink-0">Liên kết kênh</button>
     </div>
   );
 });
 
-function Nxx315Logo() {
+function Wordmark() {
   return (
-    <div className="flex items-center gap-1 text-[18px] font-extrabold tracking-tight text-slate-900">
-      Nxx315 <span className="text-cyan-600">Creator</span>
-    </div>
+    <Link to="/app" className="flex items-center gap-2 text-[15px] tracking-head" style={{ fontWeight: 450 }}>
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+        <rect width="18" height="18" rx="3" fill="#1a1a1a" />
+        <path d="M6.5 5l6 4-6 4z" fill="#f8f8f7" />
+      </svg>
+      <span>nxx315 <span className="text-mute">creator</span></span>
+    </Link>
   );
 }
 
-// Nền trắng đặc, không blur: thanh dưới đáy luôn nằm trên nội dung đang cuộn
+/* Điện thoại: thanh tab dưới đáy, nền đặc, một đường kẻ mảnh phía trên */
 const BottomNav = memo(function BottomNav() {
   return (
-    <nav className="fixed inset-x-3 bottom-3 z-40 mx-auto max-w-md rounded-[2rem] border border-white bg-white px-2 py-2 shadow-[0_8px_30px_rgba(0,0,0,0.08)] md:max-w-xl">
-      <div className="grid grid-cols-5">
+    <nav
+      aria-label="Điều hướng chính"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-rule bg-canvas md:hidden"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
+      <div className="mx-auto grid max-w-md grid-cols-5">
         {TABS.map(({ to, end, label, Icon }) => (
           <NavLink
             key={to}
             to={to}
             end={end}
             className={({ isActive }) =>
-              `flex flex-col items-center gap-1 rounded-2xl py-2.5 text-[9px] font-bold tracking-wide ${
-                isActive ? "text-emerald-600" : "text-slate-400"
-              }`
+              `flex min-h-[56px] flex-col items-center justify-center gap-1 text-[11px] ${isActive ? "text-ink" : "text-mute"}`
             }
+            style={({ isActive }) => ({ fontWeight: isActive ? 500 : 400 })}
           >
-            <Icon size={20} strokeWidth={2.5} />
+            <Icon size={20} strokeWidth={1.75} />
             {label}
           </NavLink>
         ))}
@@ -72,21 +68,37 @@ const BottomNav = memo(function BottomNav() {
   );
 });
 
+/* Máy tính: tab nằm ngay thanh trên */
+function TopTabs() {
+  return (
+    <nav aria-label="Điều hướng chính" className="hidden items-center gap-1 md:flex">
+      {TABS.map(({ to, end, label }) => (
+        <NavLink
+          key={to}
+          to={to}
+          end={end}
+          className={({ isActive }) =>
+            `rounded px-3 py-1.5 text-[13px] transition-colors ${isActive ? "bg-stone text-ink" : "text-navgray hover:text-ink"}`
+          }
+        >
+          {label}
+        </NavLink>
+      ))}
+    </nav>
+  );
+}
+
 const Skeleton = memo(function Skeleton() {
   return (
-    <div className="space-y-4 animate-pulse">
-      <div className="h-64 rounded-[2rem] border border-white bg-white p-5 shadow-sm">
-        <div className="flex gap-4">
-          <div className="h-20 w-20 rounded-full bg-slate-200" />
-          <div className="flex-1 space-y-3 py-2">
-            <div className="h-5 w-1/2 rounded bg-slate-200" />
-            <div className="h-6 w-3/4 rounded bg-slate-200" />
-          </div>
+    <div className="animate-pulse space-y-6" aria-hidden="true">
+      <div className="flex gap-4 border-b border-rule pb-6">
+        <div className="h-16 w-16 rounded-full bg-stone" />
+        <div className="flex-1 space-y-3 py-2">
+          <div className="h-4 w-1/3 rounded bg-stone" />
+          <div className="h-5 w-2/3 rounded bg-stone" />
         </div>
       </div>
-      <div className="h-48 rounded-[2rem] border border-white bg-white p-5 shadow-sm">
-        <div className="mb-6 h-12 w-1/2 rounded bg-slate-200" />
-      </div>
+      <div className="h-40 rounded bg-stone" />
     </div>
   );
 });
@@ -99,7 +111,6 @@ export default function AppLayout() {
   const [loading, setLoading] = useState(true);
   const syncedRef = useRef(false);
 
-  const [showLang, setShowLang] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [showNotify, setShowNotify] = useState(false);
@@ -107,7 +118,6 @@ export default function AppLayout() {
   const [notifications, setNotifications] = useState([]);
   const [notifLoading, setNotifLoading] = useState(false);
 
-  const langRef = useRef(null);
   const profileRef = useRef(null);
 
   // reload ổn định (không phụ thuộc ov) và luôn lấy dữ liệu mới
@@ -159,14 +169,13 @@ export default function AppLayout() {
 
   // Chỉ lắng nghe click ngoài khi có dropdown đang mở
   useEffect(() => {
-    if (!showLang && !showProfile) return;
+    if (!showProfile) return;
     const onDown = (e) => {
-      if (langRef.current && !langRef.current.contains(e.target)) setShowLang(false);
       if (profileRef.current && !profileRef.current.contains(e.target)) setShowProfile(false);
     };
     document.addEventListener("pointerdown", onDown);
     return () => document.removeEventListener("pointerdown", onDown);
-  }, [showLang, showProfile]);
+  }, [showProfile]);
 
   const linked = (ov?.channels || []).length > 0;
 
@@ -185,35 +194,35 @@ export default function AppLayout() {
   const avatarUrl = user?.user_metadata?.avatar_url || ov?.avatar;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f4fbf9] to-[#e6f7fa] pb-28 font-sans text-slate-800">
+    <div className="min-h-screen bg-canvas pb-24 text-ink md:pb-10">
       {showSearch && <SearchModal onClose={() => setShowSearch(false)} />}
 
-      <header className="sticky top-0 z-50 border-b border-white/50 bg-[#f4fbf9]">
-        <div className="mx-auto flex max-w-md items-center justify-between px-4 py-3 md:max-w-3xl">
-          <Nxx315Logo />
+      <header className="sticky top-0 z-50 border-b border-rule bg-canvas">
+        <div className="mx-auto flex h-14 max-w-md items-center justify-between gap-3 px-4 md:max-w-3xl">
+          <Wordmark />
+          <TopTabs />
 
-          <div className="flex items-center gap-3 text-slate-600 sm:gap-4">
+          <div className="flex items-center gap-1 text-navgray">
             <button
-              onClick={() => alert("Tính năng đang phát triển!")}
-              className="hidden sm:block"
+              onClick={() => setShowSearch(true)}
+              aria-label="Tìm kiếm"
+              className="flex h-11 w-11 items-center justify-center rounded transition-colors hover:bg-stone hover:text-ink md:h-9 md:w-9"
             >
-              <Download size={20} />
-            </button>
-            <button onClick={() => setShowSearch(true)} className="flex items-center">
-              <Search size={20} />
+              <Search size={19} strokeWidth={1.75} />
             </button>
 
             <button
               data-notif-toggle
+              aria-label="Thông báo"
               onClick={() => {
                 setShowNotify(!showNotify);
                 if (!showNotify) fetchNotifications();
               }}
-              className="relative flex items-center"
+              className="relative flex h-11 w-11 items-center justify-center rounded transition-colors hover:bg-stone hover:text-ink md:h-9 md:w-9"
             >
-              <Bell size={20} />
+              <Bell size={19} strokeWidth={1.75} />
               {unreadCount > 0 && (
-                <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border border-white bg-rose-500" />
+                <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-rose-500 md:right-2 md:top-2" />
               )}
             </button>
 
@@ -237,72 +246,50 @@ export default function AppLayout() {
               />
             )}
 
-            <div className="relative" ref={langRef}>
-              <button onClick={() => setShowLang(!showLang)} className="flex items-center">
-                <Globe size={20} />
-              </button>
-              {showLang && (
-                <div className="absolute right-0 mt-3 w-40 rounded-2xl border border-slate-100 bg-white p-2 shadow-xl">
-                  <button className="w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700">
-                    EN — English
-                  </button>
-                  <button className="w-full rounded-lg bg-emerald-50 px-3 py-2 text-left text-sm font-medium text-emerald-600">
-                    VI — Tiếng Việt
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <div className="relative" ref={profileRef}>
+            <div className="relative ml-1" ref={profileRef}>
               <button
                 onClick={() => setShowProfile(!showProfile)}
-                className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100 shadow-sm"
+                aria-label="Menu tài khoản"
+                aria-expanded={showProfile}
+                className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-rule bg-stone"
               >
                 {avatarUrl ? (
                   <img
                     src={avatarUrl}
-                    alt="Avatar"
-                    width={32}
-                    height={32}
+                    alt=""
+                    width={36}
+                    height={36}
                     decoding="async"
                     referrerPolicy="no-referrer"
                     className="h-full w-full object-cover"
                   />
-                ) : user ? (
-                  <div className="flex h-full w-full items-center justify-center bg-cyan-600 text-xs font-bold uppercase text-white">
-                    {user.email?.charAt(0) || "U"}
-                  </div>
                 ) : (
-                  <div className="h-full w-full bg-slate-200" />
+                  <span className="text-[13px] text-ink">{(user?.email?.charAt(0) || "U").toUpperCase()}</span>
                 )}
               </button>
 
               {showProfile && (
-                <div className="absolute right-0 mt-3 w-56 rounded-2xl border border-slate-100 bg-white py-2 shadow-xl">
-                  <div className="mb-1 border-b border-slate-100 px-4 py-2">
-                    <p className="truncate font-bold text-slate-800">
+                <div className="absolute right-0 mt-2 w-60 rounded border border-rule bg-canvas py-1">
+                  <div className="border-b border-rule px-4 py-3">
+                    <p className="truncate text-[14px]" style={{ fontWeight: 450 }}>
                       {ov?.username || user?.user_metadata?.full_name || "Creator"}
                     </p>
-                    <p className="truncate text-xs text-slate-500">{user?.email}</p>
+                    <p className="t-cap truncate text-mute">{user?.email}</p>
                   </div>
                   <button
                     onClick={() => {
                       setShowProfile(false);
                       goSettings();
                     }}
-                    className="flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700"
+                    className="flex min-h-[44px] w-full items-center gap-3 px-4 text-[14px] transition-colors hover:bg-stone"
                   >
-                    <Settings size={16} /> Cài đặt
+                    <Settings size={16} strokeWidth={1.75} /> Cài đặt
                   </button>
-                  <button className="flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700">
-                    <User size={16} /> Tài khoản
-                  </button>
-                  <div className="my-1 h-px bg-slate-100" />
                   <button
                     onClick={signOut}
-                    className="flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium text-rose-500"
+                    className="flex min-h-[44px] w-full items-center gap-3 px-4 text-[14px] text-rose-600 transition-colors hover:bg-stone"
                   >
-                    <LogOut size={16} /> Đăng xuất
+                    <LogOut size={16} strokeWidth={1.75} /> Đăng xuất
                   </button>
                 </div>
               )}
@@ -311,18 +298,18 @@ export default function AppLayout() {
         </div>
       </header>
 
-      <main className="relative mx-auto max-w-md space-y-4 px-4 py-5 md:max-w-3xl">
+      <main className="relative mx-auto max-w-md space-y-5 px-4 py-6 md:max-w-3xl">
         {loading ? (
           <Skeleton />
         ) : !ov ? (
           <div className="py-16 text-center">
-            <p className="text-sm text-slate-500">Không tải được dữ liệu.</p>
+            <p className="text-[14px] text-mute">Không tải được dữ liệu.</p>
             <button
               onClick={() => {
                 setLoading(true);
                 reload();
               }}
-              className="mt-3 rounded-full border border-slate-300 bg-white px-5 py-2 text-sm font-semibold text-slate-700 shadow-sm"
+              className="btn btn-quiet mt-4"
             >
               Thử lại
             </button>
@@ -338,4 +325,4 @@ export default function AppLayout() {
       <BottomNav />
     </div>
   );
-    }
+}
