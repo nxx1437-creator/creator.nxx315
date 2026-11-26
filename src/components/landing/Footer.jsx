@@ -1,74 +1,58 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Sparkles, Trophy, MessageSquare, Gamepad2, LogIn } from "lucide-react";
 import { Logo } from "./theme.jsx";
 import { MAIN_SITE } from "../../lib/supabaseClient.js";
 
-export function FinalCta() {
+const COLS = [
+  ["Chương trình", [["Cách làm", "#cach-lam"], ["Quyền lợi", "#quyen-loi"], ["Xếp hạng", "#ranking"], ["Hỏi đáp", "#hoi-dap"]]],
+  ["Tài khoản", [["Đăng nhập", "/login"], ["Tham gia", "/login"]]],
+  ["Nxx315 Studio", [["Trang chính", MAIN_SITE]]],
+];
+
+/* Kết thúc bằng khối charcoal: một lời mời, cột liên kết kẻ mảnh, chữ ký chìm */
+export default function Footer() {
   return (
-    <section className="mx-auto max-w-5xl px-4 py-16">
-      <div className="relative isolate overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 px-5 py-16 text-center text-white shadow-2xl shadow-emerald-500/30 sm:px-10 sm:py-20">
-        <Gamepad2 className="pointer-events-none absolute -left-6 -top-6 -z-10 h-44 w-44 rotate-12 text-white/10" />
-        <Trophy className="pointer-events-none absolute -bottom-8 -right-6 -z-10 h-52 w-52 -rotate-12 text-white/10" />
+    <footer className="bg-night text-[#f0f0ee]">
+      <div className="frame pb-8 pt-[72px] md:pt-[115px]">
+        <Link to="/login" className="inline-block text-[28px] leading-[1.15] tracking-head hover:opacity-80 md:text-[32px]">
+          Tham gia ngay →
+        </Link>
 
-        <div className="relative z-10">
-          <span className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur">
-            <Trophy size={34} className="text-amber-300" />
-          </span>
-
-          <p className="mb-4 font-mono text-xs font-bold uppercase tracking-[0.3em] text-emerald-50 sm:text-sm">
-            Chinh phục đỉnh cao
-          </p>
-
-          <h2 className="whitespace-nowrap text-center text-[clamp(1.9rem,7vw,4rem)] font-black tracking-tight">
-            Sẵn sàng lên sóng?
-          </h2>
-
-          <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-emerald-50 sm:text-lg">
-            Tham gia cộng đồng Creator. Đăng ký miễn phí, không giới hạn số video.
-            Khẳng định đẳng cấp của bạn ngay hôm nay.
-          </p>
-
-          <div className="mx-auto mt-9 flex max-w-lg flex-col items-center gap-3">
-            <Link
-              to="/login"
-              className="group flex min-h-[60px] w-full items-center justify-center gap-3 rounded-2xl bg-white px-6 py-4 text-lg font-extrabold text-emerald-700 shadow-xl transition hover:-translate-y-1"
-            >
-              <Sparkles size={21} />
-              <span>Gia nhập ngay</span>
-              <ArrowRight size={22} className="transition-transform duration-300 group-hover:translate-x-1" />
-            </Link>
-            <Link
-              to="/login"
-              className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-2xl border border-white/50 bg-white/10 px-6 py-3 text-lg font-bold backdrop-blur transition hover:bg-white/20"
-            >
-              <LogIn size={19} /> Đăng nhập
-            </Link>
-          </div>
-
-          <div className="mt-10 flex items-center justify-center gap-3 font-mono text-xs font-bold uppercase tracking-[0.2em] text-emerald-50/80 sm:text-sm">
-            <MessageSquare size={18} />
-            <span>Cùng nhau phát triển</span>
-          </div>
+        <div className="mt-[72px] grid grid-cols-2 border-r border-nightrule md:mt-[115px] md:grid-cols-6">
+          {COLS.map(([title, links]) => (
+            <div key={title} className="border-l border-nightrule px-[10px] pb-10">
+              <p className="t-cap text-[#656565]">{title}</p>
+              <ul className="mt-3 space-y-1">
+                {links.map(([label, href]) => (
+                  <li key={label}>
+                    {href.startsWith("/") ? (
+                      <Link to={href} className="block py-1 text-[14px] hover:opacity-70">{label}</Link>
+                    ) : (
+                      <a href={href} className="block py-1 text-[14px] hover:opacity-70">{label}</a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+          <div className="hidden border-l border-nightrule md:col-span-3 md:block" />
         </div>
-      </div>
-    </section>
-  );
-}
 
-export function Footer() {
-  return (
-    <footer className="relative z-10 border-t border-emerald-900/10 bg-white/60 py-8 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 text-center md:flex-row md:text-left">
-        <Logo />
-        <p className="text-xs font-medium text-slate-500">
-          © {new Date().getFullYear()} Nxx315 Creator · Một phần của hệ sinh thái{" "}
-          <a href={MAIN_SITE} className={"font-bold text-emerald-600 transition-colors hover:text-emerald-500"}>
-            Nxx315 Studio
-          </a>
+        <p
+          aria-hidden="true"
+          className="mt-[48px] select-none overflow-hidden whitespace-nowrap text-center leading-[0.9] text-[#242424]"
+          style={{ fontSize: "clamp(72px, 19vw, 236px)", letterSpacing: "-0.05em" }}
+        >
+          nxx315
         </p>
+
+        <div className="mt-[40px] flex flex-col gap-3 md:mt-[66px] md:flex-row md:items-center md:justify-between">
+          <Logo dark />
+          <p className="t-cap text-[#656565]">
+            © {new Date().getFullYear()} Nxx315 Creator. Một phần của hệ sinh thái Nxx315 Studio.
+          </p>
+        </div>
       </div>
     </footer>
   );
 }
-
