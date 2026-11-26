@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Loader2, Film, Trophy, Gift, ShieldCheck, Home, Globe } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { Logo } from "../components/landing/theme.jsx";
+import { Scene, VideoCard, RankCard } from "../components/landing/Scenes.jsx";
 import { supabase, MAIN_SITE } from "../lib/supabaseClient.js";
 
 function GoogleG() {
@@ -79,7 +81,7 @@ function GoogleSignIn({ setBusy, setError, onFallback }) {
           theme: "outline",
           size: "large",
           text: "continue_with",
-          shape: "pill",
+          shape: "rectangular",
           logo_alignment: "left",
           locale: "vi",
           width: Math.max(200, Math.min(400, Math.floor(w))),
@@ -99,10 +101,10 @@ function GoogleSignIn({ setBusy, setError, onFallback }) {
       <div className="mt-5">
         <button
           onClick={onFallback}
-          className="flex w-full items-center justify-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-3 shadow-sm transition hover:bg-slate-50 active:scale-[0.98]"
+          className="flex h-12 w-full items-center justify-center gap-3 rounded border border-rule bg-white px-4 transition hover:bg-stone active:scale-[0.98]"
         >
           <GoogleG />
-          <span className="text-[14px] font-bold text-slate-700">Đăng nhập bằng Google</span>
+          <span className="text-[14px] text-ink" style={{ fontWeight: 450 }}>Tiếp tục với Google</span>
         </button>
       </div>
     );
@@ -112,9 +114,9 @@ function GoogleSignIn({ setBusy, setError, onFallback }) {
     <div className="mt-5 flex flex-col items-center">
       <div className="relative w-full min-h-[44px] flex justify-center">
         {!ready && (
-          <div className="absolute inset-0 flex w-full animate-pulse items-center justify-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2.5 shadow-sm">
+          <div className="absolute inset-0 flex w-full animate-pulse items-center justify-center gap-3 rounded border border-rule bg-white px-4 py-2.5">
             <GoogleG />
-            <span className="text-[14px] font-bold text-slate-700">Đăng nhập bằng Google</span>
+            <span className="text-[14px] text-ink" style={{ fontWeight: 450 }}>Tiếp tục với Google</span>
           </div>
         )}
         <div ref={boxRef} className={`w-full flex justify-center ${!ready ? 'opacity-0 pointer-events-none' : 'opacity-100'}`} />
@@ -122,63 +124,18 @@ function GoogleSignIn({ setBusy, setError, onFallback }) {
 
       <button
         onClick={onFallback}
-        className="mt-3 text-center text-[11px] font-medium text-slate-500 transition hover:text-cyan-600"
+        className="mt-4 min-h-[44px] text-center text-[13px] text-mute underline decoration-rule underline-offset-4 transition hover:text-ink hover:decoration-ink"
       >
-        Không thấy tài khoản? Dùng cách đăng nhập khác
+        Không thấy nút Google? Dùng cách đăng nhập khác
       </button>
     </div>
   );
 }
 
-/* ---------- Hình trang trí ở các góc ---------- */
-function OrnScan() {
-  return (
-    <svg width="80" height="80" viewBox="0 0 100 100" fill="none" className="opacity-40 text-cyan-500">
-      <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 8" />
-      <circle cx="50" cy="50" r="20" stroke="currentColor" strokeWidth="2" />
-      <path d="M50 0v20M50 80v20M0 50h20M80 50h20" stroke="currentColor" strokeWidth="2.5" />
-    </svg>
-  );
-}
-
-function OrnSparkle() {
-  return (
-    <svg width="100" height="100" viewBox="0 0 120 120" fill="none" className="opacity-70">
-      <defs>
-        <linearGradient id="spk" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#a5f3fc" />
-          <stop offset="1" stopColor="#60a5fa" />
-        </linearGradient>
-      </defs>
-      <path d="M60 10 L75 45 L110 60 L75 75 L60 110 L45 75 L10 60 L45 45 Z" fill="url(#spk)" fillOpacity="0.6" />
-      <path d="M60 30 L68 52 L90 60 L68 68 L60 90 L52 68 L30 60 L52 52 Z" fill="#ffffff" fillOpacity="0.9" />
-    </svg>
-  );
-}
-
-function OrnGem() {
-  return (
-    <svg width="80" height="90" viewBox="0 0 84 96" fill="none" className="opacity-60 -rotate-12">
-      <path d="M42 6l32 26-32 58L10 32z" fill="#22D3EE" fillOpacity=".4" stroke="#06B6D4" strokeWidth="2.5" />
-      <path d="M10 32h64M42 6l-14 26 14 58 14-58z" stroke="#ffffff" strokeOpacity=".8" strokeWidth="1.5" />
-    </svg>
-  );
-}
-
-function OrnCoin() {
-  return (
-    <svg width="80" height="80" viewBox="0 0 104 104" fill="none" className="opacity-60 rotate-12">
-      <path d="M52 6l40 22v48L52 98 12 76V28z" fill="#60A5FA" fillOpacity=".2" stroke="#3B82F6" strokeWidth="3" />
-      <circle cx="52" cy="52" r="26" fill="#BFDBFE" fillOpacity=".6" />
-      <text x="52" y="59" textAnchor="middle" fontSize="20" fontWeight="800" fill="#1E3A8A" fontFamily="sans-serif">xu</text>
-    </svg>
-  );
-}
-
 const PERKS = [
-  [Film, "Tự quét kênh"],
-  [Trophy, "Leo xếp hạng"],
-  [Gift, "Nhận code xu"],
+  ["Liên kết kênh", "Dán link TikTok hoặc YouTube, hệ thống tự nhận diện kênh."],
+  ["Đăng video", "Quay review Nxx315 Studio, kèm hashtag bắt buộc."],
+  ["Nhận thưởng", "Video được duyệt nhận Gift Code, top tháng nhận tiền mặt."],
 ];
 
 export default function Login() {
@@ -218,97 +175,47 @@ export default function Login() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-b from-[#f4fbf9] to-[#e6f7fa] text-slate-800 font-sans">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(0,0,0,0.8) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.8) 1px, transparent 1px)",
-          backgroundSize: "30px 30px",
-        }}
-      />
+    <div className="min-h-screen bg-canvas text-ink lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      <div className="flex min-h-screen flex-col px-5 md:px-10">
+        <header className="flex h-14 items-center justify-between">
+          <Link to="/" aria-label="Nxx315 Creator"><Logo /></Link>
+          <a href={MAIN_SITE} className="text-[13px] text-navgray transition-colors hover:text-ink">Nxx315 Studio</a>
+        </header>
 
-      <header className="relative mx-auto flex max-w-md items-center justify-between px-6 py-4 z-20">
-        <Link to="/" className="text-[20px] font-extrabold tracking-tight text-slate-900">
-          Nxx315 <span className="text-cyan-600">Creator</span>
-        </Link>
-        <div className="flex items-center gap-4 text-slate-500">
-          <Link to="/" aria-label="Trang giới thiệu" className="transition hover:text-slate-900">
-            <Home size={20} />
-          </Link>
-          <a href={MAIN_SITE} aria-label="Nxx315 Studio" className="transition hover:text-slate-900">
-            <Globe size={20} />
-          </a>
-        </div>
-      </header>
+        <main className="mx-auto flex w-full max-w-[380px] flex-1 flex-col justify-center py-10">
+          <h1 className="t-head">Đăng nhập</h1>
+          <p className="mt-3 text-[15px] leading-[1.6] text-mute">
+            Một lần chạm với Google. Lần đầu đăng nhập, hệ thống tự tạo tài khoản và dùng chung với Nxx315 Studio.
+          </p>
 
-      <main className="relative mx-auto flex max-w-md flex-col justify-center px-5 pb-6 pt-2 z-10">
-        <div className="relative mt-2">
-          {/* Hình trang trí 4 góc */}
-          <div className="absolute top-10 -left-6 z-0 pointer-events-none"><OrnScan /></div>
-          <div className="absolute -top-6 -right-6 z-0 pointer-events-none"><OrnSparkle /></div>
-          <div className="absolute bottom-20 -left-6 z-0 pointer-events-none"><OrnGem /></div>
-          <div className="absolute -bottom-4 -right-6 z-0 pointer-events-none"><OrnCoin /></div>
+          <GoogleSignIn setBusy={setBusy} setError={setError} onFallback={google} />
 
-          {/* Thẻ chính - Đã xóa phần Emblem ở trên cùng */}
-          <div className="relative z-10 rounded-[2rem] border border-white bg-white/85 px-5 pb-6 pt-8 shadow-[0_8px_30px_rgba(0,0,0,0.05)] backdrop-blur-xl">
-            
-            <div className="flex justify-center">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-600/20 bg-cyan-50 px-3 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.15em] text-cyan-700">
-                <span className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" /> Kết nối an toàn
-              </span>
-            </div>
-
-            {/* Đã giảm khoảng cách margin top của tiêu đề vì không còn cụm icon ở trên */}
-            <h1 className="mt-5 text-center font-mono text-[22px] font-semibold uppercase tracking-[0.1em] text-slate-900">
-              Lối vào Creator
-            </h1>
-            <p className="mx-auto mt-2 max-w-[16rem] text-center text-[13px] leading-relaxed text-slate-600">
-              Đăng nhập hoặc tạo tài khoản bằng một lần chạm.
-            </p>
-
-            <div className="mt-6 grid grid-cols-3 gap-2.5">
-              {PERKS.map(([Icon, label]) => (
-                <div
-                  key={label}
-                  className="flex flex-col items-center gap-2 rounded-2xl border border-slate-100 bg-white/60 px-1.5 py-3 text-center shadow-sm"
-                >
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-cyan-100/80 text-cyan-600">
-                    <Icon size={18} />
-                  </span>
-                  <span className="text-[11px] font-medium leading-tight text-slate-700">{label}</span>
-                </div>
-              ))}
-            </div>
-
-            <GoogleSignIn setBusy={setBusy} setError={setError} onFallback={google} />
-
-            <div className="mt-2 min-h-[20px]">
-              {busy && (
-                <p className="flex items-center justify-center gap-2 text-xs font-medium text-cyan-600">
-                  <Loader2 size={14} className="animate-spin" /> Đang đăng nhập...
-                </p>
-              )}
-              {error && <p className="text-center text-xs font-semibold text-rose-500">{error}</p>}
-            </div>
-
-            <div className="mt-2 flex items-center justify-center gap-2">
-              <ShieldCheck size={16} className="text-cyan-600" />
-              <p className="text-[11px] text-slate-500">
-                Chỉ dùng Google để xác minh bạn là ai.
+          <div className="mt-2 min-h-[24px]" aria-live="polite">
+            {busy && (
+              <p className="flex items-center justify-center gap-2 text-[13px] text-mute">
+                <Loader2 size={14} className="animate-spin" /> Đang đăng nhập...
               </p>
-            </div>
+            )}
+            {error && <p className="text-center text-[13px] text-rose-600">{error}</p>}
           </div>
-        </div>
 
-        <p className="mx-auto mt-5 max-w-[260px] text-center text-[10px] leading-relaxed text-slate-500">
-          Lần đầu đăng nhập, hệ thống tự tạo tài khoản, dùng chung với{" "}
-          <a href={MAIN_SITE} className="font-semibold text-cyan-600 hover:text-cyan-700">
-            Nxx315 Studio
-          </a>
-          .
-        </p>
-      </main>
+          <ul className="mt-10">
+            {PERKS.map(([t, d]) => (
+              <li key={t} className="rule-t py-4">
+                <p className="text-[15px]" style={{ fontWeight: 450 }}>{t}</p>
+                <p className="mt-1 text-[14px] leading-[1.55] text-mute">{d}</p>
+              </li>
+            ))}
+          </ul>
+
+          <p className="t-cap mt-6 text-mute">Chỉ dùng Google để xác minh bạn là ai.</p>
+        </main>
+      </div>
+
+      <aside className="relative hidden overflow-hidden lg:block" aria-hidden="true">
+        <Scene tone="grass" className="absolute left-[12%] top-[16%] h-[250px] w-[300px]" delay={150}><VideoCard /></Scene>
+        <Scene tone="sky" className="absolute bottom-[14%] right-[12%] h-[230px] w-[290px]" delay={350}><RankCard /></Scene>
+      </aside>
     </div>
   );
-  }
+}

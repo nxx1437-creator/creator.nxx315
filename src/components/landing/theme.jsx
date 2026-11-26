@@ -1,47 +1,31 @@
 import React from "react";
-import { Gamepad2 } from "lucide-react";
 
-/* Design tokens dùng chung */
-export const INK = "text-[#06251f]";
-export const GLASS =
-  "border border-white/80 bg-white/80 shadow-[0_12px_40px_-14px_rgba(6,78,59,0.25)] md:bg-white/70 md:backdrop-blur-xl";
-export const GRAD_TEXT =
-  "bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500 bg-clip-text text-transparent";
-
-export function Logo() {
+/* Token dùng chung cho trang giới thiệu */
+export function Logo({ dark = false }) {
   return (
     <span className="flex shrink-0 items-center gap-2 whitespace-nowrap">
-      <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 text-white shadow-lg shadow-emerald-500/30">
-        <Gamepad2 size={19} />
-      </span>
-      <span className={`text-base font-black tracking-tight sm:text-lg ${INK}`}>
-        Nxx315 <span className="text-emerald-600">Creator</span>
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+        <rect width="18" height="18" rx="3" fill={dark ? "#f0f0ee" : "#1a1a1a"} />
+        <path d="M6.5 5l6 4-6 4z" fill={dark ? "#1a1a1a" : "#f8f8f7"} />
+      </svg>
+      <span className={`text-[15px] tracking-head ${dark ? "text-[#f0f0ee]" : "text-ink"}`} style={{ fontWeight: 450 }}>
+        nxx315 <span className={dark ? "text-[#7c7c7c]" : "text-mute"}>creator</span>
       </span>
     </span>
   );
 }
 
-export function Eyebrow({ children, className = "" }) {
+/* Tiêu đề khu vực: nhỏ, thường, nằm trên một đường kẻ mảnh */
+export function SectionHead({ title, sub, children }) {
   return (
-    <span className={`inline-flex items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-emerald-700 ${className}`}>
-      <span className="h-px w-7 bg-emerald-600/50" />
-      {children}
-    </span>
-  );
-}
-
-export function SectionTitle({ eyebrow, title, sub, center = true }) {
-  return (
-    <div className={center ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}>
-      <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 className={`mt-4 text-3xl font-black tracking-tight sm:text-5xl ${INK}`}>{title}</h2>
-      {sub && <p className="mt-4 text-sm leading-relaxed text-slate-600 md:text-base">{sub}</p>}
+    <div className="rule-t pt-5">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div className="max-w-[549px]">
+          <h2 className="t-head text-ink">{title}</h2>
+          {sub && <p className="mt-3 text-[15px] leading-[1.6] text-mute">{sub}</p>}
+        </div>
+        {children}
+      </div>
     </div>
   );
 }
-
-export function GlassCard({ children, className = "" }) {
-  return <div className={`${GLASS} rounded-[1.75rem] ${className}`}>{children}</div>;
-}
-
-
